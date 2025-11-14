@@ -1,0 +1,71 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "image.ncl (Win)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "-d",
+        "windows",
+        "--dart-define",
+        "APP=examples/ncl/image.ncl"
+      ]
+    },
+    {
+      "name": "image.ncl (Web)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "-d",
+        "chrome",
+        "--dart-define",
+        "APP=examples/ncl/image.ncl"
+      ]
+    },
+    {
+      "name": "image.html (Win)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "-d",
+        "windows",
+        "--dart-define",
+        "APP=examples/html/image.html"
+      ]
+    },
+    {
+      "name": "image.html (Web)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "-d",
+        "chrome",
+        "--dart-define",
+        "APP=examples/html/image.html"
+      ]
+    },
+    {
+      "name": "CCWS current_service.html (Win)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "-d",
+        "windows",
+        "--dart-define",
+        "APP=examples/ccws/current_service.html"
+      ]
+    },
+    {
+      "name": "CCWS current_service.html (Web)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "-d",
+        "chrome",
+        "--dart-define",
+        "APP=examples/ccws/current_service.html"
+      ]
+    }
+  ]
+}

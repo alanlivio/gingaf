@@ -1,0 +1,33 @@
+name: gingaf
+description: multi-platform ginga player for web, mobile, and desktop
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  lua_dardo_plus: any
+  xml: ^6.3.0
+  shelf: ^1.4.1
+  shelf_router: ^1.1.4
+  service_worker: ^0.4.0
+  http: ^1.1.0
+  cupertino_icons: ^1.0.2
+  webview_all: ^1.0.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - examples/ncl/
+    - examples/html/
+    - examples/ccws/
+

@@ -1,0 +1,41 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+pubspec.lock
+
+# Android-related
+.gradle/
+local.properties
+*.apk
+*.aab
+
+# iOS-related
+Runner.xcworkspace/
+Pods/
+
+# Desktop-related
+windows/flutter/ephemeral/
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins.cmake
+windows/runner/GeneratedFiles/
+linux/flutter/ephemeral/
+macos/Flutter/ephemeral/
+
+# IDE-related
+.idea/
+*.swp
+*.swo
+*.DS_Store
+
+# others
+.agents/
+.metadata
+*.iml
+test_output_utf8.txt
+test_output.txt
+flutter_*.log
