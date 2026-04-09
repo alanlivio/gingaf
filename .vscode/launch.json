@@ -46,6 +46,28 @@
       ]
     },
     {
+      "name": "lua_canvas.ncl (Win)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "-d",
+        "windows",
+        "--dart-define",
+        "APP=examples/ncl/lua_canvas.ncl"
+      ]
+    },
+    {
+      "name": "lua_canvas.ncl (Web)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "-d",
+        "chrome",
+        "--dart-define",
+        "APP=examples/ncl/lua_canvas.ncl"
+      ]
+    },
+    {
       "name": "CCWS current_service.html (Win)",
       "request": "launch",
       "type": "dart",

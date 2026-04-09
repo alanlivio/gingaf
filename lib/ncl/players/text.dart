@@ -1,32 +1,19 @@
 import 'package:flutter/material.dart';
-import 'abstract.dart';
+import 'base.dart';
 
-class TextPlayer with Player {
-  static List<String> get handledMimeTypes => ['text/plain'];
-
-  @override
-  void init(String uri) {
-    this.uri = uri;
-  }
+class TextPlayer extends StatefulWidget {
+  final String uri;
+  const TextPlayer({super.key, required this.uri});
 
   @override
-  Future<void> start() async {
-    state = PlayerState.occurring;
-  }
+  State<TextPlayer> createState() => TextPlayerState();
+}
 
+class TextPlayerState extends PlayerState<TextPlayer> {
   @override
-  Future<void> stop() async {
-    state = PlayerState.sleeping;
-  }
-
-  @override
-  Future<void> pause() async {
-    state = PlayerState.paused;
-  }
-
-  @override
-  Future<void> resume() async {
-    state = PlayerState.occurring;
+  void initState() {
+    super.initState();
+    initPlayer(widget.uri);
   }
 
   @override

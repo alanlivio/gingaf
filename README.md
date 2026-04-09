@@ -1,4 +1,4 @@
-# Gingaf
+# gingaf
 
 Multi-platform Ginga engine implementation for Web and Desktop.
 
@@ -38,4 +38,3 @@ flutter run -d chrome --dart-define="APP=examples/html/image.html"
 ```powershell
 flutter run -d windows --dart-define="APP=examples/html/ccws-current-service.html"
 ```
-

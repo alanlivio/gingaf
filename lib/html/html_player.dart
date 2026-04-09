@@ -4,35 +4,23 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:webview_all/webview_all.dart';
 
+import '../ncl/players/base.dart';
+
 const RUNTIME = kIsWeb ? 'gingahtml(browser)' : 'gingahtml';
 
-class HTMLApp extends StatelessWidget {
+class HTMLPlayer extends StatefulWidget {
   final String uri;
-  final String? content;
   final void Function(JavaScriptMessage)? onMessageReceived;
-  const HTMLApp({super.key, required this.uri, this.content, this.onMessageReceived});
+
+  const HTMLPlayer({super.key, required this.uri, this.onMessageReceived});
 
   @override
-  Widget build(BuildContext context) {
-    return HTMLScreen(uri: uri, content: content, onMessageReceived: onMessageReceived);
-  }
+  State<HTMLPlayer> createState() => HTMLPlayerState();
 }
 
-class HTMLScreen extends StatefulWidget {
-  final String uri;
-  final String? content;
-  final void Function(JavaScriptMessage)? onMessageReceived;
-  const HTMLScreen({super.key, required this.uri, this.content, this.onMessageReceived});
-
-  @override
-  State<HTMLScreen> createState() => HTMLScreenState();
-}
-
-class HTMLScreenState extends State<HTMLScreen> {
+class HTMLPlayerState extends PlayerState<HTMLPlayer> {
   late final WebViewController _controller;
   bool _initialized = false;
-
-  WebViewController get controller => _controller;
 
   @override
   void initState() {
@@ -43,6 +31,9 @@ class HTMLScreenState extends State<HTMLScreen> {
         print("$RUNTIME: GingaBridge message: ${message.message}");
         widget.onMessageReceived?.call(message);
       });
+
+    initPlayer(widget.uri);
+    _loadHTML();
   }
 
   @override
@@ -71,14 +62,11 @@ class HTMLScreenState extends State<HTMLScreen> {
 
   Future<void> _loadHTML() async {
     try {
-      String content;
-      if (widget.content != null) {
-        content = widget.content!;
-      } else {
-        content = await _loadContent(widget.uri);
-      }
+      final String content = await _loadContent(widget.uri);
       await _controller.loadHtmlString(content);
-      setState(() => _initialized = true);
+      if (mounted) {
+        setState(() => _initialized = true);
+      }
     } catch (e) {
       print("$RUNTIME: Error loading ${widget.uri}: $e");
       final errorHtml = """
@@ -92,7 +80,9 @@ class HTMLScreenState extends State<HTMLScreen> {
         </html>
       """;
       await _controller.loadHtmlString(errorHtml);
-      setState(() => _initialized = true);
+      if (mounted) {
+        setState(() => _initialized = true);
+      }
     }
   }
 

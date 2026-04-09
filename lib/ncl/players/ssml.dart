@@ -1,32 +1,19 @@
 import 'package:flutter/material.dart';
-import 'abstract.dart';
+import 'base.dart';
 
-class SsmlPlayer with Player {
-  static List<String> get handledMimeTypes => ['application/ssml+xml'];
-
-  @override
-  void init(String uri) {
-    this.uri = uri;
-  }
+class SsmlPlayer extends StatefulWidget {
+  final String uri;
+  const SsmlPlayer({super.key, required this.uri});
 
   @override
-  Future<void> start() async {
-    state = PlayerState.occurring;
-  }
+  State<SsmlPlayer> createState() => SsmlPlayerState();
+}
 
+class SsmlPlayerState extends PlayerState<SsmlPlayer> {
   @override
-  Future<void> stop() async {
-    state = PlayerState.sleeping;
-  }
-
-  @override
-  Future<void> pause() async {
-    state = PlayerState.paused;
-  }
-
-  @override
-  Future<void> resume() async {
-    state = PlayerState.occurring;
+  void initState() {
+    super.initState();
+    initPlayer(widget.uri);
   }
 
   @override
