@@ -9,7 +9,7 @@
         "-d",
         "windows",
         "--dart-define",
-        "APP=examples/ncl/image.ncl"
+        "APP=examples_ncl/image.ncl"
       ]
     },
     {
@@ -20,7 +20,7 @@
         "-d",
         "chrome",
         "--dart-define",
-        "APP=examples/ncl/image.ncl"
+        "APP=examples_ncl/image.ncl"
       ]
     },
     {
@@ -31,7 +31,7 @@
         "-d",
         "windows",
         "--dart-define",
-        "APP=examples/html/image.html"
+        "APP=examples_html/image.html"
       ]
     },
     {
@@ -42,7 +42,7 @@
         "-d",
         "chrome",
         "--dart-define",
-        "APP=examples/html/image.html"
+        "APP=examples_html/image.html"
       ]
     },
     {
@@ -53,7 +53,7 @@
         "-d",
         "windows",
         "--dart-define",
-        "APP=examples/ncl/lua_canvas.ncl"
+        "APP=examples_ncl/lua_canvas.ncl"
       ]
     },
     {
@@ -64,7 +64,7 @@
         "-d",
         "chrome",
         "--dart-define",
-        "APP=examples/ncl/lua_canvas.ncl"
+        "APP=examples_ncl/lua_canvas.ncl"
       ]
     },
     {
@@ -75,7 +75,7 @@
         "-d",
         "windows",
         "--dart-define",
-        "APP=examples/ccws/current_service.html"
+        "APP=examples_html/current_service.html"
       ]
     },
     {
@@ -86,7 +86,7 @@
         "-d",
         "chrome",
         "--dart-define",
-        "APP=examples/ccws/current_service.html"
+        "APP=examples_html/current_service.html"
       ]
     }
   ]

@@ -9,8 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  lua_dardo_plus: any
-  xml: ^6.3.0
+  ncl_vm:
+    path: ./ncl_vm
+  xml: 7.0.1
   shelf: ^1.4.1
   shelf_router: ^1.1.4
   service_worker: ^0.4.0
@@ -27,7 +28,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - examples/ncl/
-    - examples/html/
-    - examples/ccws/
+    - examples_ncl/
+    - examples_html/
 
