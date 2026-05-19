@@ -2,23 +2,22 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:ncl_app/widgets/base.dart';
 import 'package:webview_all/webview_all.dart';
-
-import '../ncl/players/base.dart';
 
 const RUNTIME = kIsWeb ? 'gingahtml(browser)' : 'gingahtml';
 
-class HTMLPlayer extends StatefulWidget {
+class HTMLApp extends StatefulWidget {
   final String uri;
   final void Function(JavaScriptMessage)? onMessageReceived;
 
-  const HTMLPlayer({super.key, required this.uri, this.onMessageReceived});
+  const HTMLApp({super.key, required this.uri, this.onMessageReceived});
 
   @override
-  State<HTMLPlayer> createState() => HTMLPlayerState();
+  State<HTMLApp> createState() => HTMLAppState();
 }
 
-class HTMLPlayerState extends PlayerState<HTMLPlayer> {
+class HTMLAppState extends PlayerState<HTMLApp> {
   late final WebViewController _controller;
   bool _initialized = false;
 

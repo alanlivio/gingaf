@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gingaf/html/html_player.dart';
+import 'package:gingaf/html_app.dart';
 import 'package:integration_test/integration_test.dart';
 
 class MockHTMLAssetBundle extends CachingAssetBundle {
@@ -48,7 +48,7 @@ void main() {
         home: Material(
           child: DefaultAssetBundle(
             bundle: mockBundle,
-            child: HTMLPlayer(
+            child: HTMLApp(
               uri: "test_status.html",
               onMessageReceived: (message) {
                 if (!completer.isCompleted) {
@@ -65,6 +65,6 @@ void main() {
     final result = await completer.future.timeout(const Duration(seconds: 10));
 
     expect(result, equals("BRIDGE_READY"));
-    expect(find.byType(HTMLPlayer), findsOneWidget);
+    expect(find.byType(HTMLApp), findsOneWidget);
   });
 }

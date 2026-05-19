@@ -18,6 +18,8 @@ class TextPlayerState extends PlayerState<TextPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("TextPlayer: Not Implemented", style: TextStyle(color: Colors.red)));
+    return const Center(
+        child: Text("TextPlayer: Not Implemented",
+            style: TextStyle(color: Colors.red)));
   }
 }

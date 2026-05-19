@@ -13,8 +13,7 @@ void main() {
       expect(GingaConfig('APP.HTML').appPath, 'APP.HTML');
     });
 
-    test('Constructor should capture CCWS environment (true by default)',
-        () {
+    test('Constructor should capture CCWS environment (true by default)', () {
       final config = GingaConfig('app.ncl');
       expect(config.enableCCWS, isTrue);
     });

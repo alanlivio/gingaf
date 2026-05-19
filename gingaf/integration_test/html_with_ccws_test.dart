@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gingaf/ccws/ccws.dart';
-import 'package:gingaf/ccws/router.dart';
-import 'package:gingaf/html/html_player.dart';
+import 'package:ccws/ccws.dart';
+import 'package:ccws/router.dart';
 import 'package:integration_test/integration_test.dart';
+
+import '../lib/html_app.dart';
 
 class MockCCWSAssetBundle extends CachingAssetBundle {
   @override
@@ -80,7 +81,7 @@ void main() {
           home: Material(
             child: DefaultAssetBundle(
               bundle: mockBundle,
-              child: HTMLPlayer(
+              child: HTMLApp(
                 uri: "test_ccws.html",
                 onMessageReceived: (message) {
                   if (!completer.isCompleted) {

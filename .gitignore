@@ -19,12 +19,12 @@ Runner.xcworkspace/
 Pods/
 
 # Desktop-related
-windows/flutter/ephemeral/
-windows/flutter/generated_plugin_registrant.h
-windows/flutter/generated_plugins.cmake
-windows/runner/GeneratedFiles/
-linux/flutter/ephemeral/
-macos/Flutter/ephemeral/
+**/windows/flutter/ephemeral/
+**/windows/flutter/generated_plugin_registrant.h
+**/windows/flutter/generated_plugins.cmake
+**/windows/runner/GeneratedFiles/
+**/linux/flutter/ephemeral/
+**/macos/Flutter/ephemeral/
 
 # IDE-related
 .idea/

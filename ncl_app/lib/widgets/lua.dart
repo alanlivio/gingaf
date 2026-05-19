@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ncl_vm/ncl_vm.dart';
+import 'package:ncl_vm/ncl_vm.dart' hide State;
 import 'base.dart';
 
 class LuaPlayer extends StatefulWidget {
@@ -11,19 +11,19 @@ class LuaPlayer extends StatefulWidget {
 }
 
 class LuaPlayerState extends PlayerState<LuaPlayer> {
-  late NCLuaEngine _engine;
+  late NCLua _engine;
   final CanvasState canvasState = CanvasState();
 
   @override
   void initState() {
     super.initState();
     initPlayer(widget.uri);
-    _engine = NCLuaEngine(delegate: canvasState);
-    
+    _engine = NCLua(delegate: canvasState);
+
     canvasState.onUpdate = () {
       if (mounted) setState(() {});
     };
-    
+
     _runScript();
   }
 

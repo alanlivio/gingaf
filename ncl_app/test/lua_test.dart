@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gingaf/ncl/ncl_player.dart';
-import 'package:gingaf/ncl/players/lua.dart';
+
+import '../lib/widgets/lua.dart';
+import '../lib/ncl_app.dart';
 
 class MockAssetBundle extends CachingAssetBundle {
   final Map<String, String> assets;
@@ -52,14 +53,14 @@ c:drawRect("fill", 110, 110, 20, 20)
       MaterialApp(
         home: DefaultAssetBundle(
           bundle: mockBundle,
-          child: const NCLPlayer(uri: 'test.ncl'),
+          child: const NCLApp(uri: 'test.ncl'),
         ),
       ),
     );
 
     await tester.pumpAndSettle();
 
-    expect(find.byType(NCLPlayer), findsOneWidget);
+    expect(find.byType(NCLApp), findsOneWidget);
   });
 
   group('LuaPlayer Standalone Unit Tests', () {

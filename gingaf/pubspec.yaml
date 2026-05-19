@@ -9,13 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  ncl_vm:
-    path: ./ncl_vm
-  xml: 7.0.1
-  shelf: ^1.4.1
-  shelf_router: ^1.1.4
-  service_worker: ^0.4.0
-  http: ^1.1.0
+  ncl_app:
+    path: ../ncl_app
+  ccws:
+    path: ../ccws
   cupertino_icons: ^1.0.2
   webview_all: ^1.0.3
 
@@ -24,10 +21,9 @@ dev_dependencies:
     sdk: flutter
   integration_test:
     sdk: flutter
+  test: ^1.29.0
 
 flutter:
   uses-material-design: true
   assets:
-    - examples_ncl/
-    - examples_html/
-
+    - examples/

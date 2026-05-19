@@ -24,23 +24,23 @@ flutter run -d <device> --dart-define="APP=<path_to_file>"
 **NCL Runtime:**
 
 ```powershell
-flutter run -d windows --dart-define="APP=examples_ncl/image.ncl"
+flutter run -d windows --dart-define="APP=examples/image.ncl"
 ```
 
 **HTML Runtime (Chrome):**
 
 ```powershell
-flutter run -d chrome --dart-define="APP=examples_html/image.html"
+flutter run -d chrome --dart-define="APP=examples/image.html"
 ```
 
 **HTML Runtime (Windows):**
 
 ```powershell
-flutter run -d windows --dart-define="APP=examples_html/current_service.html"
+flutter run -d windows --dart-define="APP=examples/current_service.html"
 ```
 
 **Headless NCL Validation (CLI):**
 
 ```powershell
-dart ./ncl_vm/lib/main.dart ./examples_ncl/image.ncl
+dart ./ncl_vm/lib/main.dart ./gingaf/examples/image.ncl
 ```

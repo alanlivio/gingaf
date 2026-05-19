@@ -18,6 +18,8 @@ class SsmlPlayerState extends PlayerState<SsmlPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("SsmlPlayer: Not Implemented", style: TextStyle(color: Colors.red)));
+    return const Center(
+        child: Text("SsmlPlayer: Not Implemented",
+            style: TextStyle(color: Colors.red)));
   }
 }

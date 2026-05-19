@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gingaf/ncl/ncl_player.dart';
+
+import '../lib/ncl_app.dart';
 
 class MockNCLAssetBundle extends CachingAssetBundle {
   @override
@@ -26,7 +27,7 @@ class MockNCLAssetBundle extends CachingAssetBundle {
 }
 
 void main() {
-  testWidgets('Verify NCLPlayer launches with branding logo',
+  testWidgets('Verify NCLApp launches with branding logo',
       (WidgetTester tester) async {
     final mockBundle = MockNCLAssetBundle();
 
@@ -35,12 +36,12 @@ void main() {
         home: Material(
           child: DefaultAssetBundle(
             bundle: mockBundle,
-            child: NCLPlayer(uri: "test_image.ncl"),
+            child: NCLApp(uri: "test_image.ncl"),
           ),
         ),
       ),
     );
     await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byType(NCLPlayer), findsOneWidget);
+    expect(find.byType(NCLApp), findsOneWidget);
   });
 }

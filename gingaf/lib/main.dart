@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
-import 'ccws/ccws.dart';
-import 'html/html_player.dart' as html;
-import 'ncl/ncl_player.dart' as ncl;
+import 'package:ccws/ccws.dart';
+import 'html_app.dart' as html;
+import 'package:ncl_app/ncl_app.dart' as ncl;
 
 const GINGA = 'gingaf';
 const USAGE = '''
@@ -156,9 +156,9 @@ class MainScreen extends StatelessWidget {
     }
 
     if (appPath!.toLowerCase().endsWith('.html')) {
-      return html.HTMLPlayer(uri: appPath!);
+      return html.HTMLApp(uri: appPath!);
     } else {
-      return ncl.NCLPlayer(uri: appPath!);
+      return ncl.NCLApp(uri: appPath!);
     }
   }
 }

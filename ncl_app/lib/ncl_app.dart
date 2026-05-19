@@ -1,22 +1,20 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:ncl_vm/ncl_vm.dart' hide State;
 
-import 'ncl_parser.dart';
-import 'players/base.dart';
+import 'widgets/base.dart';
 
 const RUNTIME = kIsWeb ? 'gingancl(browser)' : 'gingancl';
 
-class NCLPlayer extends StatefulWidget {
+class NCLApp extends StatefulWidget {
   final String uri;
-  const NCLPlayer({super.key, required this.uri});
+  const NCLApp({super.key, required this.uri});
 
   @override
-  State<NCLPlayer> createState() => NCLPlayerState();
+  State<NCLApp> createState() => NCLAppState();
 }
 
-class NCLPlayerState extends PlayerState<NCLPlayer> {
+class NCLAppState extends PlayerState<NCLApp> {
   final List<Widget> _activePlayers = [];
   String errorMsg = "";
   String runtimeStatus = "Initializing...";
@@ -27,7 +25,6 @@ class NCLPlayerState extends PlayerState<NCLPlayer> {
     initPlayer(widget.uri);
     _startApplication();
   }
-
 
   Future<void> _startApplication() async {
     try {
@@ -44,21 +41,26 @@ class NCLPlayerState extends PlayerState<NCLPlayer> {
           ? widget.uri.substring(0, widget.uri.lastIndexOf('/') + 1)
           : "";
 
-      final nclDoc = NCLParser.parse(nclData);
+      final nclVM = NCLVM(nclData);
+      final document = nclVM.document;
+      final ports = document.elements.whereType<Port>().toList();
 
       if (mounted) {
-        setState(() => runtimeStatus = "Parsing Ports (${nclDoc.portList.length})...");
+        setState(() => runtimeStatus = "Parsing Ports (${ports.length})...");
       }
 
-      for (var port in nclDoc.portList) {
-        final media = nclDoc.mediaList.firstWhere(
-          (m) => m.id == port.component,
-          orElse: () => throw Exception(
-              "Media component '${port.component}' referenced by port '${port.id}' not found"),
-        );
+      for (var port in ports) {
+        final componentId = port.component;
+        if (componentId == null || componentId.isEmpty) continue;
 
-        final src = media.src;
-        String? mimeType = media.type;
+        final media = document.getNodeById(componentId);
+        if (media == null || media is! Media) {
+          throw Exception(
+              "Media component '$componentId' referenced by port '${port.id}' not found");
+        }
+
+        final src = media.rawAttributes['src'] ?? '';
+        String? mimeType = media.rawAttributes['type'];
         if (mimeType == null || mimeType.isEmpty) {
           mimeType = PlayerFactory.getMimeTypeFromExtension(src);
         }
@@ -67,11 +69,14 @@ class NCLPlayerState extends PlayerState<NCLPlayer> {
           setState(() => runtimeStatus = "Launching: $src ($mimeType)");
         }
 
-        final contentPath = src.startsWith('http') ? src : (src.contains('/') ? src : "$nclBase$src");
-        
+        final contentPath = src.startsWith('http')
+            ? src
+            : (src.contains('/') ? src : "$nclBase$src");
+
         if (mounted) {
           setState(() {
-            final playerWidget = PlayerFactory.createPlayer(mimeType!, contentPath);
+            final playerWidget =
+                PlayerFactory.createPlayer(mimeType!, contentPath);
             if (playerWidget != null) {
               _activePlayers.add(playerWidget);
             }
