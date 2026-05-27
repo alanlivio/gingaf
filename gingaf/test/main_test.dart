@@ -33,11 +33,11 @@ void main() {
     });
   });
 
-  group('MainScreen Integration Rendering', () {
-    testWidgets('MainScreen shows usage when appPath is null',
+  group('Ginga Integration Rendering', () {
+    testWidgets('Ginga shows usage when appPath is null',
         (WidgetTester tester) async {
-      await tester.pumpWidget(const MaterialApp(
-        home: MainScreen(appPath: null),
+      await tester.pumpWidget(Ginga(
+        config: GingaConfig(null),
       ));
 
       expect(find.textContaining('Usage:'), findsOneWidget);

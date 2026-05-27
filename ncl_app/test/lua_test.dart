@@ -63,8 +63,8 @@ c:drawRect("fill", 110, 110, 20, 20)
     expect(find.byType(NCLApp), findsOneWidget);
   });
 
-  group('LuaPlayer Standalone Unit Tests', () {
-    testWidgets('LuaPlayer should process multiple drawing commands',
+  group('LuaWidget Standalone Unit Tests', () {
+    testWidgets('LuaWidget should process multiple drawing commands',
         (WidgetTester tester) async {
       final mockBundle = MockAssetBundle(assets: sharedAssets);
 
@@ -72,14 +72,13 @@ c:drawRect("fill", 110, 110, 20, 20)
         MaterialApp(
           home: DefaultAssetBundle(
             bundle: mockBundle,
-            child: const LuaPlayer(uri: 'test.lua'),
+            child: const LuaWidget(uri: 'test.lua'),
           ),
         ),
       );
-      // Allow async loadContent and Lua execution to complete
       await tester.pumpAndSettle();
 
-      final state = tester.state<LuaPlayerState>(find.byType(LuaPlayer));
+      final state = tester.state<LuaWidgetState>(find.byType(LuaWidget));
 
       final commands = state.canvasState.commands;
       expect(commands.length, 3);

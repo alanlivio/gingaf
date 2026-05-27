@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:ncl_doc/ncl_document.dart' hide State;
 import 'base.dart';
 
-class ImagePlayer extends StatefulWidget {
+class ImageWidget extends StatefulWidget {
   final String uri;
-  const ImagePlayer({super.key, required this.uri});
+  final Media? media;
+  const ImageWidget({super.key, required this.uri, this.media});
 
   @override
-  State<ImagePlayer> createState() => ImagePlayerState();
+  State<ImageWidget> createState() => ImageWidgetState();
 }
 
-class ImagePlayerState extends PlayerState<ImagePlayer> {
+class ImageWidgetState extends BaseWidgetState<ImageWidget> {
   @override
   void initState() {
     super.initState();
     initPlayer(widget.uri);
+    parseAttributes(widget.media);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildWidgetContent(BuildContext context) {
     return Center(
       child: Image.network(
         uri,

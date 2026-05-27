@@ -1,20 +1,18 @@
 import 'package:xml/xml.dart';
 import 'schema.dart';
 import 'xml_elements.dart';
-import 'document.dart';
+import 'ncl_document.dart';
 
 class NCLParser {
   final Schema schema = Schema();
 
   NCLParser();
 
-  Document parseString(String xmlString) {
+  NCLDocument parseString(String xmlString) {
     final document = XmlDocument.parse(xmlString);
     final root = document.rootElement;
     final rootElement = _parseNode(root);
 
-    // For now, return a flat list of all parsed elements to keep compatibility with existing tests
-    // but ensured they have their children populated.
     final allElements = <NCLXMLElement>[];
     void collect(NCLXMLElement e) {
       allElements.add(e);
@@ -27,7 +25,7 @@ class NCLParser {
       collect(rootElement);
     }
 
-    return Document(allElements);
+    return NCLDocument.fromElements(allElements);
   }
 
   NCLXMLElement? _parseNode(XmlElement node) {

@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:ncl_vm/ncl_vm.dart';
+import 'package:ncl_doc/ncl_document.dart';
 
 void main() {
   group('NCLua Tests', () {

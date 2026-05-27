@@ -1,36 +1,97 @@
-/// Support for NCL execution in headless mode.
-library ncl_vm;
+library ncl_document;
 
 import 'dart:async';
-import 'parser.dart';
-import 'document.dart';
 import 'xml_elements.dart';
+import 'parser.dart';
+
+import 'event.dart';
 
 export 'xml_elements.dart';
 export 'parser.dart';
-export 'document.dart';
 export 'lua.dart';
+export 'event.dart';
 
-class NCLVM {
-  final NCLParser _parser = NCLParser();
-  late final Document document;
+enum State { OCCURRING, PAUSED, SLEEPING }
+
+class NCLDocument {
+  final List<NCLXMLElement> elements;
+  Context? _root;
+  Settings? _settings;
+
   int virtualClock = 0;
   final List<Action> _actionQueue = [];
   Timer? _timer;
 
-  NCLVM(String xml) {
-    document = _parser.parseString(xml);
+  NCLDocument(String xml) : elements = <NCLXMLElement>[] {
+    final parsed = NCLParser().parseString(xml);
+    elements.addAll(parsed.elements);
+    _initializeRootAndSettings();
+    _setupEventStateListeners();
     _processPorts();
   }
 
-  NCLVM.fromDocument(this.document) {
+  NCLDocument.fromElements([List<NCLXMLElement>? initialElements])
+      : elements = initialElements != null
+            ? List<NCLXMLElement>.from(initialElements)
+            : <NCLXMLElement>[] {
+    _initializeRootAndSettings();
+    _setupEventStateListeners();
     _processPorts();
+  }
+
+  void _initializeRootAndSettings() {
+    final contexts = elements.whereType<Context>();
+    if (contexts.isNotEmpty) {
+      _root = contexts.first;
+    } else {
+      _root = Context(id: '__root__');
+      elements.add(_root!);
+    }
+
+    final settingsList = elements.whereType<Settings>();
+    if (settingsList.isNotEmpty) {
+      _settings = settingsList.first;
+    } else {
+      _settings = Settings(id: 'default_settings');
+      _root!.children.add(_settings!);
+      _settings!.parent = _root;
+      elements.add(_settings!);
+    }
+
+    for (var node in elements.whereType<Node>()) {
+      for (var child in node.children.whereType<Property>()) {
+        if (child.name != null && child.value != null) {
+          node.setProperty(child.name!, child.value!);
+        }
+      }
+    }
+  }
+
+  Context? getRoot() => _root;
+
+  Settings? getSettings() => _settings;
+
+  Node? getNodeById(String id) {
+    final nodes = elements.whereType<Node>().where((n) => n.id == id);
+    return nodes.isEmpty ? null : nodes.first;
+  }
+
+  void _setupEventStateListeners() {
+    for (var node in elements.whereType<Node>()) {
+      node.lambda.addStateListener((oldState, newState) {
+        print(
+          '[Clock: $virtualClock] Node "${node.id}" changed state: '
+          '${Event.getEventStateAsString(oldState)} -> ${Event.getEventStateAsString(newState)}',
+        );
+        _triggerLinks(node.id, newState);
+      });
+    }
   }
 
   void _processPorts() {
-    for (var port in document.elements.whereType<Port>()) {
+    for (var port in elements.whereType<Port>()) {
       if (port.component != null) {
-        final node = document.getNodeById(port.component!);
+        final node = getNodeById(port.component!);
         if (node != null) {
           node.startTimestamp = 0;
           final event = node.lambda;
@@ -41,23 +102,14 @@ class NCLVM {
   }
 
   State getLambdaState(String targetId) {
-    final node = document.getNodeById(targetId);
+    final node = getNodeById(targetId);
     return node?.lambda.state ?? State.SLEEPING;
   }
 
   void setEventState(String targetId, State newState) {
-    final node = document.getNodeById(targetId);
+    final node = getNodeById(targetId);
     if (node == null) return;
-
-    final currentState = node.lambda.state;
-    if (currentState == newState) return;
-
     node.lambda.state = newState;
-    print(
-      '[Clock: $virtualClock] Node "$targetId" changed state: '
-      '${Event.getEventStateAsString(currentState)} -> ${Event.getEventStateAsString(newState)}',
-    );
-    _triggerLinks(targetId, newState);
   }
 
   void tick([int increment = 1]) {
@@ -70,31 +122,20 @@ class NCLVM {
     while (_actionQueue.isNotEmpty &&
         _actionQueue.first.event.targetNode.startTimestamp <= time) {
       final actionItem = _actionQueue.removeAt(0);
-
       virtualClock = actionItem.event.targetNode.startTimestamp;
-
-      final currentState = getLambdaState(actionItem.event.targetNode.id);
-      final nextState = actionItem.event.doAction(actionItem.action);
-
-      if (currentState != nextState) {
-        print(
-          '[Clock: $virtualClock] Node "${actionItem.event.targetNode.id}" changed state: '
-          '${Event.getEventStateAsString(currentState)} -> ${Event.getEventStateAsString(nextState)}',
-        );
-        _triggerLinks(actionItem.event.targetNode.id, nextState);
-      }
+      actionItem.event.doAction(actionItem.action);
     }
 
     virtualClock = time;
   }
 
   void _triggerLinks(String targetId, State newState) {
-    final node = document.getNodeById(targetId);
+    final node = getNodeById(targetId);
     final context = node?.parent;
 
     final links = context is Context
         ? context.links
-        : document.elements.whereType<Link>().toList();
+        : elements.whereType<Link>().toList();
 
     for (var link in links) {
       bool triggered = false;
@@ -113,7 +154,7 @@ class NCLVM {
           (b) => b.role == 'start',
         )) {
           if (bind.component != null) {
-            final bindNode = document.getNodeById(bind.component!);
+            final bindNode = getNodeById(bind.component!);
             if (bindNode != null) {
               bindNode.startTimestamp = virtualClock;
               final event = bindNode.lambda;

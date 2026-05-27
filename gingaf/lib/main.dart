@@ -17,10 +17,14 @@ Usage:
 
 class GingaConfig {
   final String? appPath;
+  final String? videoUri;
   final bool enableCCWS;
 
-  GingaConfig([String? manualPath, bool? manualCCWS])
+  GingaConfig([String? manualPath, bool? manualCCWS, String? manualVideo])
       : appPath = _resolve(manualPath),
+        videoUri = manualVideo ?? (const String.fromEnvironment('VIDEO').isNotEmpty
+            ? const String.fromEnvironment('VIDEO')
+            : null),
         enableCCWS = manualCCWS ??
             const bool.fromEnvironment('CCWS', defaultValue: true);
 
@@ -92,19 +96,23 @@ void main() {
     }
   }
 
-  runApp(GingaApp(config: config));
+  runApp(Ginga(config: config));
 }
 
-class GingaApp extends StatefulWidget {
+class Ginga extends StatefulWidget {
   final GingaConfig config;
-  const GingaApp({super.key, required this.config});
+  const Ginga({super.key, required this.config});
 
   @override
-  State<GingaApp> createState() => _GingaAppState();
+  State<Ginga> createState() => _GingaState();
 }
 
-class _GingaAppState extends State<GingaApp> {
+class _GingaState extends State<Ginga> {
   late final CCWS _ccws;
+  late final MainAVController mainAVController;
+  late final Widget main_av_widget;
+  Widget? ginga_html_app;
+  Widget? ginga_ncl_app;
 
   @override
   void initState() {
@@ -113,6 +121,28 @@ class _GingaAppState extends State<GingaApp> {
     print('$GINGA: CCWS enabled: ${widget.config.enableCCWS}');
     if (widget.config.enableCCWS) {
       _ccws.start();
+    }
+
+    mainAVController = MainAVController()..setVideoUri(widget.config.videoUri);
+    main_av_widget = MainAVWidget(controller: mainAVController);
+
+    final path = widget.config.appPath;
+    if (path != null) {
+      if (path.toLowerCase().endsWith('.html')) {
+        ginga_html_app = html.HTMLApp(
+          uri: path,
+          onBackgroundVideoChanged: (newUri) {
+            mainAVController.setVideoUri(newUri);
+          },
+        );
+      } else {
+        ginga_ncl_app = ncl.NCLApp(
+          uri: path,
+          onBackgroundVideoChanged: (newUri) {
+            mainAVController.setVideoUri(newUri);
+          },
+        );
+      }
     }
   }
 
@@ -126,6 +156,7 @@ class _GingaAppState extends State<GingaApp> {
 
   @override
   Widget build(BuildContext context) {
+    final showUsage = ginga_html_app == null && ginga_ncl_app == null;
     return MaterialApp(
       title: 'gingaf',
       themeMode: ThemeMode.light,
@@ -133,32 +164,108 @@ class _GingaAppState extends State<GingaApp> {
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.grey[200],
       ),
-      home: MainScreen(appPath: widget.config.appPath),
+      home: Scaffold(
+        body: showUsage
+            ? const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text(USAGE, textAlign: TextAlign.center),
+                ),
+              )
+            : Stack(
+                fit: StackFit.expand,
+                children: [
+                  main_av_widget,
+                  if (ginga_html_app != null) ginga_html_app!,
+                  if (ginga_ncl_app != null) ginga_ncl_app!,
+                ],
+              ),
+      ),
     );
   }
 }
 
-class MainScreen extends StatelessWidget {
-  final String? appPath;
-  const MainScreen({super.key, this.appPath});
+class MainAVController extends ChangeNotifier {
+  String? _uri;
+  bool _isPlaying = true;
+
+  String? get uri => _uri;
+  bool get isPlaying => _isPlaying;
+
+  void setVideoUri(String? val) {
+    if (_uri != val) {
+      _uri = val;
+      notifyListeners();
+    }
+  }
+
+  void play() {
+    if (!_isPlaying) {
+      _isPlaying = true;
+      notifyListeners();
+    }
+  }
+
+  void stop() {
+    if (_isPlaying) {
+      _isPlaying = false;
+      notifyListeners();
+    }
+  }
+}
+
+class MainAVWidget extends StatefulWidget {
+  final MainAVController controller;
+
+  const MainAVWidget({super.key, required this.controller});
+
+  @override
+  State<MainAVWidget> createState() => _MainAVWidgetState();
+}
+
+class _MainAVWidgetState extends State<MainAVWidget> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onControllerChange);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onControllerChange);
+    super.dispose();
+  }
+
+  void _onControllerChange() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (appPath == null) {
-      return const Scaffold(
-        body: Center(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Text(USAGE, textAlign: TextAlign.center),
-          ),
-        ),
-      );
+    final uri = widget.controller.uri;
+    final isPlaying = widget.controller.isPlaying;
+
+    if (uri == null || uri.isEmpty || !isPlaying) {
+      return Container(color: Colors.black);
     }
 
-    if (appPath!.toLowerCase().endsWith('.html')) {
-      return html.HTMLApp(uri: appPath!);
-    } else {
-      return ncl.NCLApp(uri: appPath!);
-    }
+    return Container(
+      color: Colors.black,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.movie, size: 64, color: Colors.white70),
+            const SizedBox(height: 8),
+            Text(
+              "Playing Background AV: $uri",
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

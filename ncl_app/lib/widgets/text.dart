@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:ncl_doc/ncl_document.dart' hide State;
 import 'base.dart';
 
-class TextPlayer extends StatefulWidget {
+class TextWidget extends StatefulWidget {
   final String uri;
-  const TextPlayer({super.key, required this.uri});
+  final Media? media;
+  const TextWidget({super.key, required this.uri, this.media});
 
   @override
-  State<TextPlayer> createState() => TextPlayerState();
+  State<TextWidget> createState() => TextWidgetState();
 }
 
-class TextPlayerState extends PlayerState<TextPlayer> {
+class TextWidgetState extends BaseWidgetState<TextWidget> {
   @override
   void initState() {
     super.initState();
     initPlayer(widget.uri);
+    parseAttributes(widget.media);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildWidgetContent(BuildContext context) {
     return const Center(
-        child: Text("TextPlayer: Not Implemented",
+        child: Text("TextWidget: Not Implemented",
             style: TextStyle(color: Colors.red)));
   }
 }

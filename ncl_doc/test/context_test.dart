@@ -1,4 +1,4 @@
-import 'package:ncl_vm/ncl_vm.dart';
+import 'package:ncl_doc/ncl_document.dart';
 import 'package:test/test.dart';
 
 void main() {

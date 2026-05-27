@@ -9,8 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  ncl_vm:
-    path: ../ncl_vm
+  ncl_doc:
+    path: ../ncl_doc
 
 dev_dependencies:
   flutter_test:

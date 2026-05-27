@@ -9,15 +9,16 @@ const RUNTIME = kIsWeb ? 'gingahtml(browser)' : 'gingahtml';
 
 class HTMLApp extends StatefulWidget {
   final String uri;
+  final void Function(String? uri)? onBackgroundVideoChanged;
   final void Function(JavaScriptMessage)? onMessageReceived;
 
-  const HTMLApp({super.key, required this.uri, this.onMessageReceived});
+  const HTMLApp({super.key, required this.uri, this.onBackgroundVideoChanged, this.onMessageReceived});
 
   @override
   State<HTMLApp> createState() => HTMLAppState();
 }
 
-class HTMLAppState extends PlayerState<HTMLApp> {
+class HTMLAppState extends BaseWidgetState<HTMLApp> {
   late final WebViewController _controller;
   bool _initialized = false;
 
@@ -28,6 +29,11 @@ class HTMLAppState extends PlayerState<HTMLApp> {
       ..setBackgroundColor(const Color(0x00000000))
       ..addJavaScriptChannel("GingaBridge", onMessageReceived: (message) {
         print("$RUNTIME: GingaBridge message: ${message.message}");
+        final msg = message.message;
+        if (msg.startsWith("SET_VIDEO_URI:")) {
+          final newUri = msg.substring("SET_VIDEO_URI:".length).trim();
+          widget.onBackgroundVideoChanged?.call(newUri);
+        }
         widget.onMessageReceived?.call(message);
       });
 
@@ -86,7 +92,7 @@ class HTMLAppState extends PlayerState<HTMLApp> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildWidgetContent(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: const Text("ginga-html")),

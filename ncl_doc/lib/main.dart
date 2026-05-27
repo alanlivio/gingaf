@@ -1,11 +1,11 @@
 // lib/main.dart
 import 'dart:io';
-import 'ncl_vm.dart';
+import 'ncl_document.dart';
 
 void main(List<String> arguments) {
-  print('NCL-VM Headless CLI');
+  print('NCL Document Headless CLI');
   if (arguments.isEmpty) {
-    print('Usage: ncl-vm <file.ncl>');
+    print('Usage: ncl-doc <file.ncl>');
     exit(1);
   }
 
@@ -31,6 +31,6 @@ void main(List<String> arguments) {
 
   print('Validation passed. Starting headless execution...');
 
-  var vm = NCLVM(content);
-  vm.start(ticksPerSecond: 1000);
+  var document = NCLDocument(content);
+  document.start(ticksPerSecond: 1000);
 }

@@ -1,5 +1,5 @@
-name: ncl_vm
-description: "A pure Dart implementation of the Nested Context Language (NCL) virtual machine."
+name: ncl_doc
+description: "A pure Dart implementation of the Nested Context Language (NCL) document model."
 version: 0.0.1
 
 environment:

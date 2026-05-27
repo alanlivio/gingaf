@@ -1,5 +1,4 @@
-import 'package:ncl_vm/parser.dart';
-import 'package:ncl_vm/xml_elements.dart';
+import 'package:ncl_doc/ncl_document.dart';
 import 'package:test/test.dart';
 
 void main() {

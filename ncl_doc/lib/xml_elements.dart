@@ -1,6 +1,6 @@
 // lib/xml_elements.dart
 
-import 'document.dart';
+import 'ncl_document.dart';
 
 class NCLXMLElement {
   final Map<String, String> rawAttributes;
@@ -64,6 +64,8 @@ abstract class Node extends NCLXMLElement {
     type: EventType.PRESENTATION,
     targetNode: this,
   );
+
+  Event getPresentationEvent() => lambda;
 
   Node({required super.id, super.rawAttributes});
 

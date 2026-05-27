@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:ncl_vm/ncl_vm.dart' hide State;
+import 'package:ncl_doc/ncl_document.dart' hide State;
 import 'base.dart';
 
-class LuaPlayer extends StatefulWidget {
+class LuaWidget extends StatefulWidget {
   final String uri;
-  const LuaPlayer({super.key, required this.uri});
+  final Media? media;
+  const LuaWidget({super.key, required this.uri, this.media});
 
   @override
-  State<LuaPlayer> createState() => LuaPlayerState();
+  State<LuaWidget> createState() => LuaWidgetState();
 }
 
-class LuaPlayerState extends PlayerState<LuaPlayer> {
+class LuaWidgetState extends BaseWidgetState<LuaWidget> {
   late NCLua _engine;
   final CanvasState canvasState = CanvasState();
 
@@ -18,6 +19,7 @@ class LuaPlayerState extends PlayerState<LuaPlayer> {
   void initState() {
     super.initState();
     initPlayer(widget.uri);
+    parseAttributes(widget.media);
     _engine = NCLua(delegate: canvasState);
 
     canvasState.onUpdate = () {
@@ -38,7 +40,7 @@ class LuaPlayerState extends PlayerState<LuaPlayer> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildWidgetContent(BuildContext context) {
     return SizedBox.expand(
       child: RepaintBoundary(
         child: CustomPaint(

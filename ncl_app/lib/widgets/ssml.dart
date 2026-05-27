@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:ncl_doc/ncl_document.dart' hide State;
 import 'base.dart';
 
-class SsmlPlayer extends StatefulWidget {
+class SsmlWidget extends StatefulWidget {
   final String uri;
-  const SsmlPlayer({super.key, required this.uri});
+  final Media? media;
+  const SsmlWidget({super.key, required this.uri, this.media});
 
   @override
-  State<SsmlPlayer> createState() => SsmlPlayerState();
+  State<SsmlWidget> createState() => SsmlWidgetState();
 }
 
-class SsmlPlayerState extends PlayerState<SsmlPlayer> {
+class SsmlWidgetState extends BaseWidgetState<SsmlWidget> {
   @override
   void initState() {
     super.initState();
     initPlayer(widget.uri);
+    parseAttributes(widget.media);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildWidgetContent(BuildContext context) {
     return const Center(
-        child: Text("SsmlPlayer: Not Implemented",
+        child: Text("SsmlWidget: Not Implemented",
             style: TextStyle(color: Colors.red)));
   }
 }

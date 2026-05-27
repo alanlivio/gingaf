@@ -2,15 +2,14 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ncl_doc/ncl_document.dart' hide State;
 import 'image.dart';
 import 'lua.dart';
 import 'ssml.dart';
 import 'text.dart';
+import 'av.dart';
 
-/// Base class for all player state classes.
-/// Extends State and provides common media properties.
-abstract class PlayerState<T extends StatefulWidget> extends State<T> {
-  // Common player properties
+abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
   Color bgColor = Colors.transparent;
   Rect rect = Rect.zero;
   Duration? duration;
@@ -32,13 +31,52 @@ abstract class PlayerState<T extends StatefulWidget> extends State<T> {
     this.uri = uri;
   }
 
+  void parseAttributes(Media? media) {
+    if (media == null) return;
+    id = media.id;
+    final leftStr = media.rawAttributes['left'] ?? '';
+    final topStr = media.rawAttributes['top'] ?? '';
+    final widthStr = media.rawAttributes['width'] ?? '';
+    final heightStr = media.rawAttributes['height'] ?? '';
+    final visibleStr = media.rawAttributes['visible'] ?? 'true';
+    visible = visibleStr.toLowerCase() == 'true';
+    bgColor = _parseColor(media.rawAttributes['bgColor'] ?? media.rawAttributes['backgroundColor']);
+    focusBorderColor = _parseColor(media.rawAttributes['focusBorderColor']);
+    selBorderColor = _parseColor(media.rawAttributes['selBorderColor']);
+    final left = double.tryParse(leftStr.replaceAll('%', '')) ?? 0.0;
+    final top = double.tryParse(topStr.replaceAll('%', '')) ?? 0.0;
+    final width = double.tryParse(widthStr.replaceAll('%', '')) ?? 100.0;
+    final height = double.tryParse(heightStr.replaceAll('%', '')) ?? 100.0;
+    rect = Rect.fromLTWH(left, top, width, height);
+  }
+
+  Color _parseColor(String? colorStr) {
+    if (colorStr == null || colorStr.isEmpty) return Colors.transparent;
+    if (colorStr.startsWith('#')) {
+      final hex = colorStr.substring(1);
+      if (hex.length == 6) {
+        return Color(int.parse('FF$hex', radix: 16));
+      } else if (hex.length == 8) {
+        return Color(int.parse(hex, radix: 16));
+      }
+    }
+    switch (colorStr.toLowerCase()) {
+      case 'red': return Colors.red;
+      case 'green': return Colors.green;
+      case 'blue': return Colors.blue;
+      case 'yellow': return Colors.yellow;
+      case 'black': return Colors.black;
+      case 'white': return Colors.white;
+      default: return Colors.transparent;
+    }
+  }
+
   Future<String> loadContent(String path) async {
     if (!kIsWeb) {
       final file = File(path);
       if (file.existsSync()) {
         return await file.readAsString();
       }
-
       final fileName =
           path.contains('/') ? path.substring(path.lastIndexOf('/') + 1) : path;
       final localFile = File(fileName);
@@ -53,9 +91,39 @@ abstract class PlayerState<T extends StatefulWidget> extends State<T> {
   }
 
   String get playerKey => id ?? uri;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = Visibility(
+      visible: visible,
+      child: Opacity(
+        opacity: alpha / 255.0,
+        child: Container(
+          decoration: BoxDecoration(
+            color: bgColor,
+            border: selBorderColor != Colors.transparent
+                ? Border.all(color: selBorderColor, width: 3.0)
+                : (focusBorderColor != Colors.transparent
+                    ? Border.all(color: focusBorderColor, width: 2.0)
+                    : null),
+          ),
+          child: buildWidgetContent(context),
+        ),
+      ),
+    );
+    if (rect == Rect.zero) {
+      return content;
+    }
+    return Positioned.fromRect(
+      rect: rect,
+      child: content,
+    );
+  }
+
+  Widget buildWidgetContent(BuildContext context);
 }
 
-class PlayerFactory {
+class WidgetFactory {
   static final Map<String, List<String>> _extensionMap = {
     'lua': ['application/x-ginga-NCLua'],
     'html': ['text/html'],
@@ -69,23 +137,30 @@ class PlayerFactory {
     'jpg': ['image/jpeg'],
     'heic': ['image/heic'],
     'heif': ['image/heic'],
+    'mp4': ['video/mp4'],
+    'mp3': ['audio/mpeg'],
+    'mpeg': ['video/mpeg'],
+    'avi': ['video/avi'],
   };
 
-  static Widget? createPlayer(String mimeType, String uri) {
+  static Widget? createWidget(String mimeType, String uri, {Media? media, VoidCallback? onVideoStopped}) {
+    if (mimeType.startsWith('video/') || mimeType.startsWith('audio/') || mimeType.contains('video') || mimeType.contains('audio')) {
+      return AVWidget(uri: uri, media: media, onVideoStopped: onVideoStopped);
+    }
     switch (mimeType) {
       case 'application/x-ginga-NCLua':
-        return LuaPlayer(uri: uri);
+        return LuaWidget(uri: uri, media: media);
       case 'application/ssml+xml':
-        return SsmlPlayer(uri: uri);
+        return SsmlWidget(uri: uri, media: media);
       case 'text/plain':
-        return TextPlayer(uri: uri);
+        return TextWidget(uri: uri, media: media);
       case 'image/png':
       case 'image/jpeg':
       case 'image/gif':
       case 'image/webp':
       case 'image/bmp':
       case 'image/heic':
-        return ImagePlayer(uri: uri);
+        return ImageWidget(uri: uri, media: media);
       default:
         return null;
     }

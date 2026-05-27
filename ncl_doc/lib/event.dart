@@ -1,18 +1,36 @@
 import 'xml_elements.dart';
+import 'ncl_document.dart';
 
 enum EventType { PRESENTATION, ATTRIBUTION, SELECTION, PREPARATION }
 
 enum ActionType { ABORT, PAUSE, RESUME, START, STOP }
 
-enum State { OCCURRING, PAUSED, SLEEPING }
-
 class Event {
   final EventType type;
   final Node targetNode;
   final String? propertyName;
-  State state = State.SLEEPING;
+  State _state = State.SLEEPING;
+  final List<void Function(State oldState, State newState)> _stateListeners = [];
 
   Event({required this.type, required this.targetNode, this.propertyName});
+
+  State get state => _state;
+  set state(State newState) {
+    final oldState = _state;
+    if (oldState == newState) return;
+    _state = newState;
+    for (var listener in _stateListeners) {
+      listener(oldState, newState);
+    }
+  }
+
+  void addStateListener(void Function(State oldState, State newState) listener) {
+    _stateListeners.add(listener);
+  }
+
+  void transition(ActionType action) {
+    doAction(action);
+  }
 
   State doAction(ActionType action) {
     switch (action) {
@@ -90,42 +108,4 @@ class Action {
     this.duration = 0,
     this.delay = 0,
   });
-}
-
-class Document {
-  final List<NCLXMLElement> elements;
-  Context? _root;
-  Settings? _settings;
-
-  Document([List<NCLXMLElement>? initialElements])
-    : elements = initialElements != null
-          ? List<NCLXMLElement>.from(initialElements)
-          : <NCLXMLElement>[] {
-    final contexts = elements.whereType<Context>();
-    if (contexts.isNotEmpty) {
-      _root = contexts.first;
-    } else {
-      _root = Context(id: '__root__');
-      elements.add(_root!);
-    }
-
-    final settingsList = elements.whereType<Settings>();
-    if (settingsList.isNotEmpty) {
-      _settings = settingsList.first;
-    } else {
-      _settings = Settings(id: 'default_settings');
-      _root!.children.add(_settings!);
-      _settings!.parent = _root;
-      elements.add(_settings!);
-    }
-  }
-
-  Context? getRoot() => _root;
-
-  Settings? getSettings() => _settings;
-
-  Node? getNodeById(String id) {
-    final nodes = elements.whereType<Node>().where((n) => n.id == id);
-    return nodes.isEmpty ? null : nodes.first;
-  }
 }
