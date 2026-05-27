@@ -35,8 +35,6 @@ class NCLDocument {
           ? List<NCLXMLElement>.from(initialElements)
           : <NCLXMLElement>[] {
     _initializeRootAndSettings();
-    _setupEventStateListeners();
-    _processPorts();
   }
 
   void _initializeRootAndSettings() {
@@ -171,12 +169,14 @@ class NCLDocument {
   }
 
   void start({int ticksPerSecond = 10}) {
-    stop();
+    _timer?.cancel();
+    _timer = null;
+    print('[Clock: $virtualClock] NCLDocument will start');
     final interval = Duration(milliseconds: 1000 ~/ ticksPerSecond);
     _timer = Timer.periodic(interval, (timer) {
       if (_actionQueue.isEmpty) {
-        stop();
-        print('Execution finished. Total virtual time: $virtualClock');
+        _timer?.cancel();
+        _timer = null;
         return;
       }
       tick();
@@ -184,7 +184,14 @@ class NCLDocument {
   }
 
   void stop() {
+    print('[Clock: $virtualClock] NCLDocument will stop');
     _timer?.cancel();
     _timer = null;
+    for (var node in elements.whereType<Node>()) {
+      if (node.lambda.state == State.OCCURRING ||
+          node.lambda.state == State.PAUSED) {
+        node.lambda.doAction(ActionType.STOP);
+      }
+    }
   }
 }

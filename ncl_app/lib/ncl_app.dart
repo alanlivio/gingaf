@@ -29,9 +29,10 @@ class NCLApp extends StatefulWidget {
 }
 
 class NCLAppState extends BaseWidgetState<NCLApp> {
-  late final NCLDocument nclDocument;
+  NCLDocument? nclDocument;
   final Map<String, Widget> _activeWidgets = {};
   String errorMsg = "";
+  bool _loading = false;
 
   @override
   void initState() {
@@ -41,6 +42,8 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
   }
 
   Future<void> _startApplication() async {
+    if (_loading) return;
+    _loading = true;
     try {
       if (mounted) {
         setState(() {
@@ -54,9 +57,9 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
           ? widget.uri.substring(0, widget.uri.lastIndexOf('/') + 1)
           : "";
 
-      nclDocument = NCLDocument(nclData);
+      final doc = NCLDocument(nclData);
 
-      final settings = nclDocument.getSettings();
+      final settings = doc.getSettings();
       if (settings != null) {
         settings.addPropertyChangeListener((name, value) {
           if (name == 'videoUri') {
@@ -69,7 +72,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
         }
       }
 
-      final mediaNodes = nclDocument.elements.whereType<Media>().toList();
+      final mediaNodes = doc.elements.whereType<Media>().toList();
       for (var media in mediaNodes) {
         media.lambda.addStateListener((oldState, newState) {
           if (newState == vm.State.OCCURRING) {
@@ -104,7 +107,8 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
         });
       }
 
-      nclDocument.start();
+      nclDocument = doc;
+      doc.start();
 
       if (mounted) {
         setState(() {
@@ -118,12 +122,21 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
           errorMsg = "Error: $e";
         });
       }
+    } finally {
+      _loading = false;
     }
+  }
+
+  Future<void> _reloadApplication() async {
+    nclDocument?.stop();
+    nclDocument = null;
+    _loading = false;
+    await _startApplication();
   }
 
   @override
   void dispose() {
-    nclDocument.stop();
+    nclDocument?.stop();
     super.dispose();
   }
 
@@ -136,7 +149,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
         children: _activeWidgets.values.toList(),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _startApplication,
+        onPressed: _reloadApplication,
         mini: true,
         tooltip: 'Reload NCL',
         child: const Icon(Icons.refresh),
