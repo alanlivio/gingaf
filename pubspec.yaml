@@ -10,15 +10,16 @@ dependencies:
   flutter:
     sdk: flutter
   ncl_app:
-    path: ../ncl_app
+    path: ncl_app
   ccws:
-    path: ../ccws
+    path: ccws
   cupertino_icons: ^1.0.2
   webview_all: ^1.0.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^5.0.0
   integration_test:
     sdk: flutter
   test: ^1.29.0

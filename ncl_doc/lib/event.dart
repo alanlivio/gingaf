@@ -1,4 +1,3 @@
-import 'xml_elements.dart';
 import 'ncl_document.dart';
 
 enum EventType { PRESENTATION, ATTRIBUTION, SELECTION, PREPARATION }
@@ -10,7 +9,8 @@ class Event {
   final Node targetNode;
   final String? propertyName;
   State _state = State.SLEEPING;
-  final List<void Function(State oldState, State newState)> _stateListeners = [];
+  final List<void Function(State oldState, State newState)> _stateListeners =
+      [];
 
   Event({required this.type, required this.targetNode, this.propertyName});
 
@@ -24,7 +24,9 @@ class Event {
     }
   }
 
-  void addStateListener(void Function(State oldState, State newState) listener) {
+  void addStateListener(
+    void Function(State oldState, State newState) listener,
+  ) {
     _stateListeners.add(listener);
   }
 
@@ -39,8 +41,9 @@ class Event {
         break;
       case ActionType.STOP:
       case ActionType.ABORT:
-        if (state == State.OCCURRING || state == State.PAUSED)
+        if (state == State.OCCURRING || state == State.PAUSED) {
           state = State.SLEEPING;
+        }
         break;
       case ActionType.PAUSE:
         if (state == State.OCCURRING) state = State.PAUSED;

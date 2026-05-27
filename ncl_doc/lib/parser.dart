@@ -1,6 +1,5 @@
 import 'package:xml/xml.dart';
 import 'schema.dart';
-import 'xml_elements.dart';
 import 'ncl_document.dart';
 
 class NCLParser {

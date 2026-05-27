@@ -1,15 +1,15 @@
-library ncl_document;
+library;
 
 import 'dart:async';
-import 'xml_elements.dart';
-import 'parser.dart';
 
 import 'event.dart';
+import 'parser.dart';
+import 'xml_elements.dart';
 
-export 'xml_elements.dart';
-export 'parser.dart';
-export 'lua.dart';
 export 'event.dart';
+export 'lua.dart';
+export 'parser.dart';
+export 'xml_elements.dart';
 
 enum State { OCCURRING, PAUSED, SLEEPING }
 
@@ -31,9 +31,9 @@ class NCLDocument {
   }
 
   NCLDocument.fromElements([List<NCLXMLElement>? initialElements])
-      : elements = initialElements != null
-            ? List<NCLXMLElement>.from(initialElements)
-            : <NCLXMLElement>[] {
+    : elements = initialElements != null
+          ? List<NCLXMLElement>.from(initialElements)
+          : <NCLXMLElement>[] {
     _initializeRootAndSettings();
     _setupEventStateListeners();
     _processPorts();
