@@ -32,7 +32,6 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
   late final NCLDocument nclDocument;
   final Map<String, Widget> _activeWidgets = {};
   String errorMsg = "";
-  String runtimeStatus = "Initializing...";
 
   @override
   void initState() {
@@ -45,7 +44,6 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
     try {
       if (mounted) {
         setState(() {
-          runtimeStatus = "Loading NCL...";
           _activeWidgets.clear();
         });
       }
@@ -110,7 +108,6 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
 
       if (mounted) {
         setState(() {
-          runtimeStatus = "Running";
           errorMsg = "";
         });
       }
@@ -119,7 +116,6 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
       if (mounted) {
         setState(() {
           errorMsg = "Error: $e";
-          runtimeStatus = "Failed";
         });
       }
     }
@@ -134,17 +130,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
   @override
   Widget buildWidgetContent(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        title: const Text('ginga-ncl'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(20),
-          child: Text(runtimeStatus,
-              style: const TextStyle(fontSize: 10, color: Colors.white70)),
-        ),
-      ),
+      backgroundColor: Colors.white,
       body: Stack(
         fit: StackFit.expand,
         children: _activeWidgets.values.toList(),
