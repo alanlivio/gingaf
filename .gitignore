@@ -33,6 +33,7 @@ Pods/
 *.DS_Store
 
 # others
+*.log
 .agents/
 .metadata
 *.iml

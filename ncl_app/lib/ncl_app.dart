@@ -33,6 +33,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
   final Map<String, Widget> _activeWidgets = {};
   String errorMsg = "";
   bool _loading = false;
+  bool _isDisposed = false;
 
   @override
   void initState() {
@@ -94,12 +95,12 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
               },
             );
 
-            if (widgetInstance != null && mounted) {
+            if (widgetInstance != null && mounted && !_isDisposed) {
               setState(() {
                 _activeWidgets[media.id] = widgetInstance;
               });
             }
-          } else if (newState == vm.State.SLEEPING && mounted) {
+          } else if (newState == vm.State.SLEEPING && mounted && !_isDisposed) {
             setState(() {
               _activeWidgets.remove(media.id);
             });
@@ -136,6 +137,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
 
   @override
   void dispose() {
+    _isDisposed = true;
     nclDocument?.stop();
     super.dispose();
   }

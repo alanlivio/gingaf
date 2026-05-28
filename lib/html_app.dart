@@ -21,6 +21,7 @@ class HTMLApp extends StatefulWidget {
 class HTMLAppState extends BaseWidgetState<HTMLApp> {
   late final WebViewController _controller;
   bool _initialized = false;
+  bool _loadStarted = false;
 
   @override
   void initState() {
@@ -38,13 +39,13 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
       });
 
     initPlayer(widget.uri);
-    _loadHTML();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_initialized) {
+    if (!_loadStarted) {
+      _loadStarted = true;
       _loadHTML();
     }
   }
