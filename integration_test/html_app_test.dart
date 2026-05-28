@@ -22,8 +22,8 @@ class MockHTMLAssetBundle extends CachingAssetBundle {
     <h1>Runtime Bridge Test</h1>
     <script>
         setTimeout(() => {
-            if (window.GingaBridge) {
-                GingaBridge.postMessage("BRIDGE_READY");
+            if (window.HTMLAppChannel) {
+                HTMLAppChannel.postMessage("BRIDGE_READY");
             }
         }, 500);
     </script>
@@ -38,7 +38,7 @@ class MockHTMLAssetBundle extends CachingAssetBundle {
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('Verify HTMLApp enables GingaBridge on real platform',
+  testWidgets('Verify HTMLApp enables HTMLAppChannel on real platform',
       (WidgetTester tester) async {
     final mockBundle = MockHTMLAssetBundle();
     final completer = Completer<String>();

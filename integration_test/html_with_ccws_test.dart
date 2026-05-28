@@ -36,8 +36,8 @@ class MockCCWSAssetBundle extends CachingAssetBundle {
 
                     if (response.ok) {
                         const data = await response.json();
-                        if (window.GingaBridge) {
-                            window.GingaBridge.postMessage("SUCCESS: " + JSON.stringify(data));
+                        if (window.HTMLAppChannel) {
+                            window.HTMLAppChannel.postMessage("SUCCESS: " + JSON.stringify(data));
                         }
                         return;
                     }

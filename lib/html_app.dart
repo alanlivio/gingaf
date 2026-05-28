@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:ncl_app/widgets/base.dart';
 import 'package:logging/logging.dart';
+import 'package:ncl_app/widgets/base.dart';
 import 'package:webview_all/webview_all.dart';
 
-const RUNTIME = kIsWeb ? 'gingahtml(browser)' : 'gingahtml';
+const RUNTIME = kIsWeb ? 'Ginga-HTML(browser)' : 'Ginga-HTML';
 
 final _logger = Logger(RUNTIME);
 
@@ -15,7 +15,11 @@ class HTMLApp extends StatefulWidget {
   final void Function(String? uri)? onBackgroundVideoChanged;
   final void Function(JavaScriptMessage)? onMessageReceived;
 
-  const HTMLApp({super.key, required this.uri, this.onBackgroundVideoChanged, this.onMessageReceived});
+  const HTMLApp(
+      {super.key,
+      required this.uri,
+      this.onBackgroundVideoChanged,
+      this.onMessageReceived});
 
   @override
   State<HTMLApp> createState() => HTMLAppState();
@@ -31,8 +35,8 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
     super.initState();
     _controller = WebViewController()
       ..setBackgroundColor(const Color(0x00000000))
-      ..addJavaScriptChannel("GingaBridge", onMessageReceived: (message) {
-        _logger.info("$RUNTIME: GingaBridge message: ${message.message}");
+      ..addJavaScriptChannel("HTMLAppChannel", onMessageReceived: (message) {
+        _logger.info("$RUNTIME: HTMLAppChannel message: ${message.message}");
         final msg = message.message;
         if (msg.startsWith("SET_VIDEO_URI:")) {
           final newUri = msg.substring("SET_VIDEO_URI:".length).trim();
@@ -99,7 +103,7 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
   Widget buildWidgetContent(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text("ginga-html")),
+      appBar: AppBar(title: const Text(RUNTIME)),
       body: Container(
         color: Colors.white,
         child: _initialized
