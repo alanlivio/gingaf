@@ -61,16 +61,14 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
       final doc = NCLDocument.fromXML(nclData);
 
       final settings = doc.getSettings();
-      if (settings != null) {
-        settings.addPropertyChangeListener((name, value) {
-          if (name == 'videoUri') {
-            widget.onBackgroundVideoChanged?.call(value?.toString());
-          }
-        });
-        final initialVideo = settings.getProperty('videoUri');
-        if (initialVideo != null) {
-          widget.onBackgroundVideoChanged?.call(initialVideo.toString());
+      settings.addPropertyChangeListener((name, value) {
+        if (name == 'videoUri') {
+          widget.onBackgroundVideoChanged?.call(value?.toString());
         }
+      });
+      final initialVideo = settings.getProperty('videoUri');
+      if (initialVideo != null) {
+        widget.onBackgroundVideoChanged?.call(initialVideo.toString());
       }
 
       final mediaNodes = doc.elements.whereType<Media>().toList();

@@ -50,7 +50,7 @@ void main() {
       final doc = NCLDocument.fromBodyElements([]);
       final settings = doc.getSettings();
       expect(settings, isNotNull);
-      expect(settings!.id, 'default_settings');
+      expect(settings.id, 'default_settings');
     });
 
     test('NCLDocument Composition', () {

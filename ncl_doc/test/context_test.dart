@@ -9,18 +9,20 @@ void main() {
       expect(context.id, 'c1');
     });
 
-    test('getRoot is returned correctly when provided', () {
+    test('getBody is returned correctly when provided', () {
       final c1 = Context(id: 'c1');
       final doc = NCLDocument.fromBodyElements([c1]);
-      expect(doc.getRoot()?.id, 'body');
+      expect(doc.getBody().id, 'body');
+      expect(doc.getBody().children.first.id, 'c1');
     });
   });
 
   test('trigger links only within target Context', () {
     final m1 = Media(id: 'm1');
     final m2 = Media(id: 'm2');
+    final p_c1 = Port(id: 'p_c1', rawAttributes: {'component': 'm1'});
     final context1 = Context(id: 'c1');
-    context1.children.addAll([m1, m2]);
+    context1.children.addAll([p_c1, m1, m2]);
     m1.parent = context1;
     m2.parent = context1;
 
@@ -35,31 +37,37 @@ void main() {
 
     final m3 = Media(id: 'm3');
     final m4 = Media(id: 'm4');
+    final p_c2 = Port(id: 'p_c2', rawAttributes: {'component': 'm3'});
     final context2 = Context(id: 'c2');
-    context2.children.addAll([m3, m4]);
+    context2.children.addAll([p_c2, m3, m4]);
     m3.parent = context2;
     m4.parent = context2;
 
     final link2 = Link(id: 'l2');
     link2.children.add(
-      Bind(rawAttributes: {'role': 'onBegin', 'component': 'm1'}),
+      Bind(rawAttributes: {'role': 'onBegin', 'component': 'm3'}),
     );
     link2.children.add(
       Bind(rawAttributes: {'role': 'start', 'component': 'm4'}),
     );
     context2.links.add(link2);
 
-    final port = Port(id: 'p1', rawAttributes: {'component': 'm1'});
+    final p1 = Port(id: 'p1', rawAttributes: {'component': 'c1'});
+    final p2 = Port(id: 'p2', rawAttributes: {'component': 'c2'});
 
     final vm = NCLDocument.fromBodyElements([
+      p1,
+      p2,
       context1,
       context2,
-      port,
     ]);
     vm.tickTo(0);
+    expect(vm.getLambdaState('c1'), State.OCCURRING);
+    expect(vm.getLambdaState('c2'), State.OCCURRING);
     expect(vm.getLambdaState('m1'), State.OCCURRING);
     expect(vm.getLambdaState('m2'), State.OCCURRING);
-    expect(vm.getLambdaState('m4'), State.SLEEPING);
+    expect(vm.getLambdaState('m3'), State.OCCURRING);
+    expect(vm.getLambdaState('m4'), State.OCCURRING);
   });
 }
 

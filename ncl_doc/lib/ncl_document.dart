@@ -15,8 +15,8 @@ enum State { OCCURRING, PAUSED, SLEEPING }
 
 class NCLDocument {
   final List<NCLXMLElement> elements;
-  Context? _root;
-  Settings? _settings;
+  late final Context _body;
+  late final Settings _settings;
 
   int virtualClock = 0;
   final List<Action> _actionQueue = [];
@@ -34,15 +34,15 @@ class NCLDocument {
         body.links.add(el);
       }
     }
-    return NCLDocument._(body: body);
+    return NCLDocument(body: body);
   }
 
   factory NCLDocument.fromXML(String xml) {
     final (head, body) = NCLParser().parseString(xml);
-    return NCLDocument._(head: head, body: body);
+    return NCLDocument(head: head, body: body);
   }
 
-  NCLDocument._({Head? head, Body? body}) : elements = <NCLXMLElement>[] {
+  NCLDocument({Head? head, Body? body}) : elements = <NCLXMLElement>[] {
     void collect(NCLXMLElement e) {
       elements.add(e);
       for (var child in e.children) {
@@ -54,30 +54,22 @@ class NCLDocument {
         collect(h);
       }
     }
-    if (body != null) {
-      collect(body);
-    }
-    _initializeRootAndSettings();
+    _body = body ?? Context(id: 'body');
+    collect(_body);
+    _initializeBodyAndSettings();
     _setupEventStateListeners();
     _processPorts();
   }
 
-  void _initializeRootAndSettings() {
-    final contexts = elements.whereType<Context>();
-    if (contexts.isNotEmpty) {
-      _root = contexts.first;
-    } else {
-      _root = Context(id: '__root__');
-      elements.add(_root!);
-    }
+  void _initializeBodyAndSettings() {
 
     final settingsList = elements.whereType<Settings>();
     if (settingsList.isNotEmpty) {
       _settings = settingsList.first;
     } else {
       _settings = Settings(id: 'default_settings');
-      _root!.children.add(_settings!);
-      _settings!.parent = _root;
+      _body.children.add(_settings!);
+      _settings!.parent = _body;
       elements.add(_settings!);
     }
 
@@ -90,9 +82,9 @@ class NCLDocument {
     }
   }
 
-  Context? getRoot() => _root;
+  Context getBody() => _body;
 
-  Settings? getSettings() => _settings;
+  Settings getSettings() => _settings;
 
   Node? getNodeById(String id) {
     final nodes = elements.whereType<Node>().where((n) => n.id == id);
