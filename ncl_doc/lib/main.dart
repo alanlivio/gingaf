@@ -1,11 +1,17 @@
 // lib/main.dart
 import 'dart:io';
+
 import 'ncl_document.dart';
 
 void main(List<String> arguments) {
   print('NCL Document Headless CLI');
   if (arguments.isEmpty) {
-    print('Usage: ncl-doc <file.ncl>');
+    print('Usage: dart ncl_doc/lib/main.dart <file.ncl>');
+    exit(1);
+  }
+
+  if (!arguments[0].toLowerCase().endsWith('.ncl')) {
+    print('Error: Only .ncl files are supported.');
     exit(1);
   }
 
