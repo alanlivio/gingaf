@@ -22,14 +22,9 @@ class NCLDocument {
   final List<Action> _actionQueue = [];
   Timer? _timer;
 
-  NCLDocument(String xml) : elements = <NCLXMLElement>[] {
-    final parsed = NCLParser().parseString(xml);
-    elements.addAll(parsed.elements);
-    _initializeRootAndSettings();
-    _setupEventStateListeners();
-    _processPorts();
+  factory NCLDocument(String xml) {
+    return NCLParser().parseString(xml);
   }
-
   NCLDocument.fromElements([List<NCLXMLElement>? initialElements])
     : elements = initialElements != null
           ? List<NCLXMLElement>.from(initialElements)
