@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:ccws/ccws.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:ncl_app/ncl_app.dart' as ncl;
 
 import 'html_app.dart' as html;
 
 const GINGA = 'gingaf';
+final _logger = Logger(GINGA);
 const USAGE = '''
 Usage:
   flutter run --dart-define="APP=path/to/app.{ncl|html}" 
@@ -49,7 +51,7 @@ class GingaConfig {
 
     final lower = path.toLowerCase();
     if (!lower.endsWith('.ncl') && !lower.endsWith('.html')) {
-      print('\n[$GINGA ERROR] Unsupported format: $path\n$USAGE');
+      _logger.severe('\n[$GINGA ERROR] Unsupported format: $path\n$USAGE');
       return null;
     }
 
@@ -58,8 +60,13 @@ class GingaConfig {
 }
 
 void main() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    debugPrint('[${record.loggerName}] ${record.level.name}: ${record.message}');
+  });
+
   if (!kIsWeb) {
-    print('$GINGA: Initial working directory: ${Directory.current.path}');
+    _logger.info('$GINGA: Initial working directory: ${Directory.current.path}');
   }
 
   final config = GingaConfig();
@@ -86,14 +93,14 @@ void main() {
   if (!kIsWeb) {
     try {
       final file = File(config.appPath!).absolute;
-      print('$GINGA: Resolved app path: ${file.path}');
+      _logger.info('$GINGA: Resolved app path: ${file.path}');
       if (file.existsSync()) {
         Directory.current = file.parent.path;
-        print(
+        _logger.info(
             '$GINGA: Switched working directory to ${Directory.current.path}');
       }
     } catch (e) {
-      print('$GINGA: Failed to set working directory: $e');
+      _logger.severe('$GINGA: Failed to set working directory: $e');
     }
   }
 
@@ -119,7 +126,7 @@ class _GingaState extends State<Ginga> {
   void initState() {
     super.initState();
     _ccws = CCWS();
-    print('$GINGA: CCWS enabled: ${widget.config.enableCCWS}');
+    _logger.info('$GINGA: CCWS enabled: ${widget.config.enableCCWS}');
     if (widget.config.enableCCWS) {
       _ccws.start();
     }

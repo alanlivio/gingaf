@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:ncl_app/widgets/base.dart';
+import 'package:logging/logging.dart';
 import 'package:webview_all/webview_all.dart';
 
 const RUNTIME = kIsWeb ? 'gingahtml(browser)' : 'gingahtml';
+
+final _logger = Logger(RUNTIME);
 
 class HTMLApp extends StatefulWidget {
   final String uri;
@@ -29,7 +32,7 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
     _controller = WebViewController()
       ..setBackgroundColor(const Color(0x00000000))
       ..addJavaScriptChannel("GingaBridge", onMessageReceived: (message) {
-        print("$RUNTIME: GingaBridge message: ${message.message}");
+        _logger.info("$RUNTIME: GingaBridge message: ${message.message}");
         final msg = message.message;
         if (msg.startsWith("SET_VIDEO_URI:")) {
           final newUri = msg.substring("SET_VIDEO_URI:".length).trim();
@@ -74,7 +77,7 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
         setState(() => _initialized = true);
       }
     } catch (e) {
-      print("$RUNTIME: Error loading ${widget.uri}: $e");
+      _logger.severe("$RUNTIME: Error loading ${widget.uri}: $e");
       final errorHtml = """
         <!DOCTYPE html>
         <html>

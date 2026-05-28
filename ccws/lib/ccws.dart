@@ -1,13 +1,16 @@
 import 'dart:io';
 
+import 'package:logging/logging.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 
 import 'router.dart';
 
 const bool isWeb = bool.hasEnvironment('dart.library.js_util');
-const RUNTIME = isWeb ? 'gingaccws(browser)' : 'gingaccws';
+const RUNTIME = isWeb ? 'ginga-ccws(browser)' : 'ginga-ccws';
 const CCWS_PORT = 44642;
+
+final _logger = Logger(RUNTIME);
 
 class CCWS {
   HttpServer? _server;
@@ -34,7 +37,7 @@ class CCWS {
       _server = null;
     }
     _running = false;
-    print('$RUNTIME: Server stopped');
+    _logger.info('$RUNTIME: Server stopped');
   }
 
   Future<void> _startDesktopServer() async {
@@ -45,7 +48,7 @@ class CCWS {
       try {
         _server =
             await io.serve(handler, InternetAddress.loopbackIPv4, currentPort);
-        print(
+        _logger.info(
             '$RUNTIME: Server running on http://${_server!.address.address}:${_server!.port}');
         return;
       } catch (e) {
@@ -56,18 +59,24 @@ class CCWS {
         rethrow;
       }
     }
-    print('$RUNTIME: Server failed to start after $maxRetry port attempts');
+    _logger.severe(
+        '$RUNTIME: Server failed to start after $maxRetry port attempts');
   }
 
   void _startWebImplementation() {
-    print(
+    _logger.info(
         '$RUNTIME: Mock Initialized (Use service-worker.js for fetch interception)');
   }
 }
 
 void main() async {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    stdout.writeln('[${record.loggerName}] ${record.level.name}: ${record.message}');
+  });
+
   final ccws = CCWS();
   await ccws.start();
-  print('CCWS Standalone active. Target Port: ${ccws.port}');
-  print('Press Ctrl+C to terminate the service.');
+  _logger.info('CCWS Standalone active. Target Port: ${ccws.port}');
+  _logger.info('Press Ctrl+C to terminate the service.');
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
 import 'package:ncl_doc/ncl_document.dart' as vm show State;
 
@@ -13,6 +14,8 @@ export 'widgets/text.dart';
 export 'widgets/av.dart';
 
 const RUNTIME = kIsWeb ? 'gingancl(browser)' : 'gingancl';
+
+final _logger = Logger(RUNTIME);
 
 class NCLApp extends StatefulWidget {
   final String uri;
@@ -111,7 +114,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
         });
       }
     } catch (e, stacktrace) {
-      print("$RUNTIME Error: $e\n$stacktrace");
+      _logger.severe("$RUNTIME Error: $e\n$stacktrace");
       if (mounted) {
         setState(() {
           errorMsg = "Error: $e";

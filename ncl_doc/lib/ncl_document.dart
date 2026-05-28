@@ -2,6 +2,8 @@ library;
 
 import 'dart:async';
 
+import 'package:logging/logging.dart';
+
 import 'event.dart';
 import 'parser.dart';
 import 'xml_elements.dart';
@@ -12,6 +14,8 @@ export 'parser.dart';
 export 'xml_elements.dart';
 
 enum State { OCCURRING, PAUSED, SLEEPING }
+
+final _logger = Logger('ncl_doc');
 
 class NCLDocument {
   final List<NCLXMLElement> elements;
@@ -84,7 +88,7 @@ class NCLDocument {
   void _setupEventStateListeners() {
     for (var node in elements.whereType<Node>()) {
       node.getNodeEvent().addStateListener((oldState, newState) {
-        print(
+        _logger.info(
           '[Clock: $virtualClock] Node "${node.id}" changed state: '
           '${Event.getEventStateAsString(oldState)} -> ${Event.getEventStateAsString(newState)}',
         );
@@ -178,7 +182,7 @@ class NCLDocument {
   void start({int ticksPerSecond = 10}) {
     _timer?.cancel();
     _timer = null;
-    print('[Clock: $virtualClock] NCLDocument will start');
+    _logger.info('[Clock: $virtualClock] NCLDocument will start');
     final interval = Duration(milliseconds: 1000 ~/ ticksPerSecond);
     _timer = Timer.periodic(interval, (timer) {
       if (_actionQueue.isEmpty) {
@@ -191,7 +195,7 @@ class NCLDocument {
   }
 
   void stop() {
-    print('[Clock: $virtualClock] NCLDocument will stop');
+    _logger.info('[Clock: $virtualClock] NCLDocument will stop');
     _timer?.cancel();
     _timer = null;
     for (var node in elements.whereType<Node>()) {
