@@ -16,9 +16,11 @@ void main() {
       expect(doc.getLambdaState('m1'), State.SLEEPING);
       doc.start(ticksPerSecond: 100);
       await Future.delayed(const Duration(milliseconds: 50));
+      expect(doc.getBodyLambdaState(), State.OCCURRING);
       expect(doc.virtualClock, greaterThan(0));
       expect(doc.getLambdaState('m1'), State.OCCURRING);
       doc.stop();
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('state of media elements doc', () {
@@ -37,6 +39,10 @@ void main() {
       expect(doc.getLambdaState('audio1'), State.SLEEPING);
       doc.tickTo(10);
       expect(doc.getLambdaState('video1'), State.SLEEPING);
+      doc.stop();
+      expect(doc.getLambdaState('video1'), State.SLEEPING);
+      expect(doc.getLambdaState('audio1'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('state of nested contexts doc', () {
@@ -57,6 +63,11 @@ void main() {
       expect(doc.getLambdaState('c1'), State.SLEEPING);
       expect(doc.getLambdaState('m1'), State.SLEEPING);
       expect(doc.getLambdaState('m2'), State.SLEEPING);
+      doc.stop();
+      expect(doc.getLambdaState('c1'), State.SLEEPING);
+      expect(doc.getLambdaState('m1'), State.SLEEPING);
+      expect(doc.getLambdaState('m2'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('state of image.ncl', () {
@@ -72,7 +83,11 @@ void main() {
 
       expect(doc.getLambdaState('ginga_logo'), State.SLEEPING);
       doc.tickTo(0);
+      expect(doc.getBodyLambdaState(), State.OCCURRING);
       expect(doc.getLambdaState('ginga_logo'), State.OCCURRING);
+      doc.stop();
+      expect(doc.getLambdaState('ginga_logo'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('state of media with properties doc', () {
@@ -87,6 +102,9 @@ void main() {
         ''';
       final doc = NCLDocument.fromXML(xmlString);
       expect(doc.getLambdaState('lua_script'), State.SLEEPING);
+      doc.stop();
+      expect(doc.getLambdaState('lua_script'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('start media with property from port', () {
@@ -107,11 +125,13 @@ void main() {
       doc.tickTo(0);
       expect(doc.virtualClock, 0);
       expect(doc.getLambdaState('m1'), State.OCCURRING);
+      expect(doc.getBodyLambdaState(), State.OCCURRING);
 
       doc.tickTo(1);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getLambdaState('m1'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('link onEnd starts another media', () {
@@ -133,6 +153,7 @@ void main() {
       expect(doc.getLambdaState('m1'), State.SLEEPING);
 
       doc.tickTo(0);
+      expect(doc.getBodyLambdaState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
       expect(doc.getLambdaState('m1'), State.OCCURRING);
 
@@ -140,6 +161,7 @@ void main() {
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getLambdaState('m1'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('link onBegin starts another media', () {
@@ -161,6 +183,7 @@ void main() {
       expect(doc.getLambdaState('m1'), State.SLEEPING);
 
       doc.tickTo(0);
+      expect(doc.getBodyLambdaState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
       expect(doc.getLambdaState('m1'), State.OCCURRING);
       expect(doc.getLambdaState('m2'), State.OCCURRING);
@@ -169,6 +192,8 @@ void main() {
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getLambdaState('m1'), State.SLEEPING);
+      expect(doc.getLambdaState('m2'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('start context from port', () {
@@ -187,6 +212,7 @@ void main() {
       expect(doc.getLambdaState('ctx1'), State.SLEEPING);
 
       doc.tickTo(0);
+      expect(doc.getBodyLambdaState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
       expect(doc.getLambdaState('ctx1'), State.OCCURRING);
 
@@ -194,6 +220,7 @@ void main() {
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getLambdaState('ctx1'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('start single media from port', () {
@@ -210,6 +237,7 @@ void main() {
       expect(doc.getLambdaState('m1'), State.SLEEPING);
 
       doc.tickTo(0);
+      expect(doc.getBodyLambdaState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
       expect(doc.getLambdaState('m1'), State.OCCURRING);
 
@@ -217,6 +245,7 @@ void main() {
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getLambdaState('m1'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('start NCLua media', () {
@@ -233,6 +262,7 @@ void main() {
       expect(doc.getLambdaState('m1'), State.SLEEPING);
 
       doc.tickTo(0);
+      expect(doc.getBodyLambdaState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
       expect(doc.getLambdaState('m1'), State.OCCURRING);
 
@@ -240,6 +270,7 @@ void main() {
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getLambdaState('m1'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
   });
 }

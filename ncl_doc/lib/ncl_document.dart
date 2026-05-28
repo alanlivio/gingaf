@@ -72,6 +72,8 @@ class NCLDocument {
   }
 
   Context getBody() => _body;
+  
+  State getBodyLambdaState() => _body.lambda.state;
 
   Settings getSettings() => _settings;
 
@@ -93,6 +95,9 @@ class NCLDocument {
   }
 
   void _processPorts() {
+    _body.startTimestamp = 0;
+    _scheduleAction(_body.lambda, ActionType.START);
+
     for (var port in elements.whereType<Port>()) {
       if (port.component != null) {
         final node = getNodeById(port.component!);

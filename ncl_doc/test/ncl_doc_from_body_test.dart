@@ -26,7 +26,12 @@ void main() {
       final doc = NCLDocument.fromBodyElements([media, port]);
       expect(doc.getLambdaState('m1'), State.SLEEPING);
       doc.tickTo(0);
+      expect(doc.getBodyLambdaState(), State.OCCURRING);
       expect(doc.getLambdaState('m1'), State.OCCURRING);
+      
+      doc.stop();
+      expect(doc.getLambdaState('m1'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('causal link between two media', () {
@@ -42,8 +47,14 @@ void main() {
       );
       final doc = NCLDocument.fromBodyElements([m1, m2, port, link]);
       doc.tickTo(0);
+      expect(doc.getBodyLambdaState(), State.OCCURRING);
       expect(doc.getLambdaState('m1'), State.OCCURRING);
       expect(doc.getLambdaState('m2'), State.OCCURRING);
+
+      doc.stop();
+      expect(doc.getLambdaState('m1'), State.SLEEPING);
+      expect(doc.getLambdaState('m2'), State.SLEEPING);
+      expect(doc.getBodyLambdaState(), State.SLEEPING);
     });
 
     test('default Settings is created if none is provided', () {
