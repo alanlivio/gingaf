@@ -1,4 +1,5 @@
-import 'package:ncl_doc/ncl_document.dart';
+import 'package:ncl_doc/parser.dart';
+import 'package:ncl_doc/xml_elements.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -43,54 +44,52 @@ void main() {
       </ncl>
       ''';
 
-      final document = parser.parseString(xmlString);
-      final elements = document.elements;
-
-      final ncl = elements.firstWhere((e) => e.id == 'ncl_doc');
-      expect(ncl, isA<NCLXMLElement>());
-
-      final region = elements.firstWhere((e) => e.id == 'reg1');
+      final (head, body) = parser.parseString(xmlString);
+      final regionBase = head[0];
+      final region = regionBase.children.firstWhere((e) => e.id == 'reg1');
       expect(region, isA<Region>());
 
-      final descriptor = elements.firstWhere((e) => e.id == 'desc1');
+      final descriptorBase = head[1];
+      final descriptor = descriptorBase.children.firstWhere((e) => e.id == 'desc1');
       expect(descriptor, isA<Descriptor>());
 
-      final conn1 = elements.firstWhere((e) => e.id == 'conn1');
+      final connectorBase = head[2];
+      final conn1 = connectorBase.children.firstWhere((e) => e.id == 'conn1');
       expect(conn1, isA<Connector>());
-      final conn2 = elements.firstWhere((e) => e.id == 'conn2');
+      final conn2 = conn1.children.firstWhere((e) => e.id == 'conn2');
       expect(conn2, isA<Connector>());
 
-      final settings = elements.firstWhere((e) => e.id == 's1');
+      final settings = head.whereType<Settings>().first;
       expect(settings, isA<Settings>());
 
-      final prop1 = elements.firstWhere((e) => e.id == 'prop1') as Property;
+      final prop1 = settings.children.firstWhere((e) => e.id == 'prop1') as Property;
       expect(prop1, isA<Property>());
       expect(prop1.name, 'service.currentKey');
       expect(prop1.value, '1');
 
-      final prop2 = elements.firstWhere((e) => e.id == 'prop2') as Property;
+      final port = body.children.firstWhere((e) => e.id == 'p1') as Port;
+      expect(port, isA<Port>());
+      expect(port.component, 'c1');
+
+      final context = body.children.firstWhere((e) => e.id == 'c1') as Context;
+      expect(context, isA<Context>());
+
+      final media = context.children.firstWhere((e) => e.id == 'm1') as Media;
+      expect(media, isA<Media>());
+
+      final area = media.children.firstWhere((e) => e.id == 'area1') as Area;
+      expect(area, isA<Area>());
+      expect(area.begin, '10s');
+
+      final prop2 = media.children.firstWhere((e) => e.id == 'prop2') as Property;
       expect(prop2, isA<Property>());
       expect(prop2.name, 'fontColor');
       expect(prop2.value, 'blue');
 
-      final port = elements.firstWhere((e) => e.id == 'p1') as Port;
-      expect(port, isA<Port>());
-      expect(port.component, 'c1');
-
-      final context = elements.firstWhere((e) => e.id == 'c1');
-      expect(context, isA<Context>());
-
-      final media = elements.firstWhere((e) => e.id == 'm1');
-      expect(media, isA<Media>());
-
-      final area = elements.firstWhere((e) => e.id == 'area1') as Area;
-      expect(area, isA<Area>());
-      expect(area.begin, '10s');
-
-      final link = elements.firstWhere((e) => e.id == 'l1');
+      final link = body.children.firstWhere((e) => e.id == 'l1') as Link;
       expect(link, isA<Link>());
 
-      final bind = elements.firstWhere((e) => e.id == 'bind_onBegin') as Bind;
+      final bind = link.children.firstWhere((e) => e.id == 'bind_onBegin') as Bind;
       expect(bind, isA<Bind>());
       expect(bind.role, 'onBegin');
       expect(bind.component, 'm1');
@@ -148,9 +147,9 @@ void main() {
   </body>
 </ncl>
 ''';
-      final doc = parser.parseString(ncl);
-      final ports = doc.elements.whereType<Port>().toList();
-      final mediaList = doc.elements.whereType<Media>().toList();
+      final (head, body) = parser.parseString(ncl);
+      final ports = body.children.whereType<Port>().toList();
+      final mediaList = body.children.whereType<Media>().toList();
 
       expect(ports.length, equals(2));
       expect(mediaList.length, equals(2));
@@ -164,3 +163,4 @@ void main() {
     });
   });
 }
+

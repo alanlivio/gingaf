@@ -1,0 +1,79 @@
+import 'package:ncl_doc/ncl_document.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('NCLDocument from nodes Tests', () {
+    test('tick increments virtual clock', () {
+      final vm = NCLDocument.fromBodyElements([]);
+      expect(vm.virtualClock, 0);
+      vm.tick(10);
+      expect(vm.virtualClock, 10);
+      vm.tick();
+      expect(vm.virtualClock, 11);
+    });
+
+    test('tickTo advances clock to specific time', () {
+      final vm = NCLDocument.fromBodyElements([]);
+      vm.tickTo(100);
+      expect(vm.virtualClock, 100);
+      vm.tickTo(50);
+      expect(vm.virtualClock, 100);
+    });
+
+    test('automatic start via Port', () {
+      final media = Media(id: 'm1');
+      final port = Port(id: 'p1', rawAttributes: {'component': 'm1'});
+      final vm = NCLDocument.fromBodyElements([media, port]);
+      expect(vm.getLambdaState('m1'), State.SLEEPING);
+      vm.tickTo(0);
+      expect(vm.getLambdaState('m1'), State.OCCURRING);
+    });
+
+    test('causal link between two media', () {
+      final m1 = Media(id: 'm1');
+      final m2 = Media(id: 'm2');
+      final port = Port(id: 'p1', rawAttributes: {'component': 'm1'});
+      final link = Link(id: 'l1');
+      link.children.add(
+        Bind(rawAttributes: {'role': 'onBegin', 'component': 'm1'}),
+      );
+      link.children.add(
+        Bind(rawAttributes: {'role': 'start', 'component': 'm2'}),
+      );
+      final vm = NCLDocument.fromBodyElements([m1, m2, port, link]);
+      vm.tickTo(0);
+      expect(vm.getLambdaState('m1'), State.OCCURRING);
+      expect(vm.getLambdaState('m2'), State.OCCURRING);
+    });
+
+    test('default Settings is created if none is provided', () {
+      final doc = NCLDocument.fromBodyElements([]);
+      final settings = doc.getSettings();
+      expect(settings, isNotNull);
+      expect(settings!.id, 'default_settings');
+    });
+
+    test('NCLDocument Composition', () {
+      final media = Media(
+        id: 'm1',
+        rawAttributes: {'id': 'm1', 'src': 'v.mp4'},
+      );
+      final port = Port(
+        id: 'p1',
+        rawAttributes: {'id': 'p1', 'component': 'm1'},
+      );
+      final doc = NCLDocument.fromBodyElements([media, port]);
+
+      expect(doc.elements.whereType<Media>().length, 1);
+      expect(doc.elements.whereType<Port>().length, 1);
+      expect(doc.elements.whereType<Media>().first.id, 'm1');
+      expect(doc.elements.whereType<Port>().first.id, 'p1');
+    });
+
+    test('getSettings is returned correctly when provided', () {
+      final settings = Settings(id: 's1');
+      final doc = NCLDocument.fromBodyElements([settings]);
+      expect(doc.getSettings(), settings);
+    });
+  });
+}

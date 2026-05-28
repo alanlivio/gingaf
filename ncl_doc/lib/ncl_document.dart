@@ -22,13 +22,41 @@ class NCLDocument {
   final List<Action> _actionQueue = [];
   Timer? _timer;
 
-  factory NCLDocument(String xml) {
-    return NCLParser().parseString(xml);
+  factory NCLDocument.fromBodyElements(List<NCLXMLElement> elements) {
+    final body = Context(id: 'body');
+    body.children.addAll(elements);
+    for (var el in elements) {
+      if (el is Node) {
+        el.parent = body;
+        body.nodes.add(el);
+      }
+      if (el is Link) {
+        body.links.add(el);
+      }
+    }
+    return NCLDocument._(body: body);
   }
-  NCLDocument.fromElements([List<NCLXMLElement>? initialElements])
-    : elements = initialElements != null
-          ? List<NCLXMLElement>.from(initialElements)
-          : <NCLXMLElement>[] {
+
+  factory NCLDocument.fromXML(String xml) {
+    final (head, body) = NCLParser().parseString(xml);
+    return NCLDocument._(head: head, body: body);
+  }
+
+  NCLDocument._({Head? head, Body? body}) : elements = <NCLXMLElement>[] {
+    void collect(NCLXMLElement e) {
+      elements.add(e);
+      for (var child in e.children) {
+        collect(child);
+      }
+    }
+    if (head != null) {
+      for (var h in head) {
+        collect(h);
+      }
+    }
+    if (body != null) {
+      collect(body);
+    }
     _initializeRootAndSettings();
     _setupEventStateListeners();
     _processPorts();

@@ -7,24 +7,28 @@ class NCLParser {
 
   NCLParser();
 
-  NCLDocument parseString(String xmlString) {
+  (Head, Body) parseString(String xmlString) {
     final document = XmlDocument.parse(xmlString);
     final root = document.rootElement;
-    final rootElement = _parseNode(root);
 
-    final allElements = <NCLXMLElement>[];
-    void collect(NCLXMLElement e) {
-      allElements.add(e);
-      for (var child in e.children) {
-        collect(child);
+    Head head = [];
+    Body body = Context(id: 'body');
+
+    for (var childNode in root.children.whereType<XmlElement>()) {
+      if (childNode.name.local == 'head') {
+        final headElement = _parseNode(childNode);
+        if (headElement != null) {
+          head = headElement.children;
+        }
+      } else if (childNode.name.local == 'body') {
+        final bodyElement = _parseNode(childNode);
+        if (bodyElement is Context) {
+          body = bodyElement;
+        }
       }
     }
 
-    if (rootElement != null) {
-      collect(rootElement);
-    }
-
-    return NCLDocument.fromElements(allElements);
+    return (head, body);
   }
 
   NCLXMLElement? _parseNode(XmlElement node) {
@@ -39,7 +43,8 @@ class NCLParser {
         element = Media(id: id, rawAttributes: attrs);
         break;
       case 'context':
-        element = Context(id: id, rawAttributes: attrs);
+      case 'body':
+        element = Context(id: id.isNotEmpty ? id : node.name.local, rawAttributes: attrs);
         break;
       case 'region':
         element = Region(id: id, rawAttributes: attrs);
@@ -89,6 +94,7 @@ class NCLParser {
         }
         if (element is Composition && childElement is Node) {
           childElement.parent = element;
+          element.nodes.add(childElement);
         }
       }
     }
@@ -111,3 +117,4 @@ class NCLParser {
     return errors;
   }
 }
+

@@ -58,7 +58,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
           ? widget.uri.substring(0, widget.uri.lastIndexOf('/') + 1)
           : "";
 
-      final doc = NCLDocument(nclData);
+      final doc = NCLDocument.fromXML(nclData);
 
       final settings = doc.getSettings();
       if (settings != null) {

@@ -10,9 +10,9 @@ void main() {
     });
 
     test('getRoot is returned correctly when provided', () {
-      final root = Context(id: 'c1');
-      final doc = NCLDocument.fromElements([root]);
-      expect(doc.getRoot(), root);
+      final c1 = Context(id: 'c1');
+      final doc = NCLDocument.fromBodyElements([c1]);
+      expect(doc.getRoot()?.id, 'body');
     });
   });
 
@@ -51,13 +51,9 @@ void main() {
 
     final port = Port(id: 'p1', rawAttributes: {'component': 'm1'});
 
-    final vm = NCLDocument.fromElements([
+    final vm = NCLDocument.fromBodyElements([
       context1,
-      m1,
-      m2,
       context2,
-      m3,
-      m4,
       port,
     ]);
     vm.tickTo(0);
@@ -66,3 +62,6 @@ void main() {
     expect(vm.getLambdaState('m4'), State.SLEEPING);
   });
 }
+
+
+

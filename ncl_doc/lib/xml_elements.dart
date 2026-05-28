@@ -2,6 +2,9 @@
 
 import 'ncl_document.dart';
 
+typedef Head = List<NCLXMLElement>;
+typedef Body = Context;
+
 class NCLXMLElement {
   final Map<String, String> rawAttributes;
   final String id;
@@ -84,6 +87,7 @@ abstract class Node extends NCLXMLElement {
 }
 
 abstract class Composition extends Node {
+  final List<Node> nodes = [];
   Composition({required super.id, super.rawAttributes});
 }
 

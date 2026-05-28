@@ -37,6 +37,8 @@ void main(List<String> arguments) {
 
   print('Validation passed. Starting headless execution...');
 
-  var document = NCLDocument(content);
+  var document = NCLDocument.fromXML(content);
   document.start(ticksPerSecond: 1000);
 }
+
+

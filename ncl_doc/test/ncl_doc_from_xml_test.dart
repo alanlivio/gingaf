@@ -12,7 +12,7 @@ void main() {
   </body>
 </ncl>
 ''';
-      final vm = NCLDocument(xml);
+      final vm = NCLDocument.fromXML(xml);
       expect(vm.getLambdaState('m1'), State.SLEEPING);
       vm.start(ticksPerSecond: 100);
       await Future.delayed(const Duration(milliseconds: 50));
@@ -31,7 +31,7 @@ void main() {
           </body>
         </ncl>
         ''';
-      final vm = NCLDocument(xmlString);
+      final vm = NCLDocument.fromXML(xmlString);
 
       expect(vm.getLambdaState('video1'), State.SLEEPING);
       expect(vm.getLambdaState('audio1'), State.SLEEPING);
@@ -52,7 +52,7 @@ void main() {
           </body>
         </ncl>
         ''';
-      final vm = NCLDocument(xmlString);
+      final vm = NCLDocument.fromXML(xmlString);
 
       expect(vm.getLambdaState('c1'), State.SLEEPING);
       expect(vm.getLambdaState('m1'), State.SLEEPING);
@@ -68,7 +68,7 @@ void main() {
           </body>
         </ncl>
         ''';
-      final vm = NCLDocument(imageNcl);
+      final vm = NCLDocument.fromXML(imageNcl);
 
       expect(vm.getLambdaState('ginga_logo'), State.SLEEPING);
       vm.tickTo(0);
@@ -85,7 +85,7 @@ void main() {
           </body>
         </ncl>
         ''';
-      final vm = NCLDocument(xmlString);
+      final vm = NCLDocument.fromXML(xmlString);
       expect(vm.getLambdaState('lua_script'), State.SLEEPING);
     });
 
@@ -100,7 +100,7 @@ void main() {
   </body>
 </ncl>
 ''';
-      final vm = NCLDocument(xml);
+      final vm = NCLDocument.fromXML(xml);
       expect(vm.virtualClock, 0);
       expect(vm.getLambdaState('m1'), State.SLEEPING);
 
@@ -128,7 +128,7 @@ void main() {
   </body>
 </ncl>
 ''';
-      final vm = NCLDocument(xml);
+      final vm = NCLDocument.fromXML(xml);
       expect(vm.virtualClock, 0);
       expect(vm.getLambdaState('m1'), State.SLEEPING);
 
@@ -156,7 +156,7 @@ void main() {
   </body>
 </ncl>
 ''';
-      final vm = NCLDocument(xml);
+      final vm = NCLDocument.fromXML(xml);
       expect(vm.virtualClock, 0);
       expect(vm.getLambdaState('m1'), State.SLEEPING);
 
@@ -182,7 +182,7 @@ void main() {
   </body>
 </ncl>
 ''';
-      final vm = NCLDocument(xml);
+      final vm = NCLDocument.fromXML(xml);
       expect(vm.virtualClock, 0);
       expect(vm.getLambdaState('ctx1'), State.SLEEPING);
 
@@ -205,7 +205,7 @@ void main() {
   </body>
 </ncl>
 ''';
-      final vm = NCLDocument(xml);
+      final vm = NCLDocument.fromXML(xml);
       expect(vm.virtualClock, 0);
       expect(vm.getLambdaState('m1'), State.SLEEPING);
 
@@ -228,7 +228,7 @@ void main() {
   </body>
 </ncl>
 ''';
-      final vm = NCLDocument(xml);
+      final vm = NCLDocument.fromXML(xml);
       expect(vm.virtualClock, 0);
       expect(vm.getLambdaState('m1'), State.SLEEPING);
 
@@ -243,3 +243,6 @@ void main() {
     });
   });
 }
+
+
+
