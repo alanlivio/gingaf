@@ -35,6 +35,8 @@ class NCLDocument {
           ? List<NCLXMLElement>.from(initialElements)
           : <NCLXMLElement>[] {
     _initializeRootAndSettings();
+    _setupEventStateListeners();
+    _processPorts();
   }
 
   void _initializeRootAndSettings() {
