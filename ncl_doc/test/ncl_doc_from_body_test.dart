@@ -28,7 +28,7 @@ void main() {
       doc.tickTo(0);
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
-      
+
       doc.stop();
       expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
@@ -61,7 +61,7 @@ void main() {
       final doc = NCLDocument.fromBodyElements([]);
       final settings = doc.getSettings();
       expect(settings, isNotNull);
-      expect(settings.id, 'default_settings');
+      expect(settings.id, '__settings__');
     });
 
     test('NCLDocument Composition', () {

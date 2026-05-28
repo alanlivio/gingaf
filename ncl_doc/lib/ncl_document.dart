@@ -18,7 +18,7 @@ enum State { OCCURRING, PAUSED, SLEEPING }
 final _logger = Logger('ncl_doc');
 
 class NCLDocument {
-  final List<NCLXMLElement> elements;
+  late final Head? _head;
   late final Context _body;
   late final Settings _settings;
 
@@ -42,51 +42,50 @@ class NCLDocument {
     return NCLDocument(head: head, body: body);
   }
 
-  NCLDocument({Head? head, Body? body}) : elements = <NCLXMLElement>[] {
-    void collect(NCLXMLElement e) {
-      elements.add(e);
-      for (var child in e.children) {
-        collect(child);
-      }
-    }
-
-    if (head != null) {
-      for (var h in head) {
-        collect(h);
-      }
-    }
-    _body = body ?? Context(id: 'body');
-    collect(_body);
+  NCLDocument({Head? head, required Body body}) {
+    _head = head;
+    _body = body;
     _initializeBodyAndSettings();
     _setupEventStateListeners();
     _processPorts();
   }
 
   void _initializeBodyAndSettings() {
-    final settingsList = elements.whereType<Settings>();
+    final settingsList = _body.children.whereType<Settings>();
     if (settingsList.isNotEmpty) {
       _settings = settingsList.first;
     } else {
-      _settings = Settings(id: 'default_settings');
+      _settings = Settings(id: '__settings__');
       _body.children.add(_settings);
       _settings.parent = _body;
-      elements.add(_settings);
     }
-
   }
 
+  Head? getHead() => _head;
   Context getBody() => _body;
-  State getBodyState() => _body.getNodeEvent().state;
+  State getBodyState() => _body.getNodeState();
 
   Settings getSettings() => _settings;
 
   Node? getNodeById(String id) {
-    final nodes = elements.whereType<Node>().where((n) => n.id == id);
-    return nodes.isEmpty ? null : nodes.first;
+    if (_body.id == id) return _body;
+
+    Node? search(Composition comp) {
+      for (var node in comp.getNodes()) {
+        if (node.id == id) return node;
+        if (node is Composition) {
+          final res = search(node);
+          if (res != null) return res;
+        }
+      }
+      return null;
+    }
+
+    return search(_body);
   }
 
   void _setupEventStateListeners() {
-    for (var node in elements.whereType<Node>()) {
+    void addListener(Node node) {
       node.getNodeEvent().addStateListener((oldState, newState) {
         _logger.info(
           '[Clock: $virtualClock] Node "${node.id}" changed state: '
@@ -94,26 +93,40 @@ class NCLDocument {
         );
         _triggerLinks(node.id, newState);
       });
+      if (node is Composition) {
+        for (var child in node.getNodes()) {
+          addListener(child);
+        }
+      }
     }
+
+    addListener(_body);
   }
 
   void _processPorts() {
     _body.startTimestamp = 0;
     _scheduleAction(_body.getNodeEvent(), ActionType.START);
 
-    for (var port in elements.whereType<Port>()) {
-      if (port.component != null) {
-        final node = getNodeById(port.component!);
-        if (node != null) {
-          node.startTimestamp = 0;
-          final event = node.getNodeEvent();
-          _scheduleAction(event, ActionType.START);
+    void process(Context comp) {
+      for (var port in comp.getPorts()) {
+        if (port.component != null) {
+          final node = getNodeById(port.component!);
+          if (node != null) {
+            node.startTimestamp = 0;
+            final event = node.getNodeEvent();
+            _scheduleAction(event, ActionType.START);
+          }
+        }
+      }
+      for (var child in comp.getNodes()) {
+        if (child is Context) {
+          process(child);
         }
       }
     }
+
+    process(_body);
   }
-
-
 
   void setEventState(String targetId, State newState) {
     final node = getNodeById(targetId);
@@ -142,9 +155,7 @@ class NCLDocument {
     final node = getNodeById(targetId);
     final context = node?.parent;
 
-    final links = context is Context
-        ? context.getLinks()
-        : elements.whereType<Link>().toList();
+    final links = context is Context ? context.getLinks() : _body.getLinks();
 
     for (var link in links) {
       bool triggered = false;
@@ -198,11 +209,19 @@ class NCLDocument {
     _logger.info('[Clock: $virtualClock] NCLDocument will stop');
     _timer?.cancel();
     _timer = null;
-    for (var node in elements.whereType<Node>()) {
-      if (node.getNodeEvent().state == State.OCCURRING ||
-          node.getNodeEvent().state == State.PAUSED) {
+
+    void stopNode(Node node) {
+      if (node.getNodeState() == State.OCCURRING ||
+          node.getNodeState() == State.PAUSED) {
         node.getNodeEvent().doAction(ActionType.STOP);
       }
+      if (node is Composition) {
+        for (var child in node.getNodes()) {
+          stopNode(child);
+        }
+      }
     }
+
+    stopNode(_body);
   }
 }

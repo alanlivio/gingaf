@@ -1,17 +1,17 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:ncl_doc/ncl_document.dart' hide State;
 import 'package:ncl_doc/ncl_document.dart' as vm show State;
+import 'package:ncl_doc/ncl_document.dart' hide State;
 
 import 'widgets/base.dart';
 
+export 'widgets/av.dart';
 export 'widgets/base.dart';
 export 'widgets/image.dart';
 export 'widgets/lua.dart';
 export 'widgets/ssml.dart';
 export 'widgets/text.dart';
-export 'widgets/av.dart';
 
 const RUNTIME = kIsWeb ? 'gingancl(browser)' : 'gingancl';
 
@@ -64,13 +64,22 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
       final doc = NCLDocument.fromXML(nclData);
 
       final settings = doc.getSettings();
-      final initialVideo = settings.getProperties()
-          .where((p) => p.name == 'videoUri');
+      final initialVideo =
+          settings.getProperties().where((p) => p.name == 'videoUri');
       if (initialVideo.isNotEmpty) {
-        widget.onBackgroundVideoChanged?.call(initialVideo.first.value?.toString());
+        widget.onBackgroundVideoChanged
+            ?.call(initialVideo.first.value?.toString());
       }
 
-      final mediaNodes = doc.elements.whereType<Media>().toList();
+      List<Media> getMediaNodes(Composition comp) {
+        final medias = <Media>[];
+        for (var node in comp.getNodes()) {
+          if (node is Media) medias.add(node);
+          if (node is Composition) medias.addAll(getMediaNodes(node));
+        }
+        return medias;
+      }
+      final mediaNodes = getMediaNodes(doc.getBody());
       for (var media in mediaNodes) {
         media.getNodeEvent().addStateListener((oldState, newState) {
           if (newState == vm.State.OCCURRING) {
