@@ -1,11 +1,11 @@
 import 'dart:io';
 
+import 'package:ccws/ccws.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-
-import 'package:ccws/ccws.dart';
-import 'html_app.dart' as html;
 import 'package:ncl_app/ncl_app.dart' as ncl;
+
+import 'html_app.dart' as html;
 
 const GINGA = 'gingaf';
 const USAGE = '''
@@ -22,9 +22,10 @@ class GingaConfig {
 
   GingaConfig([String? manualPath, bool? manualCCWS, String? manualVideo])
       : appPath = _resolve(manualPath),
-        videoUri = manualVideo ?? (const String.fromEnvironment('VIDEO').isNotEmpty
-            ? const String.fromEnvironment('VIDEO')
-            : null),
+        videoUri = manualVideo ??
+            (const String.fromEnvironment('VIDEO').isNotEmpty
+                ? const String.fromEnvironment('VIDEO')
+                : null),
         enableCCWS = manualCCWS ??
             const bool.fromEnvironment('CCWS', defaultValue: true);
 
@@ -110,7 +111,7 @@ class Ginga extends StatefulWidget {
 class _GingaState extends State<Ginga> {
   late final CCWS _ccws;
   late final MainAVController mainAVController;
-  late final Widget main_av_widget;
+  late final Widget mainAVWidget;
   Widget? ginga_html_app;
   Widget? ginga_ncl_app;
 
@@ -124,7 +125,7 @@ class _GingaState extends State<Ginga> {
     }
 
     mainAVController = MainAVController()..setVideoUri(widget.config.videoUri);
-    main_av_widget = MainAVWidget(controller: mainAVController);
+    mainAVWidget = MainAVWidget(controller: mainAVController);
 
     final path = widget.config.appPath;
     if (path != null) {
@@ -175,7 +176,7 @@ class _GingaState extends State<Ginga> {
             : Stack(
                 fit: StackFit.expand,
                 children: [
-                  main_av_widget,
+                  mainAVWidget,
                   if (ginga_html_app != null) ginga_html_app!,
                   if (ginga_ncl_app != null) ginga_ncl_app!,
                 ],

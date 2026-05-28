@@ -24,14 +24,14 @@ void main() {
       final media = Media(id: 'm1');
       final port = Port(id: 'p1', rawAttributes: {'component': 'm1'});
       final doc = NCLDocument.fromBodyElements([media, port]);
-      expect(doc.getLambdaState('m1'), State.SLEEPING);
+      expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
       doc.tickTo(0);
-      expect(doc.getBodyLambdaState(), State.OCCURRING);
-      expect(doc.getLambdaState('m1'), State.OCCURRING);
+      expect(doc.getBodyState(), State.OCCURRING);
+      expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
       
       doc.stop();
-      expect(doc.getLambdaState('m1'), State.SLEEPING);
-      expect(doc.getBodyLambdaState(), State.SLEEPING);
+      expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
+      expect(doc.getBodyState(), State.SLEEPING);
     });
 
     test('causal link between two media', () {
@@ -47,14 +47,14 @@ void main() {
       );
       final doc = NCLDocument.fromBodyElements([m1, m2, port, link]);
       doc.tickTo(0);
-      expect(doc.getBodyLambdaState(), State.OCCURRING);
-      expect(doc.getLambdaState('m1'), State.OCCURRING);
-      expect(doc.getLambdaState('m2'), State.OCCURRING);
+      expect(doc.getBodyState(), State.OCCURRING);
+      expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
+      expect(doc.getNodeById('m2')?.getNodeState(), State.OCCURRING);
 
       doc.stop();
-      expect(doc.getLambdaState('m1'), State.SLEEPING);
-      expect(doc.getLambdaState('m2'), State.SLEEPING);
-      expect(doc.getBodyLambdaState(), State.SLEEPING);
+      expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('m2')?.getNodeState(), State.SLEEPING);
+      expect(doc.getBodyState(), State.SLEEPING);
     });
 
     test('default Settings is created if none is provided', () {

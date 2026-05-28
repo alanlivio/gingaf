@@ -17,10 +17,10 @@ void main() {
       expect(media.getAreas().first.begin, '10s');
     });
 
-    test('lambda on Node returns same Event instance', () {
+    test('getNodeEvent on Node returns same Event instance', () {
       final media = Media(id: 'm1');
-      final event1 = media.lambda;
-      final event2 = media.lambda;
+      final event1 = media.getNodeEvent();
+      final event2 = media.getNodeEvent();
       expect(event1, same(event2));
       expect(event1.targetNode.id, 'm1');
       expect(event1.type, EventType.PRESENTATION);
@@ -28,7 +28,7 @@ void main() {
 
     test('doAction transition logic', () {
       final media = Media(id: 'm1');
-      final event = media.lambda;
+      final event = media.getNodeEvent();
       expect(event.state, State.SLEEPING);
       expect(event.doAction(ActionType.START), State.OCCURRING);
       expect(event.state, State.OCCURRING);

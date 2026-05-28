@@ -72,8 +72,7 @@ class NCLDocument {
   }
 
   Context getBody() => _body;
-  
-  State getBodyLambdaState() => _body.lambda.state;
+  State getBodyState() => _body.getNodeEvent().state;
 
   Settings getSettings() => _settings;
 
@@ -84,7 +83,7 @@ class NCLDocument {
 
   void _setupEventStateListeners() {
     for (var node in elements.whereType<Node>()) {
-      node.lambda.addStateListener((oldState, newState) {
+      node.getNodeEvent().addStateListener((oldState, newState) {
         print(
           '[Clock: $virtualClock] Node "${node.id}" changed state: '
           '${Event.getEventStateAsString(oldState)} -> ${Event.getEventStateAsString(newState)}',
@@ -96,29 +95,26 @@ class NCLDocument {
 
   void _processPorts() {
     _body.startTimestamp = 0;
-    _scheduleAction(_body.lambda, ActionType.START);
+    _scheduleAction(_body.getNodeEvent(), ActionType.START);
 
     for (var port in elements.whereType<Port>()) {
       if (port.component != null) {
         final node = getNodeById(port.component!);
         if (node != null) {
           node.startTimestamp = 0;
-          final event = node.lambda;
+          final event = node.getNodeEvent();
           _scheduleAction(event, ActionType.START);
         }
       }
     }
   }
 
-  State getLambdaState(String targetId) {
-    final node = getNodeById(targetId);
-    return node?.lambda.state ?? State.SLEEPING;
-  }
+
 
   void setEventState(String targetId, State newState) {
     final node = getNodeById(targetId);
     if (node == null) return;
-    node.lambda.state = newState;
+    node.getNodeEvent().state = newState;
   }
 
   void tick([int increment = 1]) {
@@ -166,7 +162,7 @@ class NCLDocument {
             final bindNode = getNodeById(bind.component!);
             if (bindNode != null) {
               bindNode.startTimestamp = virtualClock;
-              final event = bindNode.lambda;
+              final event = bindNode.getNodeEvent();
               _scheduleAction(event, ActionType.START);
             }
           }
@@ -199,9 +195,9 @@ class NCLDocument {
     _timer?.cancel();
     _timer = null;
     for (var node in elements.whereType<Node>()) {
-      if (node.lambda.state == State.OCCURRING ||
-          node.lambda.state == State.PAUSED) {
-        node.lambda.doAction(ActionType.STOP);
+      if (node.getNodeEvent().state == State.OCCURRING ||
+          node.getNodeEvent().state == State.PAUSED) {
+        node.getNodeEvent().doAction(ActionType.STOP);
       }
     }
   }

@@ -60,12 +60,13 @@ class Connector extends NCLXMLElement {
 abstract class Node extends NCLXMLElement {
   Composition? parent;
   int startTimestamp = 0;
-  late final Event lambda = Event(
+  late final Event _presentationEvt = Event(
     type: EventType.PRESENTATION,
     targetNode: this,
   );
 
-  Event getPresentationEvent() => lambda;
+  Event getNodeEvent() => _presentationEvt;
+  State getNodeState() => _presentationEvt.state;
 
   Node({required super.id, super.rawAttributes});
 }

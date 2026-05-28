@@ -57,11 +57,11 @@ void main() {
 
     final doc = NCLDocument.fromBodyElements([p1, p2, context1, context2]);
     doc.tickTo(0);
-    expect(doc.getLambdaState('c1'), State.OCCURRING);
-    expect(doc.getLambdaState('c2'), State.OCCURRING);
-    expect(doc.getLambdaState('m1'), State.OCCURRING);
-    expect(doc.getLambdaState('m2'), State.OCCURRING);
-    expect(doc.getLambdaState('m3'), State.OCCURRING);
-    expect(doc.getLambdaState('m4'), State.OCCURRING);
+    expect(doc.getNodeById('c1')?.getNodeState(), State.OCCURRING);
+    expect(doc.getNodeById('c2')?.getNodeState(), State.OCCURRING);
+    expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
+    expect(doc.getNodeById('m2')?.getNodeState(), State.OCCURRING);
+    expect(doc.getNodeById('m3')?.getNodeState(), State.OCCURRING);
+    expect(doc.getNodeById('m4')?.getNodeState(), State.OCCURRING);
   });
 }

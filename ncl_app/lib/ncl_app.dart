@@ -69,7 +69,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
 
       final mediaNodes = doc.elements.whereType<Media>().toList();
       for (var media in mediaNodes) {
-        media.lambda.addStateListener((oldState, newState) {
+        media.getNodeEvent().addStateListener((oldState, newState) {
           if (newState == vm.State.OCCURRING) {
             final src = media.rawAttributes['src'] ?? '';
             var mimeType = media.rawAttributes['type'];
@@ -85,7 +85,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
               contentPath,
               media: media,
               onVideoStopped: () {
-                media.lambda.transition(ActionType.STOP);
+                media.getNodeEvent().transition(ActionType.STOP);
               },
             );
 
