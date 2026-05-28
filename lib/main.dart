@@ -112,8 +112,8 @@ class _GingaState extends State<Ginga> {
   late final CCWS _ccws;
   late final MainAVController mainAVController;
   late final Widget mainAVWidget;
-  Widget? ginga_html_app;
-  Widget? ginga_ncl_app;
+  Widget? htmlApp;
+  Widget? nclApp;
 
   @override
   void initState() {
@@ -130,14 +130,14 @@ class _GingaState extends State<Ginga> {
     final path = widget.config.appPath;
     if (path != null) {
       if (path.toLowerCase().endsWith('.html')) {
-        ginga_html_app = html.HTMLApp(
+        htmlApp = html.HTMLApp(
           uri: path,
           onBackgroundVideoChanged: (newUri) {
             mainAVController.setVideoUri(newUri);
           },
         );
       } else {
-        ginga_ncl_app = ncl.NCLApp(
+        nclApp = ncl.NCLApp(
           uri: path,
           onBackgroundVideoChanged: (newUri) {
             mainAVController.setVideoUri(newUri);
@@ -157,7 +157,7 @@ class _GingaState extends State<Ginga> {
 
   @override
   Widget build(BuildContext context) {
-    final showUsage = ginga_html_app == null && ginga_ncl_app == null;
+    final showUsage = htmlApp == null && nclApp == null;
     return MaterialApp(
       title: 'gingaf',
       themeMode: ThemeMode.light,
@@ -177,8 +177,8 @@ class _GingaState extends State<Ginga> {
                 fit: StackFit.expand,
                 children: [
                   mainAVWidget,
-                  if (ginga_html_app != null) ginga_html_app!,
-                  if (ginga_ncl_app != null) ginga_ncl_app!,
+                  if (htmlApp != null) htmlApp!,
+                  if (nclApp != null) nclApp!,
                 ],
               ),
       ),
