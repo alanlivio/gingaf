@@ -89,12 +89,8 @@ class NCLParser {
       final childElement = _parseNode(childNode);
       if (childElement != null) {
         element.children.add(childElement);
-        if (element is Context && childElement is Link) {
-          element.links.add(childElement);
-        }
         if (element is Composition && childElement is Node) {
           childElement.parent = element;
-          element.nodes.add(childElement);
         }
       }
     }

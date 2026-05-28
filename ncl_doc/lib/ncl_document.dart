@@ -28,10 +28,6 @@ class NCLDocument {
     for (var el in elements) {
       if (el is Node) {
         el.parent = body;
-        body.nodes.add(el);
-      }
-      if (el is Link) {
-        body.links.add(el);
       }
     }
     return NCLDocument(body: body);
@@ -49,6 +45,7 @@ class NCLDocument {
         collect(child);
       }
     }
+
     if (head != null) {
       for (var h in head) {
         collect(h);
@@ -62,24 +59,16 @@ class NCLDocument {
   }
 
   void _initializeBodyAndSettings() {
-
     final settingsList = elements.whereType<Settings>();
     if (settingsList.isNotEmpty) {
       _settings = settingsList.first;
     } else {
       _settings = Settings(id: 'default_settings');
-      _body.children.add(_settings!);
-      _settings!.parent = _body;
-      elements.add(_settings!);
+      _body.children.add(_settings);
+      _settings.parent = _body;
+      elements.add(_settings);
     }
 
-    for (var node in elements.whereType<Node>()) {
-      for (var child in node.children.whereType<Property>()) {
-        if (child.name != null && child.value != null) {
-          node.setProperty(child.name!, child.value!);
-        }
-      }
-    }
   }
 
   Context getBody() => _body;
@@ -149,7 +138,7 @@ class NCLDocument {
     final context = node?.parent;
 
     final links = context is Context
-        ? context.links
+        ? context.getLinks()
         : elements.whereType<Link>().toList();
 
     for (var link in links) {

@@ -4,29 +4,29 @@ import 'package:test/test.dart';
 void main() {
   group('NCLDocument from nodes Tests', () {
     test('tick increments virtual clock', () {
-      final vm = NCLDocument.fromBodyElements([]);
-      expect(vm.virtualClock, 0);
-      vm.tick(10);
-      expect(vm.virtualClock, 10);
-      vm.tick();
-      expect(vm.virtualClock, 11);
+      final doc = NCLDocument.fromBodyElements([]);
+      expect(doc.virtualClock, 0);
+      doc.tick(10);
+      expect(doc.virtualClock, 10);
+      doc.tick();
+      expect(doc.virtualClock, 11);
     });
 
     test('tickTo advances clock to specific time', () {
-      final vm = NCLDocument.fromBodyElements([]);
-      vm.tickTo(100);
-      expect(vm.virtualClock, 100);
-      vm.tickTo(50);
-      expect(vm.virtualClock, 100);
+      final doc = NCLDocument.fromBodyElements([]);
+      doc.tickTo(100);
+      expect(doc.virtualClock, 100);
+      doc.tickTo(50);
+      expect(doc.virtualClock, 100);
     });
 
     test('automatic start via Port', () {
       final media = Media(id: 'm1');
       final port = Port(id: 'p1', rawAttributes: {'component': 'm1'});
-      final vm = NCLDocument.fromBodyElements([media, port]);
-      expect(vm.getLambdaState('m1'), State.SLEEPING);
-      vm.tickTo(0);
-      expect(vm.getLambdaState('m1'), State.OCCURRING);
+      final doc = NCLDocument.fromBodyElements([media, port]);
+      expect(doc.getLambdaState('m1'), State.SLEEPING);
+      doc.tickTo(0);
+      expect(doc.getLambdaState('m1'), State.OCCURRING);
     });
 
     test('causal link between two media', () {
@@ -40,10 +40,10 @@ void main() {
       link.children.add(
         Bind(rawAttributes: {'role': 'start', 'component': 'm2'}),
       );
-      final vm = NCLDocument.fromBodyElements([m1, m2, port, link]);
-      vm.tickTo(0);
-      expect(vm.getLambdaState('m1'), State.OCCURRING);
-      expect(vm.getLambdaState('m2'), State.OCCURRING);
+      final doc = NCLDocument.fromBodyElements([m1, m2, port, link]);
+      doc.tickTo(0);
+      expect(doc.getLambdaState('m1'), State.OCCURRING);
+      expect(doc.getLambdaState('m2'), State.OCCURRING);
     });
 
     test('default Settings is created if none is provided', () {
@@ -64,10 +64,11 @@ void main() {
       );
       final doc = NCLDocument.fromBodyElements([media, port]);
 
-      expect(doc.elements.whereType<Media>().length, 1);
-      expect(doc.elements.whereType<Port>().length, 1);
-      expect(doc.elements.whereType<Media>().first.id, 'm1');
-      expect(doc.elements.whereType<Port>().first.id, 'p1');
+      // Expect 2 because Settings now extends Media and a default_settings is added
+      expect(doc.getBody().getNodes().whereType<Media>().length, 2);
+      expect(doc.getBody().getPorts().length, 1);
+      expect(doc.getBody().getNodes().whereType<Media>().first.id, 'm1');
+      expect(doc.getBody().getPorts().first.id, 'p1');
     });
 
     test('getSettings is returned correctly when provided', () {

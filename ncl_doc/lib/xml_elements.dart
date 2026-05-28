@@ -56,12 +56,9 @@ class Connector extends NCLXMLElement {
   Connector({required super.id, super.rawAttributes});
 }
 
-typedef PropertyChangeListener = void Function(String name, dynamic value);
 
 abstract class Node extends NCLXMLElement {
   Composition? parent;
-  final Map<String, dynamic> properties = {};
-  final List<PropertyChangeListener> _listeners = [];
   int startTimestamp = 0;
   late final Event lambda = Event(
     type: EventType.PRESENTATION,
@@ -71,28 +68,16 @@ abstract class Node extends NCLXMLElement {
   Event getPresentationEvent() => lambda;
 
   Node({required super.id, super.rawAttributes});
-
-  void addPropertyChangeListener(PropertyChangeListener listener) {
-    _listeners.add(listener);
-  }
-
-  void setProperty(String name, dynamic value) {
-    properties[name] = value;
-    for (var listener in _listeners) {
-      listener(name, value);
-    }
-  }
-
-  dynamic getProperty(String name) => properties[name];
 }
 
 abstract class Composition extends Node {
-  final List<Node> nodes = [];
+  List<Node> getNodes() => children.whereType<Node>().toList();
+  List<Port> getPorts() => children.whereType<Port>().toList();
   Composition({required super.id, super.rawAttributes});
 }
 
 class Context extends Composition {
-  final List<Link> links = [];
+  List<Link> getLinks() => children.whereType<Link>().toList();
   Context({required super.id, super.rawAttributes});
 }
 
@@ -102,8 +87,11 @@ class Switch extends Composition {
 
 class Media extends Node {
   Media({required super.id, super.rawAttributes});
+  
+  List<Property> getProperties() => children.whereType<Property>().toList();
+  List<Area> getAreas() => children.whereType<Area>().toList();
 }
 
-class Settings extends Node {
+class Settings extends Media {
   Settings({required super.id, super.rawAttributes});
 }
