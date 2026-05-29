@@ -46,12 +46,41 @@ void main(List<String> arguments) {
   document.start();
 
   StreamSubscription<ProcessSignal>? sigintSub;
-  sigintSub = ProcessSignal.sigint.watch().listen((ProcessSignal signal) {
-    _logger.info('Captured Ctrl+C. Stopping document...');
+  StreamSubscription<List<int>>? stdinSub;
+
+  void stopDocument() {
     document.stop();
     sigintSub?.cancel();
+    stdinSub?.cancel();
+
+    if (stdin.hasTerminal) {
+      stdin.lineMode = true;
+      stdin.echoMode = true;
+    }
+    exit(0);
+  }
+
+  sigintSub = ProcessSignal.sigint.watch().listen((ProcessSignal signal) {
+    _logger.info('Captured Ctrl+C, so stopping document.');
+    stopDocument();
   });
 
   _logger.info('Starting execution at $ticksPerSecond ticks per second...');
+  _logger.info('Press Ctrl+D to quit the document...');
+
+  try {
+    if (stdin.hasTerminal) {
+      stdin.echoMode = false;
+      stdin.lineMode = false;
+    }
+    stdinSub = stdin.listen((List<int> codes) {
+      if (codes.contains(4)) {
+        _logger.info('Captured Ctrl+D, so stopping document.');
+        stopDocument();
+      }
+    });
+  } catch (e) {
+  }
+
   document.tickIndefinitely(ticksPerSecond: ticksPerSecond);
 }

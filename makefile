@@ -1,4 +1,4 @@
-.PHONY: all build build-windows build-web test test-gingaf test-ncl-doc test-ncl-app test-ccws clean clean-gingaf clean-ncl-doc clean-ncl-app clean-ccws
+.PHONY: all build build-windows build-web test test-gingaf test-ncl-doc test-ncl-app test-ccws run-examples run-examples-ncl-headless clean clean-gingaf clean-ncl-doc clean-ncl-app clean-ccws
 
 all: build
 
@@ -23,6 +23,27 @@ test-ncl-app:
 
 test-ccws:
 	cd ccws && flutter test
+
+NCL_EXAMPLES := $(wildcard examples/*.ncl)
+HEADLESS_EXAMPLES := $(addsuffix -headless, $(NCL_EXAMPLES))
+
+run-examples: $(NCL_EXAMPLES)
+
+run-examples-headless: $(HEADLESS_EXAMPLES)
+
+$(NCL_EXAMPLES):
+	@echo ======================================================================
+	@echo Running Example: $@
+	@echo ======================================================================
+	flutter run -d windows --dart-define="APP=$@"
+
+%-headless:
+	@echo ======================================================================
+	@echo Running Headless NCL Example: $*
+	@echo ======================================================================
+	dart ./ncl_doc/lib/cli.dart $*
+
+.PHONY: $(NCL_EXAMPLES) $(HEADLESS_EXAMPLES)
 
 clean: clean-ncl-doc clean-ncl-app clean-ccws clean-gingaf
 
