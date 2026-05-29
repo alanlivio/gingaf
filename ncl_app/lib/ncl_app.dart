@@ -32,7 +32,6 @@ class NCLApp extends StatefulWidget {
 
 class NCLAppState extends BaseWidgetState<NCLApp> {
   NCLDocument? nclDocument;
-  final Map<String, Widget> _activeWidgets = {};
   Timer? _ticker;
   String errorMsg = "";
   bool _loading = false;
@@ -50,9 +49,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
     _loading = true;
     try {
       if (mounted) {
-        setState(() {
-          _activeWidgets.clear();
-        });
+        setState(() {});
       }
 
       final String nclData = await loadContent(widget.uri);
@@ -62,52 +59,6 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
           : "";
 
       final doc = NCLDocument.fromXML(nclData);
-
-      List<Media> getMediaNodes(Composition comp) {
-        final medias = <Media>[];
-        for (var node in comp.getNodes()) {
-          if (node is Media) medias.add(node);
-          if (node is Composition) medias.addAll(getMediaNodes(node));
-        }
-        return medias;
-      }
-
-      final mediaNodes = getMediaNodes(doc.getBody());
-      for (var media in mediaNodes) {
-        media.getMainEvent().addStateListener((oldState, newState) {
-          if (newState == vm.State.OCCURRING) {
-            final src = media.rawAttributes['src'] ?? '';
-            var mimeType = media.rawAttributes['type'];
-            if (mimeType == null || mimeType.isEmpty) {
-              mimeType = WidgetFactory.getMimeTypeFromExtension(src);
-            }
-            final contentPath = src.startsWith('http')
-                ? src
-                : (src.contains('/') ? src : "$nclBase$src");
-
-            final widgetInstance = WidgetFactory.createWidget(
-              mimeType,
-              contentPath,
-              media: media,
-              onVideoStopped: () {
-                media.getMainEvent().doAction(ActionType.STOP);
-              },
-            );
-
-            if (widgetInstance != null && mounted) {
-              if (nclDocument == null) return;
-              setState(() {
-                _activeWidgets[media.id] = widgetInstance;
-              });
-            }
-          } else if (newState == vm.State.SLEEPING && mounted) {
-            if (nclDocument == null) return;
-            setState(() {
-              _activeWidgets.remove(media.id);
-            });
-          }
-        });
-      }
 
       nclDocument = doc;
       doc.start();
@@ -125,15 +76,18 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
               final deltaMs = now.difference(lastTick).inMilliseconds;
               lastTick = now;
               nclDocument?.tick(deltaMs);
-              if (nclDocument != null && !nclDocument!.isPlaying) {
-                _ticker?.cancel();
-                _ticker = null;
-                nclDocument = null;
-                _activeWidgets.clear();
-                if (mounted) {
+              if (nclDocument != null) {
+                if (!nclDocument!.isPlaying) {
+                  _ticker?.cancel();
+                  _ticker = null;
+                  nclDocument = null;
+                  if (mounted) {
+                    setState(() {});
+                  }
+                  NCLAppExitNotification().dispatch(context);
+                } else if (mounted) {
                   setState(() {});
                 }
-                NCLAppExitNotification().dispatch(context);
               }
             }
           });
@@ -163,11 +117,37 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
 
   @override
   Widget buildWidgetContent(BuildContext context) {
+    final String nclBase = widget.uri.contains('/')
+        ? widget.uri.substring(0, widget.uri.lastIndexOf('/') + 1)
+        : "";
+
+    final activeMedia = nclDocument?.getActiveMedia() ?? [];
+
+    final widgets = activeMedia.map((media) {
+      final src = media.rawAttributes['src'] ?? '';
+      var mimeType = media.rawAttributes['type'];
+      if (mimeType == null || mimeType.isEmpty) {
+        mimeType = WidgetFactory.getMimeTypeFromExtension(src);
+      }
+      final contentPath = src.startsWith('http')
+          ? src
+          : (src.contains('/') ? src : "$nclBase$src");
+
+      return KeyedSubtree(
+        key: ValueKey(media.id),
+        child: WidgetFactory.createWidget(
+          mimeType,
+          contentPath,
+          media: media,
+        ) ?? const SizedBox.shrink(),
+      );
+    }).toList();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         fit: StackFit.expand,
-        children: _activeWidgets.values.toList(),
+        children: widgets,
       ),
     );
   }

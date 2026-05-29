@@ -47,7 +47,6 @@ class NCLDocument {
     _head = head;
     _body = body;
     _initializeBodyAndSettings();
-    _setupEventStateListeners();
     _processPorts();
   }
 
@@ -98,26 +97,19 @@ class NCLDocument {
     return search(_body);
   }
 
-  void _setupEventStateListeners() {
-    void addListener(Node node) {
-      node.getMainEvent().addStateListener((oldState, newState) {
-        if (newState == State.OCCURRING) {
-          node.time = 0;
-        }
-        _logger.info(
-          '[Clock: ${virtualClock / 1000}s] Node "${node.id}" changed state: '
-          '${Event.getEventStateAsString(oldState)} -> ${Event.getEventStateAsString(newState)}',
-        );
-        _triggerLinks(node.id, newState);
-      });
-      if (node is Composition) {
-        for (var child in node.getNodes()) {
-          addListener(child);
+  List<Media> getActiveMedia() {
+    final active = <Media>[];
+    void search(Composition comp) {
+      for (var node in comp.getNodes()) {
+        if (node is Media && node.getMainState() == State.OCCURRING) {
+          active.add(node);
+        } else if (node is Composition) {
+          search(node);
         }
       }
     }
-
-    addListener(_body);
+    search(_body);
+    return active;
   }
 
   void _processPorts() {
@@ -143,11 +135,7 @@ class NCLDocument {
     process(_body);
   }
 
-  void setEventState(String targetId, State newState) {
-    final node = getNodeById(targetId);
-    if (node == null) return;
-    node.getMainEvent().state = newState;
-  }
+
 
   void tick([int incrementMs = 0]) {
     final targetTime = virtualClock + incrementMs;
@@ -172,6 +160,13 @@ class NCLDocument {
       actionItem.event.doAction(actionItem.action);
       final newState = actionItem.event.state;
       if (actionItem.event.isMain && newState != prevState) {
+        _logger.info(
+          '[Clock: ${(virtualClock / 1000).toStringAsFixed(3)}s] Node "${actionItem.event.targetNode.id}" changed state: ${Event.getEventStateAsString(prevState)} -> ${Event.getEventStateAsString(newState)}',
+        );
+        if (newState == State.OCCURRING) {
+          actionItem.event.targetNode.time = 0;
+        }
+        _triggerLinks(actionItem.event.targetNode.id, newState);
         final parent = actionItem.event.targetNode.parent;
         if (parent is Context) {
           if (newState == State.OCCURRING) {

@@ -9,27 +9,9 @@ class Event {
   final Node targetNode;
   final String? propertyName;
   final bool isMain;
-  State _state = State.SLEEPING;
-  final List<void Function(State oldState, State newState)> _stateListeners =
-      [];
+  State state = State.SLEEPING;
 
   Event({required this.type, required this.targetNode, this.propertyName, this.isMain = false});
-
-  State get state => _state;
-  set state(State newState) {
-    final oldState = _state;
-    if (oldState == newState) return;
-    _state = newState;
-    for (var listener in _stateListeners) {
-      listener(oldState, newState);
-    }
-  }
-
-  void addStateListener(
-    void Function(State oldState, State newState) listener,
-  ) {
-    _stateListeners.add(listener);
-  }
 
   State doAction(ActionType action) {
     switch (action) {

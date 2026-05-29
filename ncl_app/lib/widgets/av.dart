@@ -8,13 +8,11 @@ import 'base.dart';
 class AVWidget extends StatefulWidget {
   final String uri;
   final Media? media;
-  final VoidCallback? onVideoStopped;
 
   const AVWidget({
     super.key,
     required this.uri,
     this.media,
-    this.onVideoStopped,
   });
 
   @override
@@ -49,7 +47,6 @@ class AVWidgetState extends BaseWidgetState<AVWidget> {
             _controller.value.duration.inMilliseconds > 0 &&
             _controller.value.position >= _controller.value.duration) {
           _isCompleted = true;
-          widget.onVideoStopped?.call();
         }
       });
       

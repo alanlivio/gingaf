@@ -143,9 +143,9 @@ class WidgetFactory {
     'avi': ['video/avi'],
   };
 
-  static Widget? createWidget(String mimeType, String uri, {Media? media, VoidCallback? onVideoStopped}) {
+  static Widget? createWidget(String mimeType, String uri, {Media? media}) {
     if (mimeType.startsWith('video/') || mimeType.startsWith('audio/') || mimeType.contains('video') || mimeType.contains('audio')) {
-      return AVWidget(uri: uri, media: media, onVideoStopped: onVideoStopped);
+      return AVWidget(uri: uri, media: media);
     }
     switch (mimeType) {
       case 'application/x-ginga-NCLua':
