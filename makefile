@@ -1,4 +1,4 @@
-.PHONY: all build build-windows build-web test test-gingaf test-ncl-doc test-ncl-app test-ccws run-examples run-examples-ncl-headless clean clean-gingaf clean-ncl-doc clean-ncl-app clean-ccws
+.PHONY: all build build-windows build-web test clean run-examples run-examples-ncl-headless 
 
 all: build
 
@@ -16,19 +16,11 @@ build/windows/x64/runner/Release/gingaf.exe: $(DART_FILES)
 build-web:
 	flutter build web
 
-test: test-ncl-doc test-ncl-app test-ccws test-gingaf
-
-test-gingaf:
-	flutter test
-
-test-ncl-doc:
+test:
 	cd ncl_doc && flutter test
-
-test-ncl-app:
 	cd ncl_app && flutter test
-
-test-ccws:
 	cd ccws && flutter test
+	flutter test
 
 NCL_EXAMPLES := $(wildcard examples/*.ncl)
 HEADLESS_EXAMPLES := $(addsuffix -headless, $(NCL_EXAMPLES))
@@ -57,16 +49,8 @@ $(HEADLESS_EXAMPLES): %-headless:
 
 .PHONY: $(NCL_EXAMPLES) $(HEADLESS_EXAMPLES) run-examples run-examples-headless
 
-clean: clean-ncl-doc clean-ncl-app clean-ccws clean-gingaf
-
-clean-gingaf:
-	flutter clean
-
-clean-ncl-doc:
+clean:
 	cd ncl_doc && flutter clean
-
-clean-ncl-app:
 	cd ncl_app && flutter clean
-
-clean-ccws:
 	cd ccws && flutter clean
+	flutter clean
