@@ -24,7 +24,7 @@ class NCLDocument {
 
   int virtualClock = 0;
   final List<Action> _actionQueue = [];
-  Timer? _timer;
+
 
   factory NCLDocument.fromBodyElements(List<NCLXMLElement> elements) {
     final body = Context(id: 'body');
@@ -199,13 +199,10 @@ class NCLDocument {
     _logger.info(
       '[Clock: $virtualClock] NCLDocument will tick indefinitely at $ticksPerSecond ticks per second',
     );
-    _timer?.cancel();
-    _timer = null;
     final interval = Duration(milliseconds: 1000 ~/ ticksPerSecond);
-    _timer = Timer.periodic(interval, (timer) {
+    Timer.periodic(interval, (timer) {
       if (getBodyState() == State.SLEEPING) {
-        _timer?.cancel();
-        _timer = null;
+        timer.cancel();
         return;
       }
       tick(1);
@@ -215,8 +212,6 @@ class NCLDocument {
 
   void stop() {
     _logger.info('[Clock: $virtualClock] NCLDocument will stop');
-    _timer?.cancel();
-    _timer = null;
 
     void stopNode(Node node) {
       if (node.getNodeState() == State.OCCURRING ||
