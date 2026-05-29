@@ -83,5 +83,8 @@ void main(List<String> arguments) {
     _logger.severe('Error: $e');
   }
 
-  document.tickIndefinitely(ticksPerSecond: ticksPerSecond);
+  document.tickIndefinitely(
+    ticksPerSecond: ticksPerSecond,
+    onStop: () => exit(0),
+  );
 }

@@ -69,6 +69,7 @@ abstract class Node extends NCLXMLElement {
 
 abstract class Composition extends Node {
   int _activeNodes = 0;
+  int get activeNodes => _activeNodes;
   List<Node> getNodes() => children.whereType<Node>().toList();
   Composition({required super.id, super.rawAttributes});
 }

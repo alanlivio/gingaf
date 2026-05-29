@@ -23,6 +23,7 @@ class NCLDocument {
   late final Settings _settings;
 
   int virtualClock = 0;
+  bool isPlaying = false;
   final List<Action> _actionQueue = [];
   final List<Node> _timedNodes = [];
 
@@ -167,7 +168,26 @@ class NCLDocument {
 
     while (_actionQueue.isNotEmpty) {
       final actionItem = _actionQueue.removeAt(0);
+      final prevState = actionItem.event.state;
       actionItem.event.doAction(actionItem.action);
+      final newState = actionItem.event.state;
+      if (actionItem.event.isMain && newState != prevState) {
+        final parent = actionItem.event.targetNode.parent;
+        if (parent is Context) {
+          if (newState == State.OCCURRING) {
+            parent.incActiveNodes();
+          } else if (newState == State.SLEEPING) {
+            parent.decActiveNodes();
+            if (parent.activeNodes == 0) {
+              _scheduleAction(parent.getMainEvent(), ActionType.STOP);
+            }
+          }
+        }
+      }
+    }
+
+    if (_body.getMainState() == State.SLEEPING) {
+      isPlaying = false;
     }
   }
 
@@ -211,17 +231,23 @@ class NCLDocument {
 
   void start() {
     _logger.info('[Clock: ${virtualClock / 1000}s] NCLDocument will start');
+    isPlaying = true;
     tick();
   }
 
-  void tickIndefinitely({int ticksPerSecond = 10}) {
+  void tickIndefinitely({int ticksPerSecond = 10, void Function()? onStop}) {
+    if (!isPlaying) {
+      onStop?.call();
+      return;
+    }
     _logger.info(
       '[Clock: ${virtualClock / 1000}s] NCLDocument will tick indefinitely at $ticksPerSecond ticks per second',
     );
     final interval = Duration(milliseconds: 1000 ~/ ticksPerSecond);
     Timer.periodic(interval, (timer) {
-      if (getBodyState() == State.SLEEPING) {
+      if (!isPlaying) {
         timer.cancel();
+        onStop?.call();
         return;
       }
       tick(interval.inMilliseconds);
