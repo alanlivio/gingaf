@@ -49,10 +49,10 @@ flutter run -d chrome --dart-define="APP=examples/image.html"
 flutter run -d windows --dart-define="APP=examples/current_service.html"
 ```
 
-**Headless NCL Validation (CLI):**
+**Headless NCL Execution (CLI):**
 
 Run from the monorepo root:
 
 ```powershell
-dart ./ncl_doc/lib/main.dart ./gingaf/examples/image.ncl
+dart ./ncl_doc/lib/cli.dart ./examples/image.ncl
 ```
