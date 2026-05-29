@@ -95,6 +95,24 @@ class NCLParser {
       }
     }
 
+    if (element is Node) {
+      final explicitDurProp = element.children
+          .whereType<Property>()
+          .where((p) => p.name == 'explicitDur')
+          .firstOrNull;
+      if (explicitDurProp != null && explicitDurProp.value != null) {
+        final durStr = explicitDurProp.value!;
+        if (durStr.endsWith('ms')) {
+          element.explicitDurMs = int.tryParse(durStr.replaceAll('ms', ''));
+        } else if (durStr.endsWith('s')) {
+          final s = double.tryParse(durStr.replaceAll('s', ''));
+          if (s != null) {
+            element.explicitDurMs = (s * 1000).toInt();
+          }
+        }
+      }
+    }
+
     return element;
   }
 

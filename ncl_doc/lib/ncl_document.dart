@@ -24,7 +24,7 @@ class NCLDocument {
 
   int virtualClock = 0;
   final List<Action> _actionQueue = [];
-
+  final List<Node> _timedNodes = [];
 
   factory NCLDocument.fromBodyElements(List<NCLXMLElement> elements) {
     final body = Context(id: 'body');
@@ -59,6 +59,19 @@ class NCLDocument {
       _body.children.add(_settings);
       _settings.parent = _body;
     }
+
+    void gatherDurNodes(Composition comp) {
+      for (var node in comp.getNodes()) {
+        if (node.explicitDurMs != null) {
+          _timedNodes.add(node);
+        }
+        if (node is Composition) {
+          gatherDurNodes(node);
+        }
+      }
+    }
+
+    gatherDurNodes(_body);
   }
 
   Head? getHead() => _head;
@@ -87,6 +100,9 @@ class NCLDocument {
   void _setupEventStateListeners() {
     void addListener(Node node) {
       node.getNodeEvent().addStateListener((oldState, newState) {
+        if (newState == State.OCCURRING) {
+          node.time = 0;
+        }
         _logger.info(
           '[Clock: ${virtualClock / 1000}s] Node "${node.id}" changed state: '
           '${Event.getEventStateAsString(oldState)} -> ${Event.getEventStateAsString(newState)}',
@@ -104,17 +120,15 @@ class NCLDocument {
   }
 
   void _processPorts() {
-    _body.startTimestamp = 0;
+    _body.time = 0;
     _scheduleAction(_body.getNodeEvent(), ActionType.START);
-
     void process(Context comp) {
       for (var port in comp.getPorts()) {
         if (port.component != null) {
           final node = getNodeById(port.component!);
           if (node != null) {
-            node.startTimestamp = 0;
             final event = node.getNodeEvent();
-            _scheduleAction(event, ActionType.START);
+            _actionQueue.add(Action(event: event, action: ActionType.START));
           }
         }
       }
@@ -138,17 +152,26 @@ class NCLDocument {
     tickTo(virtualClock + incrementMs);
   }
 
-  void tickTo(int time) {
-    if (time < virtualClock) return;
+  void tickTo(int targetTime) {
+    if (targetTime < virtualClock) return;
 
-    while (_actionQueue.isNotEmpty &&
-        _actionQueue.first.event.targetNode.startTimestamp <= time) {
+    while (_actionQueue.isNotEmpty) {
       final actionItem = _actionQueue.removeAt(0);
-      virtualClock = actionItem.event.targetNode.startTimestamp;
       actionItem.event.doAction(actionItem.action);
     }
 
-    virtualClock = time;
+    int delta = targetTime - virtualClock;
+    if (delta > 0) {
+      for (var node in _timedNodes) {
+        if (node.getNodeState() == State.OCCURRING) {
+          node.time += delta;
+          if (node.time >= node.explicitDurMs!) {
+            node.getNodeEvent().doAction(ActionType.STOP);
+          }
+        }
+      }
+      virtualClock = targetTime;
+    }
   }
 
   void _triggerLinks(String targetId, State newState) {
@@ -176,7 +199,6 @@ class NCLDocument {
           if (bind.component != null) {
             final bindNode = getNodeById(bind.component!);
             if (bindNode != null) {
-              bindNode.startTimestamp = virtualClock;
               final event = bindNode.getNodeEvent();
               _scheduleAction(event, ActionType.START);
             }
