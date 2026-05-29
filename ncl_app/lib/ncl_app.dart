@@ -89,7 +89,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
               contentPath,
               media: media,
               onVideoStopped: () {
-                media.getNodeEvent().transition(ActionType.STOP);
+                media.getNodeEvent().doAction(ActionType.STOP);
               },
             );
 

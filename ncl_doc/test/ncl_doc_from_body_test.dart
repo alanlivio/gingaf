@@ -13,12 +13,12 @@ void main() {
       expect(doc.virtualClock, 11);
     });
 
-    test('tickTo advances clock to specific time', () {
+    test('tick does not go backwards', () {
       final doc = NCLDocument.fromBodyElements([]);
       doc.start();
-      doc.tickTo(100);
+      doc.tick(100);
       expect(doc.virtualClock, 100);
-      doc.tickTo(50);
+      doc.tick(0);
       expect(doc.virtualClock, 100);
     });
 

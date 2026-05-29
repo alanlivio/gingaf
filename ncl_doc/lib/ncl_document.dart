@@ -149,10 +149,7 @@ class NCLDocument {
   }
 
   void tick([int incrementMs = 0]) {
-    tickTo(virtualClock + incrementMs);
-  }
-
-  void tickTo(int targetTime) {
+    final targetTime = virtualClock + incrementMs;
     if (targetTime < virtualClock) return;
 
     while (_actionQueue.isNotEmpty) {
