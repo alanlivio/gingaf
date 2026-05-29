@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gingaf/main.dart';
+import 'package:gingaf/main_av.dart';
 import 'package:gingaf/html_app.dart';
 import 'package:ncl_app/ncl_app.dart';
 
@@ -26,7 +27,7 @@ class MockAVAssetBundle extends CachingAssetBundle {
 
 void main() {
   testWidgets('MainAVController and MainAVWidget rendering', (WidgetTester tester) async {
-    final controller = MainAVController()..setVideoUri('background.mp4');
+    final controller = MainAVController()..setMainAvUri('background.mp4');
 
     await tester.pumpWidget(
       MaterialApp(
@@ -36,15 +37,15 @@ void main() {
       ),
     );
 
-    expect(find.text('Playing Background AV: background.mp4'), findsOneWidget);
+    expect(find.text('Loading Background AV: background.mp4'), findsOneWidget);
 
     controller.stop();
     await tester.pump();
-    expect(find.text('Playing Background AV: background.mp4'), findsNothing);
+    expect(find.text('Loading Background AV: background.mp4'), findsNothing);
 
     controller.play();
     await tester.pump();
-    expect(find.text('Playing Background AV: background.mp4'), findsOneWidget);
+    expect(find.text('Loading Background AV: background.mp4'), findsOneWidget);
   });
 
   test('HTMLApp can change background video via callback', () {

@@ -43,6 +43,12 @@ $(NCL_EXAMPLES): build/windows/x64/runner/Release/gingaf.exe
 	@echo ======================================================================
 	@set APP=$@&& start /wait .\build\windows\x64\runner\Release\gingaf.exe
 
+run-mainav: build/windows/x64/runner/Release/gingaf.exe
+	@echo ======================================================================
+	@echo Running MainAV Test
+	@echo ======================================================================
+	@set APP=&& set MAINAV=https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4&& start /wait .\build\windows\x64\runner\Release\gingaf.exe
+
 $(HEADLESS_EXAMPLES): %-headless:
 	@echo ======================================================================
 	@echo Running Headless NCL Example: $*

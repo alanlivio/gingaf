@@ -9,28 +9,37 @@ import 'package:logging/logging.dart';
 import 'package:ncl_app/ncl_app.dart' as ncl;
 
 import 'html_app.dart' as html;
+import 'main_av.dart';
 
 final _logger = Logger('gingaf');
 const USAGE = '''
 Usage:
   flutter run --dart-define="APP=path/to/app.{ncl|html}" 
   Options:
-    --dart-define="CCWS=false"  Disable CCWS service (enabled by default)
+    --dart-define="MAINAV=path/to/video.mp4"  Set background video URI
+    --dart-define="CCWS=false"                Disable CCWS service (enabled by default)
 ''';
 
 class GingaConfig {
   final String? appPath;
-  final String? videoUri;
+  final String? mainAvUri;
   final bool enableCCWS;
 
   GingaConfig([String? manualPath, bool? manualCCWS, String? manualVideo])
       : appPath = _resolve(manualPath),
-        videoUri = manualVideo ??
-            (const String.fromEnvironment('VIDEO').isNotEmpty
-                ? const String.fromEnvironment('VIDEO')
-                : null),
+        mainAvUri = manualVideo ?? _resolveVideo(),
         enableCCWS = manualCCWS ??
             const bool.fromEnvironment('CCWS', defaultValue: true);
+
+  static String? _resolveVideo() {
+    String? video = const String.fromEnvironment('MAINAV').isNotEmpty
+        ? const String.fromEnvironment('MAINAV')
+        : null;
+    if (video == null && !kIsWeb) {
+      video = Platform.environment['MAINAV'];
+    }
+    return video;
+  }
 
   static String? _resolve(String? manualPath) {
     String? path = manualPath;
@@ -88,7 +97,7 @@ void main() {
   }
 
   final config = GingaConfig();
-  if (config.appPath == null) {
+  if (config.appPath == null && config.mainAvUri == null) {
     if (!kIsWeb) {
       exit(0);
     } else {
@@ -150,7 +159,7 @@ class _GingaState extends State<Ginga> {
       _ccws.start();
     }
 
-    mainAVController = MainAVController()..setVideoUri(widget.config.videoUri);
+    mainAVController = MainAVController()..setMainAvUri(widget.config.mainAvUri);
     mainAVWidget = MainAVWidget(controller: mainAVController);
 
     final path = widget.config.appPath;
@@ -159,7 +168,7 @@ class _GingaState extends State<Ginga> {
         htmlApp = html.HTMLApp(
           uri: path,
           onBackgroundVideoChanged: (newUri) {
-            mainAVController.setVideoUri(newUri);
+            mainAVController.setMainAvUri(newUri);
           },
         );
       } else {
@@ -167,7 +176,7 @@ class _GingaState extends State<Ginga> {
           key: nclAppKey,
           uri: path,
           onBackgroundVideoChanged: (newUri) {
-            mainAVController.setVideoUri(newUri);
+            mainAVController.setMainAvUri(newUri);
           },
         );
       }
@@ -203,7 +212,7 @@ class _GingaState extends State<Ginga> {
 
   @override
   Widget build(BuildContext context) {
-    final showUsage = htmlApp == null && nclApp == null;
+    final showUsage = htmlApp == null && nclApp == null && widget.config.mainAvUri == null;
     return MaterialApp(
       title: 'gingaf',
       themeMode: ThemeMode.light,
@@ -232,87 +241,4 @@ class _GingaState extends State<Ginga> {
   }
 }
 
-class MainAVController extends ChangeNotifier {
-  String? _uri;
-  bool _isPlaying = true;
 
-  String? get uri => _uri;
-  bool get isPlaying => _isPlaying;
-
-  void setVideoUri(String? val) {
-    if (_uri != val) {
-      _uri = val;
-      notifyListeners();
-    }
-  }
-
-  void play() {
-    if (!_isPlaying) {
-      _isPlaying = true;
-      notifyListeners();
-    }
-  }
-
-  void stop() {
-    if (_isPlaying) {
-      _isPlaying = false;
-      notifyListeners();
-    }
-  }
-}
-
-class MainAVWidget extends StatefulWidget {
-  final MainAVController controller;
-
-  const MainAVWidget({super.key, required this.controller});
-
-  @override
-  State<MainAVWidget> createState() => _MainAVWidgetState();
-}
-
-class _MainAVWidgetState extends State<MainAVWidget> {
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(_onControllerChange);
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_onControllerChange);
-    super.dispose();
-  }
-
-  void _onControllerChange() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final uri = widget.controller.uri;
-    final isPlaying = widget.controller.isPlaying;
-
-    if (uri == null || uri.isEmpty || !isPlaying) {
-      return Container(color: Colors.black);
-    }
-
-    return Container(
-      color: Colors.black,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.movie, size: 64, color: Colors.white70),
-            const SizedBox(height: 8),
-            Text(
-              "Playing Background AV: $uri",
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
