@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:ccws/ccws.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -101,7 +102,7 @@ void main() {
       stdin.listen((List<int> codes) {
         if (codes.contains(27)) {
           _logger.info('Captured ESC, stopping app.');
-          SystemNavigator.pop();
+          exit(0);
         }
       });
     } catch (e) {
@@ -176,39 +177,38 @@ class _GingaState extends State<Ginga> {
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.escape) {
         _logger.info('Captured ESC in Window, stopping app and mainAV.');
-        _exitGracefully();
+        _cleanup();
         return true;
       }
     }
     return false;
   }
 
-  void _exitGracefully() {
+  void _stopServices() {
+    mainAVController.stop();
+    if (widget.config.enableCCWS) {
+      _ccws.stop();
+    }
+  }
+
+  Future<void> _cleanup() async {
     if (_isExiting) return;
-    _isExiting = true;
     setState(() {
+      _isExiting = true;
       htmlApp = null;
       nclApp = null;
       mainAVWidget = null;
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      mainAVController.stop();
-      if (widget.config.enableCCWS) {
-        _ccws.stop();
-      }
-      if (!kIsWeb) {
-        Future.delayed(const Duration(milliseconds: 200), () => exit(0));
-      }
-    });
+    _stopServices();
+    if (!kIsWeb) {
+      Future.delayed(const Duration(milliseconds: 200), () => exit(0));
+    }
   }
 
   @override
   void dispose() {
     HardwareKeyboard.instance.removeHandler(_handleKeyPress);
-    mainAVController.stop();
-    if (widget.config.enableCCWS) {
-      _ccws.stop();
-    }
+    _stopServices();
     super.dispose();
   }
 
@@ -221,17 +221,24 @@ class _GingaState extends State<Ginga> {
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.grey[200],
       ),
-      home: Scaffold(
-        body: _isExiting
-            ? const SizedBox.shrink()
-            : Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (mainAVWidget != null) mainAVWidget!,
-                  if (htmlApp != null) htmlApp!,
-                  if (nclApp != null) nclApp!,
-                ],
-              ),
+      home: NotificationListener<ncl.NCLAppExitNotification>(
+        onNotification: (notification) {
+          _logger.info('Received NCLAppExitNotification. Cleaning up and exiting.');
+          _cleanup();
+          return true;
+        },
+        child: Scaffold(
+          body: _isExiting
+              ? const SizedBox.shrink()
+              : Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (mainAVWidget != null) mainAVWidget!,
+                    if (htmlApp != null) htmlApp!,
+                    if (nclApp != null) nclApp!,
+                  ],
+                ),
+        ),
       ),
     );
   }

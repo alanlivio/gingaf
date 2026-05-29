@@ -16,6 +16,8 @@ export 'widgets/text.dart';
 
 final _logger = Logger('ginga-ncl');
 
+class NCLAppExitNotification extends Notification {}
+
 class NCLApp extends StatefulWidget {
   final String uri;
 
@@ -34,7 +36,6 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
   Timer? _ticker;
   String errorMsg = "";
   bool _loading = false;
-  bool _isDisposed = false;
 
   @override
   void initState() {
@@ -93,12 +94,14 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
               },
             );
 
-            if (widgetInstance != null && mounted && !_isDisposed) {
+            if (widgetInstance != null && mounted) {
+              if (nclDocument == null) return;
               setState(() {
                 _activeWidgets[media.id] = widgetInstance;
               });
             }
-          } else if (newState == vm.State.SLEEPING && mounted && !_isDisposed) {
+          } else if (newState == vm.State.SLEEPING && mounted) {
+            if (nclDocument == null) return;
             setState(() {
               _activeWidgets.remove(media.id);
             });
@@ -114,14 +117,24 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
           errorMsg = "";
         });
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted || _isDisposed) return;
+          if (!mounted) return;
           DateTime lastTick = DateTime.now();
           _ticker = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-            if (mounted && !_isDisposed) {
+            if (mounted) {
               final now = DateTime.now();
               final deltaMs = now.difference(lastTick).inMilliseconds;
               lastTick = now;
               nclDocument?.tick(deltaMs);
+              if (nclDocument != null && !nclDocument!.isPlaying) {
+                _ticker?.cancel();
+                _ticker = null;
+                nclDocument = null;
+                _activeWidgets.clear();
+                if (mounted) {
+                  setState(() {});
+                }
+                NCLAppExitNotification().dispatch(context);
+              }
             }
           });
         });
@@ -138,20 +151,13 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
     }
   }
 
-  Future<void> _reloadApplication() async {
-    _ticker?.cancel();
-    nclDocument?.stop();
-    nclDocument = null;
-    _loading = false;
-    await _startApplication();
-  }
-
   @override
   void dispose() {
     _logger.info("Stopping NCL application: ${widget.uri}");
-    _isDisposed = true;
     _ticker?.cancel();
-    nclDocument?.stop();
+    final doc = nclDocument;
+    nclDocument = null;
+    doc?.stop();
     super.dispose();
   }
 
