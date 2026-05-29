@@ -22,7 +22,7 @@ void main() {
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
       expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
-      doc.tick();
+      doc.tick(1);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
@@ -49,7 +49,7 @@ void main() {
       expect(doc.virtualClock, 0);
       expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
       expect(doc.getNodeById('m2')?.getNodeState(), State.OCCURRING);
-      doc.tick();
+      doc.tick(1);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);

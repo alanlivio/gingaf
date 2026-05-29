@@ -134,7 +134,7 @@ class NCLDocument {
     node.getNodeEvent().state = newState;
   }
 
-  void tick([int increment = 1]) {
+  void tick([int increment = 0]) {
     tickTo(virtualClock + increment);
   }
 
@@ -190,18 +190,26 @@ class NCLDocument {
     _actionQueue.add(Action(event: event, action: actionType));
   }
 
-  void start({int ticksPerSecond = 10}) {
+  void start() {
+    _logger.info('[Clock: $virtualClock] NCLDocument will start');
+    tick();
+  }
+
+  void tickIndefinitely({int ticksPerSecond = 10}) {
+    _logger.info(
+      '[Clock: $virtualClock] NCLDocument will tick indefinitely at $ticksPerSecond ticks per second',
+    );
     _timer?.cancel();
     _timer = null;
-    _logger.info('[Clock: $virtualClock] NCLDocument will start');
     final interval = Duration(milliseconds: 1000 ~/ ticksPerSecond);
     _timer = Timer.periodic(interval, (timer) {
-      if (_actionQueue.isEmpty) {
+      if (getBodyState() == State.SLEEPING) {
         _timer?.cancel();
         _timer = null;
         return;
       }
-      tick();
+      tick(1);
+      _logger.info('[Clock: $virtualClock] Tick');
     });
   }
 

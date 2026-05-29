@@ -9,7 +9,7 @@ void main() {
       doc.start();
       doc.tick(10);
       expect(doc.virtualClock, 10);
-      doc.tick();
+      doc.tick(1);
       expect(doc.virtualClock, 11);
     });
 

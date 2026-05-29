@@ -27,7 +27,7 @@ void main() {
       expect(doc.virtualClock, 0);
       expect(doc.getNodeById('ctx1')?.getNodeState(), State.OCCURRING);
       expect(doc.getNodeById('ctx2')?.getNodeState(), State.SLEEPING);
-      doc.tick();
+      doc.tick(1);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getNodeById('ctx1')?.getNodeState(), State.SLEEPING);
