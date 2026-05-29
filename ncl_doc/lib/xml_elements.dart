@@ -1,5 +1,3 @@
-// lib/xml_elements.dart
-
 import 'ncl_document.dart';
 
 typedef Head = List<NCLXMLElement>;
@@ -23,7 +21,6 @@ class Bind extends NCLXMLElement {
   String? get role => rawAttributes['role'];
   String? get component => rawAttributes['component'];
   String? get interface => rawAttributes['interface'];
-  // Bind often doesn't have an ID, so we'll use role as ID if missing
   Bind({String? id, super.rawAttributes})
     : super(id: id ?? 'bind_${rawAttributes['role']}');
 }
@@ -56,7 +53,6 @@ class Connector extends NCLXMLElement {
   Connector({required super.id, super.rawAttributes});
 }
 
-
 abstract class Node extends NCLXMLElement {
   Composition? parent;
   int startTimestamp = 0;
@@ -64,10 +60,8 @@ abstract class Node extends NCLXMLElement {
     type: EventType.PRESENTATION,
     targetNode: this,
   );
-
   Event getNodeEvent() => _presentationEvt;
   State getNodeState() => _presentationEvt.state;
-
   Node({required super.id, super.rawAttributes});
 }
 
@@ -88,7 +82,6 @@ class Switch extends Composition {
 
 class Media extends Node {
   Media({required super.id, super.rawAttributes});
-  
   List<Property> getProperties() => children.whereType<Property>().toList();
   List<Area> getAreas() => children.whereType<Area>().toList();
 }
