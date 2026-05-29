@@ -16,7 +16,7 @@ void main() {
       doc.start();
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
-      expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
       doc.stop();
       expect(doc.getBodyState(), State.SLEEPING);
     });
@@ -34,10 +34,10 @@ void main() {
       final doc = NCLDocument.fromXML(xmlString);
       doc.start();
       doc.tick(10);
-      expect(doc.getNodeById('video1')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('video1')?.getMainState(), State.SLEEPING);
       doc.stop();
-      expect(doc.getNodeById('video1')?.getNodeState(), State.SLEEPING);
-      expect(doc.getNodeById('audio1')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('video1')?.getMainState(), State.SLEEPING);
+      expect(doc.getNodeById('audio1')?.getMainState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
     });
 
@@ -53,9 +53,9 @@ void main() {
       final doc = NCLDocument.fromXML(imageNcl);
       doc.start();
       expect(doc.getBodyState(), State.OCCURRING);
-      expect(doc.getNodeById('ginga_logo')?.getNodeState(), State.OCCURRING);
+      expect(doc.getNodeById('ginga_logo')?.getMainState(), State.OCCURRING);
       doc.stop();
-      expect(doc.getNodeById('ginga_logo')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('ginga_logo')?.getMainState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
     });
 
@@ -72,9 +72,9 @@ void main() {
       final doc = NCLDocument.fromXML(xmlString);
       doc.start();
       expect(doc.getBodyState(), State.OCCURRING);
-      expect(doc.getNodeById('lua_script')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('lua_script')?.getMainState(), State.SLEEPING);
       doc.stop();
-      expect(doc.getNodeById('lua_script')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('lua_script')?.getMainState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
     });
 
@@ -92,12 +92,12 @@ void main() {
       final doc = NCLDocument.fromXML(xml);
       doc.start();
       expect(doc.virtualClock, 0);
-      expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
       expect(doc.getBodyState(), State.OCCURRING);
       doc.tick(1);
       expect(doc.virtualClock, 1);
       doc.stop();
-      expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
     });
 
@@ -114,11 +114,11 @@ void main() {
       doc.start();
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
-      expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
       doc.tick(1);
       expect(doc.virtualClock, 1);
       doc.stop();
-      expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
     });
 
@@ -135,11 +135,11 @@ void main() {
       doc.start();
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
-      expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
       doc.tick(1);
       expect(doc.virtualClock, 1);
       doc.stop();
-      expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
     });
   });

@@ -57,21 +57,27 @@ abstract class Node extends NCLXMLElement {
   Composition? parent;
   int time = 0;
   int? explicitDurMs;
-  late final Event _presentationEvt = Event(
+  late final Event _mainEvt = Event(
     type: EventType.PRESENTATION,
     targetNode: this,
+    isMain: true,
   );
-  Event getNodeEvent() => _presentationEvt;
-  State getNodeState() => _presentationEvt.state;
+  Event getMainEvent() => _mainEvt;
+  State getMainState() => _mainEvt.state;
   Node({required super.id, super.rawAttributes});
 }
 
 abstract class Composition extends Node {
+  int _activeNodes = 0;
   List<Node> getNodes() => children.whereType<Node>().toList();
   Composition({required super.id, super.rawAttributes});
 }
 
 class Context extends Composition {
+  void incActiveNodes() => _activeNodes++;
+  void decActiveNodes() {
+    if (_activeNodes > 0) _activeNodes--;
+  }
   List<Port> getPorts() => children.whereType<Port>().toList();
   List<Link> getLinks() => children.whereType<Link>().toList();
   Context({required super.id, super.rawAttributes});

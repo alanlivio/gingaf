@@ -28,9 +28,9 @@ void main() {
       final doc = NCLDocument.fromBodyElements([media, port]);
       doc.start();
       expect(doc.getBodyState(), State.OCCURRING);
-      expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
       doc.stop();
-      expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
     });
 
@@ -48,11 +48,11 @@ void main() {
       final doc = NCLDocument.fromBodyElements([m1, m2, port, link]);
       doc.start();
       expect(doc.getBodyState(), State.OCCURRING);
-      expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
-      expect(doc.getNodeById('m2')?.getNodeState(), State.OCCURRING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
+      expect(doc.getNodeById('m2')?.getMainState(), State.OCCURRING);
       doc.stop();
-      expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
-      expect(doc.getNodeById('m2')?.getNodeState(), State.SLEEPING);
+      expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
+      expect(doc.getNodeById('m2')?.getMainState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
     });
 

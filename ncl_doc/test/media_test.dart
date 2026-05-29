@@ -20,10 +20,10 @@ void main() {
       expect(media.getAreas().first.begin, '10s');
     });
 
-    test('getNodeEvent on Node returns same Event instance', () {
+    test('getMainEvent on Node returns same Event instance', () {
       final media = Media(id: 'm1');
-      final event1 = media.getNodeEvent();
-      final event2 = media.getNodeEvent();
+      final event1 = media.getMainEvent();
+      final event2 = media.getMainEvent();
       expect(event1, same(event2));
       expect(event1.targetNode.id, 'm1');
       expect(event1.type, EventType.PRESENTATION);
@@ -31,7 +31,7 @@ void main() {
 
     test('doAction', () {
       final media = Media(id: 'm1');
-      final event = media.getNodeEvent();
+      final event = media.getMainEvent();
       expect(event.state, State.SLEEPING);
       expect(event.doAction(ActionType.START), State.OCCURRING);
       expect(event.state, State.OCCURRING);
@@ -47,7 +47,7 @@ void main() {
       'doAction does not change state on invalid transitions from SLEEPING',
       () {
         final media = Media(id: 'm1');
-        final event = media.getNodeEvent();
+        final event = media.getMainEvent();
         expect(event.state, State.SLEEPING);
         expect(event.doAction(ActionType.STOP), State.SLEEPING);
         expect(event.doAction(ActionType.ABORT), State.SLEEPING);
@@ -61,7 +61,7 @@ void main() {
       'doAction does not change state on invalid transitions from OCCURRING',
       () {
         final media = Media(id: 'm1');
-        final event = media.getNodeEvent();
+        final event = media.getMainEvent();
         event.doAction(ActionType.START);
         expect(event.state, State.OCCURRING);
         expect(event.doAction(ActionType.START), State.OCCURRING);
@@ -74,7 +74,7 @@ void main() {
       'doAction does not change state on invalid transitions from PAUSED',
       () {
         final media = Media(id: 'm1');
-        final event = media.getNodeEvent();
+        final event = media.getMainEvent();
         event.doAction(ActionType.START);
         event.doAction(ActionType.PAUSE);
         expect(event.state, State.PAUSED);
@@ -86,7 +86,7 @@ void main() {
 
     test('doAction ABORT behaves like STOP from OCCURRING and PAUSED', () {
       final media = Media(id: 'm1');
-      final event = media.getNodeEvent();
+      final event = media.getMainEvent();
       event.doAction(ActionType.START);
       expect(event.doAction(ActionType.ABORT), State.SLEEPING);
 

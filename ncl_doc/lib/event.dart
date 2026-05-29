@@ -8,11 +8,12 @@ class Event {
   final EventType type;
   final Node targetNode;
   final String? propertyName;
+  final bool isMain;
   State _state = State.SLEEPING;
   final List<void Function(State oldState, State newState)> _stateListeners =
       [];
 
-  Event({required this.type, required this.targetNode, this.propertyName});
+  Event({required this.type, required this.targetNode, this.propertyName, this.isMain = false});
 
   State get state => _state;
   set state(State newState) {

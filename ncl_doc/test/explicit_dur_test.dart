@@ -20,13 +20,13 @@ void main() {
       
       expect(doc.getBodyState(), State.OCCURRING);
       final mediaNode = doc.getNodeById('m1')!;
-      expect(mediaNode.getNodeState(), State.OCCURRING);
+      expect(mediaNode.getMainState(), State.OCCURRING);
       
       doc.tick(1000);
-      expect(mediaNode.getNodeState(), State.OCCURRING);
+      expect(mediaNode.getMainState(), State.OCCURRING);
       
       doc.tick(1000);
-      expect(mediaNode.getNodeState(), State.SLEEPING, reason: 'Media should stop after explicitDur of 2s');
+      expect(mediaNode.getMainState(), State.SLEEPING, reason: 'Media should stop after explicitDur of 2s');
     });
   });
 }

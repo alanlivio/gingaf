@@ -76,7 +76,7 @@ class NCLDocument {
 
   Head? getHead() => _head;
   Context getBody() => _body;
-  State getBodyState() => _body.getNodeState();
+  State getBodyState() => _body.getMainState();
 
   Settings getSettings() => _settings;
 
@@ -99,7 +99,7 @@ class NCLDocument {
 
   void _setupEventStateListeners() {
     void addListener(Node node) {
-      node.getNodeEvent().addStateListener((oldState, newState) {
+      node.getMainEvent().addStateListener((oldState, newState) {
         if (newState == State.OCCURRING) {
           node.time = 0;
         }
@@ -121,13 +121,13 @@ class NCLDocument {
 
   void _processPorts() {
     _body.time = 0;
-    _scheduleAction(_body.getNodeEvent(), ActionType.START);
+    _scheduleAction(_body.getMainEvent(), ActionType.START);
     void process(Context comp) {
       for (var port in comp.getPorts()) {
         if (port.component != null) {
           final node = getNodeById(port.component!);
           if (node != null) {
-            final event = node.getNodeEvent();
+            final event = node.getMainEvent();
             _scheduleAction(event, ActionType.START);
           }
         }
@@ -145,7 +145,7 @@ class NCLDocument {
   void setEventState(String targetId, State newState) {
     final node = getNodeById(targetId);
     if (node == null) return;
-    node.getNodeEvent().state = newState;
+    node.getMainEvent().state = newState;
   }
 
   void tick([int incrementMs = 0]) {
@@ -155,10 +155,10 @@ class NCLDocument {
     int delta = targetTime - virtualClock;
     if (delta > 0) {
       for (var node in _timedNodes) {
-        if (node.getNodeState() == State.OCCURRING) {
+        if (node.getMainState() == State.OCCURRING) {
           node.time += delta;
           if (node.time >= node.explicitDurMs!) {
-            _scheduleAction(node.getNodeEvent(), ActionType.STOP);
+            _scheduleAction(node.getMainEvent(), ActionType.STOP);
           }
         }
       }
@@ -196,7 +196,7 @@ class NCLDocument {
           if (bind.component != null) {
             final bindNode = getNodeById(bind.component!);
             if (bindNode != null) {
-              final event = bindNode.getNodeEvent();
+              final event = bindNode.getMainEvent();
               _scheduleAction(event, ActionType.START);
             }
           }
@@ -233,9 +233,9 @@ class NCLDocument {
     _logger.info('[Clock: ${virtualClock / 1000}s] NCLDocument will stop');
 
     void stopNode(Node node) {
-      if (node.getNodeState() == State.OCCURRING ||
-          node.getNodeState() == State.PAUSED) {
-        node.getNodeEvent().doAction(ActionType.STOP);
+      if (node.getMainState() == State.OCCURRING ||
+          node.getMainState() == State.PAUSED) {
+        node.getMainEvent().doAction(ActionType.STOP);
       }
       if (node is Composition) {
         for (var child in node.getNodes()) {
