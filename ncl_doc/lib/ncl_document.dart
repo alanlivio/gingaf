@@ -88,7 +88,7 @@ class NCLDocument {
     void addListener(Node node) {
       node.getNodeEvent().addStateListener((oldState, newState) {
         _logger.info(
-          '[Clock: $virtualClock] Node "${node.id}" changed state: '
+          '[Clock: ${virtualClock / 1000}s] Node "${node.id}" changed state: '
           '${Event.getEventStateAsString(oldState)} -> ${Event.getEventStateAsString(newState)}',
         );
         _triggerLinks(node.id, newState);
@@ -134,8 +134,8 @@ class NCLDocument {
     node.getNodeEvent().state = newState;
   }
 
-  void tick([int increment = 0]) {
-    tickTo(virtualClock + increment);
+  void tick([int incrementMs = 0]) {
+    tickTo(virtualClock + incrementMs);
   }
 
   void tickTo(int time) {
@@ -191,13 +191,13 @@ class NCLDocument {
   }
 
   void start() {
-    _logger.info('[Clock: $virtualClock] NCLDocument will start');
+    _logger.info('[Clock: ${virtualClock / 1000}s] NCLDocument will start');
     tick();
   }
 
   void tickIndefinitely({int ticksPerSecond = 10}) {
     _logger.info(
-      '[Clock: $virtualClock] NCLDocument will tick indefinitely at $ticksPerSecond ticks per second',
+      '[Clock: ${virtualClock / 1000}s] NCLDocument will tick indefinitely at $ticksPerSecond ticks per second',
     );
     final interval = Duration(milliseconds: 1000 ~/ ticksPerSecond);
     Timer.periodic(interval, (timer) {
@@ -205,13 +205,13 @@ class NCLDocument {
         timer.cancel();
         return;
       }
-      tick(1);
-      _logger.info('[Clock: $virtualClock] Tick');
+      tick(interval.inMilliseconds);
+      _logger.info('[Clock: ${virtualClock / 1000}s] Tick');
     });
   }
 
   void stop() {
-    _logger.info('[Clock: $virtualClock] NCLDocument will stop');
+    _logger.info('[Clock: ${virtualClock / 1000}s] NCLDocument will stop');
 
     void stopNode(Node node) {
       if (node.getNodeState() == State.OCCURRING ||
