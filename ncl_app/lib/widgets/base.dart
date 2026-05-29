@@ -124,30 +124,13 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
 }
 
 class WidgetFactory {
-  static final Map<String, List<String>> _extensionMap = {
-    'lua': ['application/x-ginga-NCLua'],
-    'html': ['text/html'],
-    'ssml': ['application/ssml+xml'],
-    'txt': ['text/plain'],
-    'png': ['image/png'],
-    'bmp': ['image/bmp'],
-    'webp': ['image/webp'],
-    'gif': ['image/gif'],
-    'jpeg': ['image/jpeg'],
-    'jpg': ['image/jpeg'],
-    'heic': ['image/heic'],
-    'heif': ['image/heic'],
-    'mp4': ['video/mp4'],
-    'mp3': ['audio/mpeg'],
-    'mpeg': ['video/mpeg'],
-    'avi': ['video/avi'],
-  };
 
   static Widget? createWidget(String mimeType, String uri, {Media? media}) {
     if (mimeType.startsWith('video/') || mimeType.startsWith('audio/') || mimeType.contains('video') || mimeType.contains('audio')) {
       return AVWidget(uri: uri, media: media);
     }
     switch (mimeType) {
+      case 'application/x-ncl-NCLua':
       case 'application/x-ginga-NCLua':
         return LuaWidget(uri: uri, media: media);
       case 'application/ssml+xml':
@@ -164,13 +147,5 @@ class WidgetFactory {
       default:
         return null;
     }
-  }
-
-  static String getMimeTypeFromExtension(String fileName) {
-    final ext = fileName.split('.').last.toLowerCase();
-    for (var entry in _extensionMap.entries) {
-      if (entry.key == ext) return entry.value.first;
-    }
-    return 'application/octet-stream';
   }
 }

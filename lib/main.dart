@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:ccws/ccws.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -223,7 +222,8 @@ class _GingaState extends State<Ginga> {
       ),
       home: NotificationListener<ncl.NCLAppExitNotification>(
         onNotification: (notification) {
-          _logger.info('Received NCLAppExitNotification. Cleaning up and exiting.');
+          _logger.info(
+              'Received NCLAppExitNotification. Cleaning up and exiting.');
           _cleanup();
           return true;
         },

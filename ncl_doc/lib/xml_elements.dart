@@ -89,11 +89,12 @@ class Switch extends Composition {
 }
 
 class Media extends Node {
-  Media({required super.id, super.rawAttributes});
+  final String mimeType;
+  Media({required super.id, super.rawAttributes, this.mimeType = 'application/octet-stream'});
   List<Property> getProperties() => children.whereType<Property>().toList();
   List<Area> getAreas() => children.whereType<Area>().toList();
 }
 
 class Settings extends Media {
-  Settings({required super.id, super.rawAttributes});
+  Settings({required super.id, super.rawAttributes, super.mimeType = 'application/x-ncl-settings'});
 }

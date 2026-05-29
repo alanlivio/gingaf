@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:ncl_doc/ncl_document.dart' as vm show State;
 import 'package:ncl_doc/ncl_document.dart' hide State;
 
 import 'widgets/base.dart';
@@ -53,11 +52,6 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
       }
 
       final String nclData = await loadContent(widget.uri);
-
-      final String nclBase = widget.uri.contains('/')
-          ? widget.uri.substring(0, widget.uri.lastIndexOf('/') + 1)
-          : "";
-
       final doc = NCLDocument.fromXML(nclData);
 
       nclDocument = doc;
@@ -123,25 +117,25 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
 
     final activeMedia = nclDocument?.getActiveMedia() ?? [];
 
-    final widgets = activeMedia.map((media) {
+    final List<Widget> widgets = [];
+    for (var media in activeMedia) {
       final src = media.rawAttributes['src'] ?? '';
-      var mimeType = media.rawAttributes['type'];
-      if (mimeType == null || mimeType.isEmpty) {
-        mimeType = WidgetFactory.getMimeTypeFromExtension(src);
-      }
       final contentPath = src.startsWith('http')
           ? src
           : (src.contains('/') ? src : "$nclBase$src");
 
-      return KeyedSubtree(
-        key: ValueKey(media.id),
-        child: WidgetFactory.createWidget(
-          mimeType,
-          contentPath,
-          media: media,
-        ) ?? const SizedBox.shrink(),
+      widgets.add(
+        KeyedSubtree(
+          key: ValueKey(media.id),
+          child: WidgetFactory.createWidget(
+                media.mimeType,
+                contentPath,
+                media: media,
+              ) ??
+              const SizedBox.shrink(),
+        ),
       );
-    }).toList();
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,

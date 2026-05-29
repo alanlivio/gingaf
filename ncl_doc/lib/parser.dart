@@ -1,6 +1,9 @@
 import 'package:xml/xml.dart';
 import 'schema.dart';
 import 'ncl_document.dart';
+import 'mimetype.dart';
+
+
 
 class NCLParser {
   final Schema schema = Schema();
@@ -40,7 +43,14 @@ class NCLParser {
     final NCLXMLElement element;
     switch (node.name.local) {
       case 'media':
-        element = Media(id: id, rawAttributes: attrs);
+        final src = attrs['src'] ?? '';
+        final type = attrs['type'] ?? '';
+        final mimeType = type.isNotEmpty ? type : getMimeTypeFromExtension(src);
+        if (mimeType == 'application/x-ncl-settings' || mimeType == 'application/x-ginga-settings') {
+          element = Settings(id: id, rawAttributes: attrs, mimeType: mimeType);
+        } else {
+          element = Media(id: id, rawAttributes: attrs, mimeType: mimeType);
+        }
         break;
       case 'context':
       case 'body':
