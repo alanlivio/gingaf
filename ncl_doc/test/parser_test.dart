@@ -50,7 +50,9 @@ void main() {
       expect(region, isA<Region>());
 
       final descriptorBase = head[1];
-      final descriptor = descriptorBase.children.firstWhere((e) => e.id == 'desc1');
+      final descriptor = descriptorBase.children.firstWhere(
+        (e) => e.id == 'desc1',
+      );
       expect(descriptor, isA<Descriptor>());
 
       final connectorBase = head[2];
@@ -62,7 +64,8 @@ void main() {
       final settings = head.whereType<Settings>().first;
       expect(settings, isA<Settings>());
 
-      final prop1 = settings.children.firstWhere((e) => e.id == 'prop1') as Property;
+      final prop1 =
+          settings.children.firstWhere((e) => e.id == 'prop1') as Property;
       expect(prop1, isA<Property>());
       expect(prop1.name, 'service.currentKey');
       expect(prop1.value, '1');
@@ -81,7 +84,8 @@ void main() {
       expect(area, isA<Area>());
       expect(area.begin, '10s');
 
-      final prop2 = media.children.firstWhere((e) => e.id == 'prop2') as Property;
+      final prop2 =
+          media.children.firstWhere((e) => e.id == 'prop2') as Property;
       expect(prop2, isA<Property>());
       expect(prop2.name, 'fontColor');
       expect(prop2.value, 'blue');
@@ -89,7 +93,8 @@ void main() {
       final link = body.children.firstWhere((e) => e.id == 'l1') as Link;
       expect(link, isA<Link>());
 
-      final bind = link.children.firstWhere((e) => e.id == 'bind_onBegin') as Bind;
+      final bind =
+          link.children.firstWhere((e) => e.id == 'bind_onBegin') as Bind;
       expect(bind, isA<Bind>());
       expect(bind.role, 'onBegin');
       expect(bind.component, 'm1');
@@ -163,4 +168,3 @@ void main() {
     });
   });
 }
-

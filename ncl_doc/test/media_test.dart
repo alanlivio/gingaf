@@ -5,14 +5,17 @@ void main() {
   group('Media Tests', () {
     test('Media can return its properties and areas', () {
       final media = Media(id: 'video1');
-      final prop = Property(id: 'p1', rawAttributes: {'name': 'bounds', 'value': '0,0,100,100'});
+      final prop = Property(
+        id: 'p1',
+        rawAttributes: {'name': 'bounds', 'value': '0,0,100,100'},
+      );
       final area = Area(id: 'a1', rawAttributes: {'begin': '10s'});
       media.children.addAll([prop, area]);
-      
+
       expect(media.getProperties().length, 1);
       expect(media.getProperties().first.name, 'bounds');
       expect(media.getProperties().first.value, '0,0,100,100');
-      
+
       expect(media.getAreas().length, 1);
       expect(media.getAreas().first.begin, '10s');
     });

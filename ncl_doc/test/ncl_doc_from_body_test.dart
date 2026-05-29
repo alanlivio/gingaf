@@ -6,6 +6,7 @@ void main() {
     test('tick increments virtual clock', () {
       final doc = NCLDocument.fromBodyElements([]);
       expect(doc.virtualClock, 0);
+      doc.start();
       doc.tick(10);
       expect(doc.virtualClock, 10);
       doc.tick();
@@ -14,6 +15,7 @@ void main() {
 
     test('tickTo advances clock to specific time', () {
       final doc = NCLDocument.fromBodyElements([]);
+      doc.start();
       doc.tickTo(100);
       expect(doc.virtualClock, 100);
       doc.tickTo(50);
@@ -24,11 +26,9 @@ void main() {
       final media = Media(id: 'm1');
       final port = Port(id: 'p1', rawAttributes: {'component': 'm1'});
       final doc = NCLDocument.fromBodyElements([media, port]);
-      expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
-      doc.tickTo(0);
+      doc.start();
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
-
       doc.stop();
       expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
@@ -46,11 +46,10 @@ void main() {
         Bind(rawAttributes: {'role': 'start', 'component': 'm2'}),
       );
       final doc = NCLDocument.fromBodyElements([m1, m2, port, link]);
-      doc.tickTo(0);
+      doc.start();
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.getNodeById('m1')?.getNodeState(), State.OCCURRING);
       expect(doc.getNodeById('m2')?.getNodeState(), State.OCCURRING);
-
       doc.stop();
       expect(doc.getNodeById('m1')?.getNodeState(), State.SLEEPING);
       expect(doc.getNodeById('m2')?.getNodeState(), State.SLEEPING);
