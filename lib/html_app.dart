@@ -12,10 +12,7 @@ class HTMLApp extends StatefulWidget {
   final String uri;
   final Map<String, void Function(JavaScriptMessage)>? javaScriptChannels;
 
-  const HTMLApp(
-      {super.key,
-      required this.uri,
-      this.javaScriptChannels});
+  const HTMLApp({super.key, required this.uri, this.javaScriptChannels});
 
   @override
   State<HTMLApp> createState() => HTMLAppState();
@@ -101,7 +98,6 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
   Widget buildWidgetContent(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('ginga-html')),
       body: Container(
         color: Colors.white,
         child: _initialized

@@ -32,14 +32,4 @@ void main() {
     });
   });
 
-  group('Ginga Integration Rendering', () {
-    testWidgets('Ginga shows usage when appPath is null',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(Ginga(
-        config: GingaConfig(null),
-      ));
-
-      expect(find.textContaining('Usage:'), findsOneWidget);
-    });
-  });
 }

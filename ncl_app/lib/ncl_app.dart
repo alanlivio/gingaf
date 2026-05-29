@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:ncl_doc/ncl_document.dart' as vm show State;
@@ -163,12 +162,6 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
       body: Stack(
         fit: StackFit.expand,
         children: _activeWidgets.values.toList(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _reloadApplication,
-        mini: true,
-        tooltip: 'Reload NCL',
-        child: const Icon(Icons.refresh),
       ),
     );
   }

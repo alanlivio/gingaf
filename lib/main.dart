@@ -69,6 +69,8 @@ class GingaConfig {
     return path;
   }
 
+  bool get isEmpty => appPath == null && mainAvUri == null;
+
   @override
   String toString() {
     return 'GingaConfig(appPath: $appPath, mainAvUri: $mainAvUri, enableCCWS: $enableCCWS)';
@@ -83,6 +85,10 @@ void main() {
   });
 
   final config = GingaConfig();
+  if (config.isEmpty) {
+    stdout.writeln(USAGE);
+    exit(0);
+  }
   _logger.info(config.toString());
 
   if (!kIsWeb) {
@@ -93,31 +99,13 @@ void main() {
         stdin.lineMode = false;
       }
       stdin.listen((List<int> codes) {
-        if (codes.contains(4)) {
-          _logger.info('Captured Ctrl+D, stopping app.');
+        if (codes.contains(27)) {
+          _logger.info('Captured ESC, stopping app.');
           SystemNavigator.pop();
         }
       });
     } catch (e) {
       _logger.severe('Failed to setup stdin listener: $e');
-    }
-  }
-
-  if (config.appPath == null && config.mainAvUri == null) {
-    if (!kIsWeb) {
-      exit(0);
-    } else {
-      runApp(const MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Text(USAGE, textAlign: TextAlign.center),
-            ),
-          ),
-        ),
-      ));
-      return;
     }
   }
 
@@ -150,10 +138,10 @@ class Ginga extends StatefulWidget {
 class _GingaState extends State<Ginga> {
   late final CCWS _ccws;
   late final MainAVController mainAVController;
-  late final Widget mainAVWidget;
-  final GlobalKey<ncl.NCLAppState> nclAppKey = GlobalKey<ncl.NCLAppState>();
+  Widget? mainAVWidget;
   Widget? htmlApp;
   Widget? nclApp;
+  bool _isExiting = false;
 
   @override
   void initState() {
@@ -177,7 +165,6 @@ class _GingaState extends State<Ginga> {
         );
       } else {
         nclApp = ncl.NCLApp(
-          key: nclAppKey,
           uri: path,
         );
       }
@@ -187,24 +174,38 @@ class _GingaState extends State<Ginga> {
 
   bool _handleKeyPress(KeyEvent event) {
     if (event is KeyDownEvent) {
-      if (HardwareKeyboard.instance.isControlPressed &&
-          event.logicalKey == LogicalKeyboardKey.keyD) {
-        _logger.info('Captured Ctrl+D in Window, stopping app and mainAV.');
-        nclAppKey.currentState?.nclDocument?.stop();
-        mainAVController.stop();
-        if (widget.config.enableCCWS) {
-          _ccws.stop();
-        }
-        _logger.info('Exiting.');
-        exit(0);
+      if (event.logicalKey == LogicalKeyboardKey.escape) {
+        _logger.info('Captured ESC in Window, stopping app and mainAV.');
+        _exitGracefully();
+        return true;
       }
     }
     return false;
   }
 
+  void _exitGracefully() {
+    if (_isExiting) return;
+    _isExiting = true;
+    setState(() {
+      htmlApp = null;
+      nclApp = null;
+      mainAVWidget = null;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      mainAVController.stop();
+      if (widget.config.enableCCWS) {
+        _ccws.stop();
+      }
+      if (!kIsWeb) {
+        Future.delayed(const Duration(milliseconds: 200), () => exit(0));
+      }
+    });
+  }
+
   @override
   void dispose() {
     HardwareKeyboard.instance.removeHandler(_handleKeyPress);
+    mainAVController.stop();
     if (widget.config.enableCCWS) {
       _ccws.stop();
     }
@@ -213,8 +214,6 @@ class _GingaState extends State<Ginga> {
 
   @override
   Widget build(BuildContext context) {
-    final showUsage =
-        htmlApp == null && nclApp == null && widget.config.mainAvUri == null;
     return MaterialApp(
       title: 'gingaf',
       themeMode: ThemeMode.light,
@@ -223,17 +222,12 @@ class _GingaState extends State<Ginga> {
         scaffoldBackgroundColor: Colors.grey[200],
       ),
       home: Scaffold(
-        body: showUsage
-            ? const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Text(USAGE, textAlign: TextAlign.center),
-                ),
-              )
+        body: _isExiting
+            ? const SizedBox.shrink()
             : Stack(
                 fit: StackFit.expand,
                 children: [
-                  mainAVWidget,
+                  if (mainAVWidget != null) mainAVWidget!,
                   if (htmlApp != null) htmlApp!,
                   if (nclApp != null) nclApp!,
                 ],
