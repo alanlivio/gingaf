@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:ccws/ccws.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:ncl_app/ncl_app.dart' as ncl;
 
@@ -62,11 +63,25 @@ class GingaConfig {
 void main() {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((record) {
-    debugPrint('[${record.loggerName}] ${record.level.name}: ${record.message}');
+    debugPrint(
+        '[${record.loggerName}] ${record.level.name}: ${record.message}');
   });
 
   if (!kIsWeb) {
-    _logger.info('$GINGA: Initial working directory: ${Directory.current.path}');
+    _logger
+        .info('$GINGA: Initial working directory: ${Directory.current.path}');
+    try {
+      if (stdin.hasTerminal) {
+        stdin.echoMode = false;
+        stdin.lineMode = false;
+      }
+      stdin.listen((List<int> codes) {
+        if (codes.contains(4)) {
+          _logger.info('Captured Ctrl+D, stopping app.');
+          SystemNavigator.pop();
+        }
+      });
+    } catch (e) {}
   }
 
   final config = GingaConfig();
@@ -119,6 +134,7 @@ class _GingaState extends State<Ginga> {
   late final CCWS _ccws;
   late final MainAVController mainAVController;
   late final Widget mainAVWidget;
+  final GlobalKey<ncl.NCLAppState> nclAppKey = GlobalKey<ncl.NCLAppState>();
   Widget? htmlApp;
   Widget? nclApp;
 
@@ -145,6 +161,7 @@ class _GingaState extends State<Ginga> {
         );
       } else {
         nclApp = ncl.NCLApp(
+          key: nclAppKey,
           uri: path,
           onBackgroundVideoChanged: (newUri) {
             mainAVController.setVideoUri(newUri);
@@ -152,10 +169,29 @@ class _GingaState extends State<Ginga> {
         );
       }
     }
+    HardwareKeyboard.instance.addHandler(_handleKeyPress);
+  }
+
+  bool _handleKeyPress(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (HardwareKeyboard.instance.isControlPressed &&
+          event.logicalKey == LogicalKeyboardKey.keyD) {
+        _logger.info('Captured Ctrl+D in Window, stopping app and mainAV.');
+        nclAppKey.currentState?.nclDocument?.stop();
+        mainAVController.stop();
+        if (widget.config.enableCCWS) {
+          _ccws.stop();
+        }
+        _logger.info('Exiting.');
+        exit(0);
+      }
+    }
+    return false;
   }
 
   @override
   void dispose() {
+    HardwareKeyboard.instance.removeHandler(_handleKeyPress);
     if (widget.config.enableCCWS) {
       _ccws.stop();
     }
