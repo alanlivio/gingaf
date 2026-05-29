@@ -24,7 +24,7 @@ class NCLDocument {
 
   int virtualClock = 0;
   bool isPlaying = false;
-  final List<Action> _actionQueue = [];
+  final List<Action> _actionStack = [];
   final List<Node> _timedNodes = [];
 
   factory NCLDocument.fromBodyElements(List<NCLXMLElement> elements) {
@@ -46,11 +46,17 @@ class NCLDocument {
   NCLDocument({Head? head, required Body body}) {
     _head = head;
     _body = body;
-    _initializeBodyAndSettings();
-    _processPorts();
+    _init();
   }
 
-  void _initializeBodyAndSettings() {
+  void _init() {
+    _gatherSettings();
+    _gatherTimedNodes();
+    _stackMainEvtAction(_body, ActionType.START);
+    _stackPorts(_body);
+  }
+
+  void _gatherSettings() {
     final settingsList = _body.children.whereType<Settings>();
     if (settingsList.isNotEmpty) {
       _settings = settingsList.first;
@@ -59,19 +65,21 @@ class NCLDocument {
       _body.children.add(_settings);
       _settings.parent = _body;
     }
+  }
 
-    void gatherDurNodes(Composition comp) {
+  void _gatherTimedNodes() {
+    void gather(Composition comp) {
       for (var node in comp.getNodes()) {
         if (node.explicitDurMs != null) {
           _timedNodes.add(node);
         }
         if (node is Composition) {
-          gatherDurNodes(node);
+          gather(node);
         }
       }
     }
 
-    gatherDurNodes(_body);
+    gather(_body);
   }
 
   Head? getHead() => _head;
@@ -108,36 +116,29 @@ class NCLDocument {
         }
       }
     }
+
     search(_body);
     return active;
   }
 
-  void _processPorts() {
-    _body.time = 0;
-    _scheduleAction(_body.getMainEvent(), ActionType.START);
-    void process(Context comp) {
-      for (var port in comp.getPorts()) {
-        if (port.component != null) {
-          final node = getNodeById(port.component!);
-          if (node != null) {
-            final event = node.getMainEvent();
-            _scheduleAction(event, ActionType.START);
-          }
-        }
-      }
-      for (var child in comp.getNodes()) {
-        if (child is Context) {
-          process(child);
+  void _stackPorts(Context comp) {
+    for (var port in comp.getPorts()) {
+      if (port.component != null) {
+        final node = getNodeById(port.component!);
+        if (node != null) {
+          _stackMainEvtAction(node, ActionType.START);
         }
       }
     }
-
-    process(_body);
   }
 
-
-
   void tick([int incrementMs = 0]) {
+    _updateTimedNodesClock(incrementMs);
+    _executeActionStack();
+    _checkIsPlaying();
+  }
+
+  void _updateTimedNodesClock(int incrementMs) {
     final targetTime = virtualClock + incrementMs;
     if (targetTime < virtualClock) return;
 
@@ -147,15 +148,20 @@ class NCLDocument {
         if (node.getMainState() == State.OCCURRING) {
           node.time += delta;
           if (node.time >= node.explicitDurMs!) {
-            _scheduleAction(node.getMainEvent(), ActionType.STOP);
+            _logger.info(
+              '[Clock: ${(targetTime / 1000).toStringAsFixed(3)}s] Node "${node.id}" reached explicit duration (${node.explicitDurMs}ms)',
+            );
+            _stackMainEvtAction(node, ActionType.STOP);
           }
         }
       }
       virtualClock = targetTime;
     }
+  }
 
-    while (_actionQueue.isNotEmpty) {
-      final actionItem = _actionQueue.removeAt(0);
+  void _executeActionStack() {
+    while (_actionStack.isNotEmpty) {
+      final actionItem = _actionStack.removeAt(0);
       final prevState = actionItem.event.state;
       actionItem.event.doAction(actionItem.action);
       final newState = actionItem.event.state;
@@ -165,23 +171,28 @@ class NCLDocument {
         );
         if (newState == State.OCCURRING) {
           actionItem.event.targetNode.time = 0;
+          if (actionItem.event.targetNode is Context) {
+            _stackPorts(actionItem.event.targetNode as Context);
+          }
         }
         _triggerLinks(actionItem.event.targetNode.id, newState);
         final parent = actionItem.event.targetNode.parent;
         if (parent is Context) {
           if (newState == State.OCCURRING) {
-            parent.incActiveNodes();
+            parent.activeNodes++;
           } else if (newState == State.SLEEPING) {
-            parent.decActiveNodes();
+            if (parent.activeNodes > 0) parent.activeNodes--;
             if (parent.activeNodes == 0) {
-              _scheduleAction(parent.getMainEvent(), ActionType.STOP);
+              _stackMainEvtAction(parent, ActionType.STOP);
             }
           }
         }
       }
     }
+  }
 
-    if (_body.getMainState() == State.SLEEPING) {
+  void _checkIsPlaying() {
+    if (_actionStack.isEmpty && _body.getMainState() == State.SLEEPING) {
       isPlaying = false;
     }
   }
@@ -211,8 +222,7 @@ class NCLDocument {
           if (bind.component != null) {
             final bindNode = getNodeById(bind.component!);
             if (bindNode != null) {
-              final event = bindNode.getMainEvent();
-              _scheduleAction(event, ActionType.START);
+              _stackMainEvtAction(bindNode, ActionType.START);
             }
           }
         }
@@ -220,8 +230,12 @@ class NCLDocument {
     }
   }
 
-  void _scheduleAction(Event event, ActionType actionType) {
-    _actionQueue.add(Action(event: event, action: actionType));
+  void _stackMainEvtAction(Node node, ActionType actionType) {
+    _stackAction(node.getMainEvent(), actionType);
+  }
+
+  void _stackAction(Event event, ActionType actionType) {
+    _actionStack.add(Action(event: event, action: actionType));
   }
 
   void start() {
@@ -256,12 +270,12 @@ class NCLDocument {
     void stopNode(Node node) {
       if (node.getMainState() == State.OCCURRING ||
           node.getMainState() == State.PAUSED) {
-        node.getMainEvent().doAction(ActionType.STOP);
-      }
-      if (node is Composition) {
-        for (var child in node.getNodes()) {
-          stopNode(child);
+        if (node is Composition) {
+          for (var child in node.getNodes()) {
+            stopNode(child);
+          }
         }
+        node.getMainEvent().doAction(ActionType.STOP);
       }
     }
 

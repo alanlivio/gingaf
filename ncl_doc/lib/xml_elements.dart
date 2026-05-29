@@ -68,17 +68,12 @@ abstract class Node extends NCLXMLElement {
 }
 
 abstract class Composition extends Node {
-  int _activeNodes = 0;
-  int get activeNodes => _activeNodes;
+  int activeNodes = 0;
   List<Node> getNodes() => children.whereType<Node>().toList();
   Composition({required super.id, super.rawAttributes});
 }
 
 class Context extends Composition {
-  void incActiveNodes() => _activeNodes++;
-  void decActiveNodes() {
-    if (_activeNodes > 0) _activeNodes--;
-  }
   List<Port> getPorts() => children.whereType<Port>().toList();
   List<Link> getLinks() => children.whereType<Link>().toList();
   Context({required super.id, super.rawAttributes});
