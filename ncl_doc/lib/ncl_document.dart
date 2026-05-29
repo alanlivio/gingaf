@@ -128,7 +128,7 @@ class NCLDocument {
           final node = getNodeById(port.component!);
           if (node != null) {
             final event = node.getNodeEvent();
-            _actionQueue.add(Action(event: event, action: ActionType.START));
+            _scheduleAction(event, ActionType.START);
           }
         }
       }
@@ -152,22 +152,22 @@ class NCLDocument {
     final targetTime = virtualClock + incrementMs;
     if (targetTime < virtualClock) return;
 
-    while (_actionQueue.isNotEmpty) {
-      final actionItem = _actionQueue.removeAt(0);
-      actionItem.event.doAction(actionItem.action);
-    }
-
     int delta = targetTime - virtualClock;
     if (delta > 0) {
       for (var node in _timedNodes) {
         if (node.getNodeState() == State.OCCURRING) {
           node.time += delta;
           if (node.time >= node.explicitDurMs!) {
-            node.getNodeEvent().doAction(ActionType.STOP);
+            _scheduleAction(node.getNodeEvent(), ActionType.STOP);
           }
         }
       }
       virtualClock = targetTime;
+    }
+
+    while (_actionQueue.isNotEmpty) {
+      final actionItem = _actionQueue.removeAt(0);
+      actionItem.event.doAction(actionItem.action);
     }
   }
 
