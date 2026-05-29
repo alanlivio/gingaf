@@ -13,6 +13,7 @@ dependencies:
   video_player: ^2.8.6
   ncl_doc:
     path: ../ncl_doc
+  video_player_platform_interface: ^6.7.0
 
 
 dev_dependencies:
