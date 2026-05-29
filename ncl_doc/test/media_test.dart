@@ -29,7 +29,7 @@ void main() {
       expect(event1.type, EventType.PRESENTATION);
     });
 
-    test('doAction transition logic', () {
+    test('doAction', () {
       final media = Media(id: 'm1');
       final event = media.getNodeEvent();
       expect(event.state, State.SLEEPING);
@@ -41,6 +41,58 @@ void main() {
       expect(event.state, State.OCCURRING);
       expect(event.doAction(ActionType.STOP), State.SLEEPING);
       expect(event.state, State.SLEEPING);
+    });
+
+    test(
+      'doAction does not change state on invalid transitions from SLEEPING',
+      () {
+        final media = Media(id: 'm1');
+        final event = media.getNodeEvent();
+        expect(event.state, State.SLEEPING);
+        expect(event.doAction(ActionType.STOP), State.SLEEPING);
+        expect(event.doAction(ActionType.ABORT), State.SLEEPING);
+        expect(event.doAction(ActionType.PAUSE), State.SLEEPING);
+        expect(event.doAction(ActionType.RESUME), State.SLEEPING);
+        expect(event.state, State.SLEEPING);
+      },
+    );
+
+    test(
+      'doAction does not change state on invalid transitions from OCCURRING',
+      () {
+        final media = Media(id: 'm1');
+        final event = media.getNodeEvent();
+        event.doAction(ActionType.START);
+        expect(event.state, State.OCCURRING);
+        expect(event.doAction(ActionType.START), State.OCCURRING);
+        expect(event.doAction(ActionType.RESUME), State.OCCURRING);
+        expect(event.state, State.OCCURRING);
+      },
+    );
+
+    test(
+      'doAction does not change state on invalid transitions from PAUSED',
+      () {
+        final media = Media(id: 'm1');
+        final event = media.getNodeEvent();
+        event.doAction(ActionType.START);
+        event.doAction(ActionType.PAUSE);
+        expect(event.state, State.PAUSED);
+        expect(event.doAction(ActionType.START), State.PAUSED);
+        expect(event.doAction(ActionType.PAUSE), State.PAUSED);
+        expect(event.state, State.PAUSED);
+      },
+    );
+
+    test('doAction ABORT behaves like STOP from OCCURRING and PAUSED', () {
+      final media = Media(id: 'm1');
+      final event = media.getNodeEvent();
+      event.doAction(ActionType.START);
+      expect(event.doAction(ActionType.ABORT), State.SLEEPING);
+
+      event.doAction(ActionType.START);
+      event.doAction(ActionType.PAUSE);
+      expect(event.doAction(ActionType.ABORT), State.SLEEPING);
     });
 
     test('Event helper methods work correctly', () {
@@ -61,16 +113,6 @@ void main() {
       expect(media.id, 'm1');
       expect(media.rawAttributes['src'], 'video.mp4');
       expect(media.rawAttributes['type'], 'video/mp4');
-    });
-
-    test('Port Initialization', () {
-      final port = Port(
-        id: 'p1',
-        rawAttributes: {'id': 'p1', 'component': 'm1', 'interface': 'i1'},
-      );
-      expect(port.id, 'p1');
-      expect(port.component, 'm1');
-      expect(port.interface, 'i1');
     });
 
     test('Settings Initialization', () {

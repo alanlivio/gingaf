@@ -30,10 +30,6 @@ class Event {
     _stateListeners.add(listener);
   }
 
-  void transition(ActionType action) {
-    doAction(action);
-  }
-
   State doAction(ActionType action) {
     switch (action) {
       case ActionType.START:
