@@ -47,9 +47,11 @@ void main(List<String> arguments) {
 
   StreamSubscription<ProcessSignal>? sigintSub;
   StreamSubscription<List<int>>? stdinSub;
+  Timer? timer;
 
   void stopDocument() {
     document.stop();
+    timer?.cancel();
     sigintSub?.cancel();
     stdinSub?.cancel();
 
@@ -80,7 +82,8 @@ void main(List<String> arguments) {
       }
     });
   } catch (e) {
+    _logger.severe('Error: $e');
   }
 
-  document.tickIndefinitely(ticksPerSecond: ticksPerSecond);
+  timer = document.tickIndefinitely(ticksPerSecond: ticksPerSecond);
 }

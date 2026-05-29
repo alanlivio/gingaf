@@ -37,13 +37,13 @@ $(NCL_EXAMPLES):
 	@echo ======================================================================
 	flutter run -d windows --dart-define="APP=$@"
 
-%-headless:
+$(HEADLESS_EXAMPLES): %-headless:
 	@echo ======================================================================
 	@echo Running Headless NCL Example: $*
 	@echo ======================================================================
 	dart ./ncl_doc/lib/cli.dart $*
 
-.PHONY: $(NCL_EXAMPLES) $(HEADLESS_EXAMPLES)
+.PHONY: $(NCL_EXAMPLES) $(HEADLESS_EXAMPLES) run-examples run-examples-headless
 
 clean: clean-ncl-doc clean-ncl-app clean-ccws clean-gingaf
 
