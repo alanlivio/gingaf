@@ -19,7 +19,13 @@ class CCWS {
   bool get isRunning => _running;
 
   Handler get handler => Pipeline()
-      .addMiddleware(logRequests())
+      .addMiddleware(logRequests(logger: (message, isError) {
+        if (isError) {
+          _logger.severe(message);
+        } else {
+          _logger.info(message);
+        }
+      }))
       .addHandler(CCWSRouter.getHandler());
 
   Future<void> start() async {
