@@ -2,9 +2,15 @@
 
 all: build
 
-build: build-windows build-web
+build: 
+	flutter build windows
 
-build-windows:
+build-windows: build/windows/x64/runner/Release/gingaf.exe
+
+rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+DART_FILES := $(call rwildcard,lib ccws ncl_doc ncl_app,*.dart)
+
+build/windows/x64/runner/Release/gingaf.exe: $(DART_FILES)
 	flutter build windows
 
 build-web:
@@ -31,17 +37,17 @@ run-examples: $(NCL_EXAMPLES)
 
 run-examples-headless: $(HEADLESS_EXAMPLES)
 
-$(NCL_EXAMPLES):
+$(NCL_EXAMPLES): build/windows/x64/runner/Release/gingaf.exe
 	@echo ======================================================================
 	@echo Running Example: $@
 	@echo ======================================================================
-	flutter run -d windows --dart-define="APP=$@"
+	@set APP=$@&& start /wait .\build\windows\x64\runner\Release\gingaf.exe
 
 $(HEADLESS_EXAMPLES): %-headless:
 	@echo ======================================================================
 	@echo Running Headless NCL Example: $*
 	@echo ======================================================================
-	dart ./ncl_doc/lib/cli.dart $*
+	@dart ./ncl_doc/lib/cli.dart $*
 
 .PHONY: $(NCL_EXAMPLES) $(HEADLESS_EXAMPLES) run-examples run-examples-headless
 

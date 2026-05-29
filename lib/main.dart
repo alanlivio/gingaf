@@ -38,7 +38,9 @@ class GingaConfig {
       path = const String.fromEnvironment('APP').isNotEmpty
           ? const String.fromEnvironment('APP')
           : null;
-
+      if (path == null && !kIsWeb) {
+        path = Platform.environment['APP'];
+      }
       if (path == null && !kIsWeb) {
         final file = File('.ginga_app');
         if (file.existsSync()) {
@@ -111,8 +113,7 @@ void main() {
       _logger.info('Resolved app path: ${file.path}');
       if (file.existsSync()) {
         Directory.current = file.parent.path;
-        _logger.info(
-            'Switched working directory to ${Directory.current.path}');
+        _logger.info('Switched working directory to ${Directory.current.path}');
       }
     } catch (e) {
       _logger.severe('Failed to set working directory: $e');
