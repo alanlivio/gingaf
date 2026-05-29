@@ -6,9 +6,7 @@ import 'package:logging/logging.dart';
 import 'package:ncl_app/widgets/base.dart';
 import 'package:webview_all/webview_all.dart';
 
-const RUNTIME = kIsWeb ? 'Ginga-HTML(browser)' : 'Ginga-HTML';
-
-final _logger = Logger(RUNTIME);
+final _logger = Logger('ginga-html');
 
 class HTMLApp extends StatefulWidget {
   final String uri;
@@ -31,6 +29,7 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
   @override
   void initState() {
     super.initState();
+    _logger.info("Starting HTML application: ${widget.uri}");
     _controller = WebViewController()
       ..setBackgroundColor(const Color(0x00000000));
 
@@ -74,7 +73,7 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
         setState(() => _initialized = true);
       }
     } catch (e) {
-      _logger.severe("$RUNTIME: Error loading ${widget.uri}: $e");
+      _logger.severe("Error loading ${widget.uri}: $e");
       final errorHtml = """
         <!DOCTYPE html>
         <html>
@@ -93,10 +92,16 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
   }
 
   @override
+  void dispose() {
+    _logger.info("Stopping HTML application: ${widget.uri}");
+    super.dispose();
+  }
+
+  @override
   Widget buildWidgetContent(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text(RUNTIME)),
+      appBar: AppBar(title: const Text('ginga-html')),
       body: Container(
         color: Colors.white,
         child: _initialized

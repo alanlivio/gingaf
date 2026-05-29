@@ -15,9 +15,7 @@ export 'widgets/lua.dart';
 export 'widgets/ssml.dart';
 export 'widgets/text.dart';
 
-const RUNTIME = kIsWeb ? 'gingancl(browser)' : 'gingancl';
-
-final _logger = Logger(RUNTIME);
+final _logger = Logger('ginga-ncl');
 
 class NCLApp extends StatefulWidget {
   final String uri;
@@ -42,6 +40,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
   @override
   void initState() {
     super.initState();
+    _logger.info("Starting NCL application: ${widget.uri}");
     initPlayer(widget.uri);
     _startApplication();
   }
@@ -129,7 +128,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
         });
       }
     } catch (e, stacktrace) {
-      _logger.severe("$RUNTIME Error: $e\n$stacktrace");
+      _logger.severe("Error: $e\n$stacktrace");
       if (mounted) {
         setState(() {
           errorMsg = "Error: $e";
@@ -150,6 +149,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
 
   @override
   void dispose() {
+    _logger.info("Stopping NCL application: ${widget.uri}");
     _isDisposed = true;
     _ticker?.cancel();
     nclDocument?.stop();

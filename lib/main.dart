@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
-
 import 'package:ncl_app/ncl_app.dart' as ncl;
 
 import 'html_app.dart' as html;
@@ -69,6 +68,11 @@ class GingaConfig {
 
     return path;
   }
+
+  @override
+  String toString() {
+    return 'GingaConfig(appPath: $appPath, mainAvUri: $mainAvUri, enableCCWS: $enableCCWS)';
+  }
 }
 
 void main() {
@@ -77,6 +81,9 @@ void main() {
     debugPrint(
         '[${record.loggerName}] ${record.level.name}: ${record.message}');
   });
+
+  final config = GingaConfig();
+  _logger.info(config.toString());
 
   if (!kIsWeb) {
     _logger.info('Initial working directory: ${Directory.current.path}');
@@ -96,7 +103,6 @@ void main() {
     }
   }
 
-  final config = GingaConfig();
   if (config.appPath == null && config.mainAvUri == null) {
     if (!kIsWeb) {
       exit(0);
@@ -116,7 +122,6 @@ void main() {
   }
 
   WidgetsFlutterBinding.ensureInitialized();
-
 
   if (!kIsWeb) {
     try {
@@ -154,16 +159,18 @@ class _GingaState extends State<Ginga> {
   void initState() {
     super.initState();
     _ccws = CCWS();
-    _logger.info('CCWS enabled: ${widget.config.enableCCWS}');
     if (widget.config.enableCCWS) {
+      _logger.info('Starting CCWS');
       _ccws.start();
     }
 
-    mainAVController = MainAVController()..setMainAvUri(widget.config.mainAvUri);
+    mainAVController = MainAVController()
+      ..setMainAvUri(widget.config.mainAvUri);
     mainAVWidget = MainAVWidget(controller: mainAVController);
 
     final path = widget.config.appPath;
     if (path != null) {
+      _logger.info('Starting application $path');
       if (path.toLowerCase().endsWith('.html')) {
         htmlApp = html.HTMLApp(
           uri: path,
@@ -206,7 +213,8 @@ class _GingaState extends State<Ginga> {
 
   @override
   Widget build(BuildContext context) {
-    final showUsage = htmlApp == null && nclApp == null && widget.config.mainAvUri == null;
+    final showUsage =
+        htmlApp == null && nclApp == null && widget.config.mainAvUri == null;
     return MaterialApp(
       title: 'gingaf',
       themeMode: ThemeMode.light,
@@ -234,5 +242,3 @@ class _GingaState extends State<Ginga> {
     );
   }
 }
-
-

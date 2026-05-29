@@ -7,10 +7,9 @@ import 'package:shelf/shelf_io.dart' as io;
 import 'router.dart';
 
 const bool isWeb = bool.hasEnvironment('dart.library.js_util');
-const RUNTIME = isWeb ? 'ginga-ccws(browser)' : 'ginga-ccws';
 const CCWS_PORT = 44642;
 
-final _logger = Logger(RUNTIME);
+final _logger = Logger('ginga-ccws');
 
 class CCWS {
   HttpServer? _server;
@@ -18,15 +17,14 @@ class CCWS {
   int get port => _server?.port ?? 0;
   bool get isRunning => _running;
 
-  Handler get handler => Pipeline()
-      .addMiddleware(logRequests(logger: (message, isError) {
+  Handler get handler =>
+      Pipeline().addMiddleware(logRequests(logger: (message, isError) {
         if (isError) {
           _logger.severe(message);
         } else {
           _logger.info(message);
         }
-      }))
-      .addHandler(CCWSRouter.getHandler());
+      })).addHandler(CCWSRouter.getHandler());
 
   Future<void> start() async {
     if (isWeb) {
@@ -43,7 +41,7 @@ class CCWS {
       _server = null;
     }
     _running = false;
-    _logger.info('$RUNTIME: Server stopped');
+    _logger.info('Server stopped');
   }
 
   Future<void> _startDesktopServer() async {
@@ -55,7 +53,7 @@ class CCWS {
         _server =
             await io.serve(handler, InternetAddress.loopbackIPv4, currentPort);
         _logger.info(
-            '$RUNTIME: Server running on http://${_server!.address.address}:${_server!.port}');
+            'Server running on http://${_server!.address.address}:${_server!.port}');
         return;
       } catch (e) {
         if (e is SocketException) {
@@ -65,20 +63,19 @@ class CCWS {
         rethrow;
       }
     }
-    _logger.severe(
-        '$RUNTIME: Server failed to start after $maxRetry port attempts');
+    _logger.severe('Server failed to start after $maxRetry port attempts');
   }
 
   void _startWebImplementation() {
-    _logger.info(
-        '$RUNTIME: Mock Initialized (Use service-worker.js for fetch interception)');
+    _logger.info('ccws at web use service-worker.js for fetch interception');
   }
 }
 
 void main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((record) {
-    stdout.writeln('[${record.loggerName}] ${record.level.name}: ${record.message}');
+    stdout.writeln(
+        '[${record.loggerName}] ${record.level.name}: ${record.message}');
   });
 
   final ccws = CCWS();
