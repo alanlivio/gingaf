@@ -21,12 +21,10 @@ final _logger = Logger(RUNTIME);
 
 class NCLApp extends StatefulWidget {
   final String uri;
-  final void Function(String? uri)? onBackgroundVideoChanged;
 
   const NCLApp({
     super.key,
     required this.uri,
-    this.onBackgroundVideoChanged,
   });
 
   @override

@@ -167,17 +167,11 @@ class _GingaState extends State<Ginga> {
       if (path.toLowerCase().endsWith('.html')) {
         htmlApp = html.HTMLApp(
           uri: path,
-          onBackgroundVideoChanged: (newUri) {
-            mainAVController.setMainAvUri(newUri);
-          },
         );
       } else {
         nclApp = ncl.NCLApp(
           key: nclAppKey,
           uri: path,
-          onBackgroundVideoChanged: (newUri) {
-            mainAVController.setMainAvUri(newUri);
-          },
         );
       }
     }

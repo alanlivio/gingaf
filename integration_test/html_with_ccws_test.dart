@@ -82,9 +82,11 @@ void main() {
               bundle: mockBundle,
               child: HTMLApp(
                 uri: "test_ccws.html",
-                onMessageReceived: (message) {
-                  if (!completer.isCompleted) {
-                    completer.complete(message.message);
+                javaScriptChannels: {
+                  "HTMLAppChannel": (message) {
+                    if (!completer.isCompleted) {
+                      completer.complete(message.message);
+                    }
                   }
                 },
               ),

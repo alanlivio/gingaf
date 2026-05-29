@@ -12,14 +12,12 @@ final _logger = Logger(RUNTIME);
 
 class HTMLApp extends StatefulWidget {
   final String uri;
-  final void Function(String? uri)? onBackgroundVideoChanged;
-  final void Function(JavaScriptMessage)? onMessageReceived;
+  final Map<String, void Function(JavaScriptMessage)>? javaScriptChannels;
 
   const HTMLApp(
       {super.key,
       required this.uri,
-      this.onBackgroundVideoChanged,
-      this.onMessageReceived});
+      this.javaScriptChannels});
 
   @override
   State<HTMLApp> createState() => HTMLAppState();
@@ -34,16 +32,11 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
   void initState() {
     super.initState();
     _controller = WebViewController()
-      ..setBackgroundColor(const Color(0x00000000))
-      ..addJavaScriptChannel("HTMLAppChannel", onMessageReceived: (message) {
-        _logger.info("$RUNTIME: HTMLAppChannel message: ${message.message}");
-        final msg = message.message;
-        if (msg.startsWith("SET_VIDEO_URI:")) {
-          final newUri = msg.substring("SET_VIDEO_URI:".length).trim();
-          widget.onBackgroundVideoChanged?.call(newUri);
-        }
-        widget.onMessageReceived?.call(message);
-      });
+      ..setBackgroundColor(const Color(0x00000000));
+
+    widget.javaScriptChannels?.forEach((name, callback) {
+      _controller.addJavaScriptChannel(name, onMessageReceived: callback);
+    });
 
     initPlayer(widget.uri);
   }

@@ -38,7 +38,7 @@ class MockHTMLAssetBundle extends CachingAssetBundle {
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('Verify HTMLApp enables HTMLAppChannel on real platform',
+  testWidgets('Verify HTMLApp run on real platform',
       (WidgetTester tester) async {
     final mockBundle = MockHTMLAssetBundle();
     final completer = Completer<String>();
@@ -50,9 +50,11 @@ void main() {
             bundle: mockBundle,
             child: HTMLApp(
               uri: "test_status.html",
-              onMessageReceived: (message) {
-                if (!completer.isCompleted) {
-                  completer.complete(message.message);
+              javaScriptChannels: {
+                "HTMLAppChannel": (message) {
+                  if (!completer.isCompleted) {
+                    completer.complete(message.message);
+                  }
                 }
               },
             ),
