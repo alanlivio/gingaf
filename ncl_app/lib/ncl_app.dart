@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -34,6 +36,7 @@ class NCLApp extends StatefulWidget {
 class NCLAppState extends BaseWidgetState<NCLApp> {
   NCLDocument? nclDocument;
   final Map<String, Widget> _activeWidgets = {};
+  Timer? _ticker;
   String errorMsg = "";
   bool _loading = false;
   bool _isDisposed = false;
@@ -63,14 +66,6 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
 
       final doc = NCLDocument.fromXML(nclData);
 
-      final settings = doc.getSettings();
-      final initialVideo =
-          settings.getProperties().where((p) => p.name == 'videoUri');
-      if (initialVideo.isNotEmpty) {
-        widget.onBackgroundVideoChanged
-            ?.call(initialVideo.first.value?.toString());
-      }
-
       List<Media> getMediaNodes(Composition comp) {
         final medias = <Media>[];
         for (var node in comp.getNodes()) {
@@ -79,6 +74,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
         }
         return medias;
       }
+
       final mediaNodes = getMediaNodes(doc.getBody());
       for (var media in mediaNodes) {
         media.getNodeEvent().addStateListener((oldState, newState) {
@@ -121,6 +117,18 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
         setState(() {
           errorMsg = "";
         });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || _isDisposed) return;
+          DateTime lastTick = DateTime.now();
+          _ticker = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+            if (mounted && !_isDisposed) {
+              final now = DateTime.now();
+              final deltaMs = now.difference(lastTick).inMilliseconds;
+              lastTick = now;
+              nclDocument?.tick(deltaMs);
+            }
+          });
+        });
       }
     } catch (e, stacktrace) {
       _logger.severe("$RUNTIME Error: $e\n$stacktrace");
@@ -135,6 +143,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
   }
 
   Future<void> _reloadApplication() async {
+    _ticker?.cancel();
     nclDocument?.stop();
     nclDocument = null;
     _loading = false;
@@ -144,6 +153,7 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
   @override
   void dispose() {
     _isDisposed = true;
+    _ticker?.cancel();
     nclDocument?.stop();
     super.dispose();
   }

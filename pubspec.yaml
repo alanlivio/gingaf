@@ -16,6 +16,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   webview_all: ^1.0.3
   logging: ^1.3.0
+  video_player: ^2.8.6
+  video_player_win: ^3.2.2
 
 dev_dependencies:
   flutter_test:
@@ -29,3 +31,4 @@ flutter:
   uses-material-design: true
   assets:
     - examples/
+

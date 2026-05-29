@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
+import 'package:video_player/video_player.dart';
 import 'base.dart';
 
 class AVWidget extends StatefulWidget {
@@ -19,32 +22,65 @@ class AVWidget extends StatefulWidget {
 }
 
 class AVWidgetState extends BaseWidgetState<AVWidget> {
+  late VideoPlayerController _controller;
+  bool _initialized = false;
+  bool _isCompleted = false;
+
   @override
   void initState() {
     super.initState();
     initPlayer(widget.uri);
     parseAttributes(widget.media);
+    _initVideo();
   }
 
-  void simulateEnd() {
-    widget.onVideoStopped?.call();
+  Future<void> _initVideo() async {
+    try {
+      final uriStr = widget.uri;
+      if (uriStr.startsWith('http://') || uriStr.startsWith('https://')) {
+        _controller = VideoPlayerController.networkUrl(Uri.parse(uriStr));
+      } else {
+        _controller = VideoPlayerController.file(File(uriStr));
+      }
+
+      _controller.addListener(() {
+        if (!_isCompleted &&
+            _controller.value.isInitialized &&
+            _controller.value.duration.inMilliseconds > 0 &&
+            _controller.value.position >= _controller.value.duration) {
+          _isCompleted = true;
+          widget.onVideoStopped?.call();
+        }
+      });
+      
+      await _controller.initialize();
+      await _controller.play();
+      
+      if (mounted) {
+        setState(() {
+          _initialized = true;
+        });
+      }
+    } catch (e) {
+      debugPrint("AVWidget Error initializing video: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget buildWidgetContent(BuildContext context) {
+    if (!_initialized) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return Center(
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("AVWidget: ${widget.uri}"),
-            ElevatedButton(
-              onPressed: simulateEnd,
-              child: const Text("Simulate End"),
-            ),
-          ],
-        ),
+      child: AspectRatio(
+        aspectRatio: _controller.value.aspectRatio,
+        child: VideoPlayer(_controller),
       ),
     );
   }

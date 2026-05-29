@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
+
 import 'package:ncl_app/ncl_app.dart' as ncl;
 
 import 'html_app.dart' as html;
@@ -106,6 +107,7 @@ void main() {
   }
 
   WidgetsFlutterBinding.ensureInitialized();
+
 
   if (!kIsWeb) {
     try {
