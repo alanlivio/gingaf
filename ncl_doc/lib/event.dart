@@ -1,4 +1,6 @@
-import 'ncl_document.dart';
+import 'xml_elements.dart';
+
+enum State { OCCURRING, PAUSED, SLEEPING }
 
 enum EventType { PRESENTATION, ATTRIBUTION, SELECTION, PREPARATION }
 
@@ -11,7 +13,12 @@ class Event {
   final bool isMain;
   State state = State.SLEEPING;
 
-  Event({required this.type, required this.targetNode, this.propertyName, this.isMain = false});
+  Event({
+    required this.type,
+    required this.targetNode,
+    this.propertyName,
+    this.isMain = false,
+  });
 
   State doAction(ActionType action) {
     switch (action) {

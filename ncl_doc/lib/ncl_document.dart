@@ -13,7 +13,7 @@ export 'lua.dart';
 export 'parser.dart';
 export 'xml_elements.dart';
 
-enum State { OCCURRING, PAUSED, SLEEPING }
+
 
 final _logger = Logger('ncl_doc');
 
