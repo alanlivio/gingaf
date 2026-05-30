@@ -1,9 +1,10 @@
-import 'package:ncl_doc/ncl_document.dart';
+import 'package:ncl_doc/xml_elements.dart';
+import 'package:ncl_doc/event.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Media Tests', () {
-    test('Media can return its properties and areas', () {
+  group('Node Tests', () {
+    test('Media Node can return its properties and areas', () {
       final media = Media(id: 'video1');
       final prop = Property(
         id: 'p1',
@@ -18,6 +19,23 @@ void main() {
 
       expect(media.getAreas().length, 1);
       expect(media.getAreas().first.begin, '10s');
+    });
+
+    test('Context Node can return its properties and areas', () {
+      final context = Context(id: 'ctx1');
+      final prop = Property(
+        id: 'p1',
+        rawAttributes: {'name': 'bounds', 'value': '0,0,100,100'},
+      );
+      final area = Area(id: 'a1', rawAttributes: {'begin': '10s'});
+      context.children.addAll([prop, area]);
+
+      expect(context.getProperties().length, 1);
+      expect(context.getProperties().first.name, 'bounds');
+      expect(context.getProperties().first.value, '0,0,100,100');
+
+      expect(context.getAreas().length, 1);
+      expect(context.getAreas().first.begin, '10s');
     });
 
     test('getMainEvent on Node returns same Event instance', () {

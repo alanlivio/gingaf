@@ -64,6 +64,8 @@ abstract class Node extends NCLXMLElement {
   );
   Event getMainEvent() => _mainEvt;
   State getMainState() => _mainEvt.state;
+  List<Property> getProperties() => children.whereType<Property>().toList();
+  List<Area> getAreas() => children.whereType<Area>().toList();
   Node({required super.id, super.rawAttributes});
 }
 
@@ -86,8 +88,6 @@ class Switch extends Composition {
 class Media extends Node {
   final String mimeType;
   Media({required super.id, super.rawAttributes, this.mimeType = 'application/octet-stream'});
-  List<Property> getProperties() => children.whereType<Property>().toList();
-  List<Area> getAreas() => children.whereType<Area>().toList();
 }
 
 class Settings extends Media {
