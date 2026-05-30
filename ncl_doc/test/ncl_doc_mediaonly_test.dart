@@ -142,5 +142,47 @@ void main() {
       expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
     });
+
+    test('state of media with areas doc', () {
+      const xmlString = '''
+<ncl>
+  <body>
+    <media id="video_main" src="main.mp4">
+      <area id="seg1" begin="10s" end="20s" />
+    </media>
+  </body>
+</ncl>
+''';
+      final doc = NCLDocument.fromXML(xmlString);
+      doc.start();
+      expect(doc.getBodyState(), State.OCCURRING);
+      expect(doc.getNodeById('video_main')?.getMainState(), State.SLEEPING);
+      doc.stop();
+      expect(doc.getNodeById('video_main')?.getMainState(), State.SLEEPING);
+      expect(doc.getBodyState(), State.SLEEPING);
+    });
+
+    test('start media with area from port', () {
+      const xml = '''
+<ncl>
+  <body>
+    <port id="p1" component="video_main"/>
+    <media id="video_main" src="main.mp4">
+      <area id="seg1" begin="10s" end="20s" />
+    </media>
+  </body>
+</ncl>
+''';
+      final doc = NCLDocument.fromXML(xml);
+      doc.start();
+      expect(doc.virtualClock, 0);
+      expect(doc.getNodeById('video_main')?.getMainState(), State.OCCURRING);
+      expect(doc.getBodyState(), State.OCCURRING);
+      doc.tick(1);
+      expect(doc.virtualClock, 1);
+      doc.stop();
+      expect(doc.getNodeById('video_main')?.getMainState(), State.SLEEPING);
+      expect(doc.getBodyState(), State.SLEEPING);
+    });
   });
 }
