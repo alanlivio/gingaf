@@ -127,6 +127,9 @@ class NCLDocument {
         final node = getNodeById(port.component!);
         if (node != null) {
           _stackMainEvtAction(node, ActionType.START);
+          if (node is Context) {
+            _stackPorts(node);
+          }
         }
       }
     }
