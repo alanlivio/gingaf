@@ -24,17 +24,18 @@ class ImageWidgetState extends BaseWidgetState<ImageWidget> {
     if (uri.isEmpty) {
       return const SizedBox.shrink();
     }
-    return Center(
-      child: Image.network(
-        uri,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return const CircularProgressIndicator();
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return const Icon(Icons.error, color: Colors.red, size: 50);
-        },
-      ),
+    return Image.network(
+      uri,
+      fit: BoxFit.fill,
+      width: double.infinity,
+      height: double.infinity,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return const Center(child: CircularProgressIndicator());
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return const Center(child: Icon(Icons.error, color: Colors.red, size: 50));
+      },
     );
   }
 }

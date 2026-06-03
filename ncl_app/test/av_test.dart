@@ -154,10 +154,11 @@ void main() {
     );
 
     final Positioned positioned = tester.widget(find.byType(Positioned));
+    final size = MediaQuery.of(tester.element(find.byType(AVWidget))).size;
     expect(positioned.left, 0.0);
     expect(positioned.top, 0.0);
-    expect(positioned.width, 100.0);
-    expect(positioned.height, 100.0);
+    expect(positioned.width, size.width);
+    expect(positioned.height, size.height);
   });
 
   testWidgets('BaseWidgetState bounds and background properties mapping tests', (WidgetTester tester) async {

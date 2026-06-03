@@ -26,6 +26,11 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
   String type = "";
   String uri = "";
   String? id;
+  String leftStr = '0%';
+  String topStr = '0%';
+  String widthStr = '100%';
+  String heightStr = '100%';
+  bool isPositioned = false;
 
   void initPlayer(String uri) {
     this.uri = uri;
@@ -33,6 +38,7 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
 
   void parseProperties(Media? media) {
     if (media == null) return;
+    isPositioned = true;
     id = media.id;
     String? backgroundVal;
     String? boundsVal;
@@ -43,10 +49,6 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
         boundsVal = prop.value;
       }
     }
-    String leftStr = '0%';
-    String topStr = '0%';
-    String widthStr = '100%';
-    String heightStr = '100%';
     if (boundsVal != null) {
       final boundsParts = boundsVal.split(',');
       if (boundsParts.length == 4) {
@@ -55,17 +57,17 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
         widthStr = boundsParts[2].trim();
         heightStr = boundsParts[3].trim();
       }
+    } else {
+      leftStr = '0%';
+      topStr = '0%';
+      widthStr = '100%';
+      heightStr = '100%';
     }
     final visibleStr = media.rawAttributes['visible'] ?? 'true';
     visible = visibleStr.toLowerCase() == 'true';
     background = _parseColor(backgroundVal);
     focusBorderColor = _parseColor(media.rawAttributes['focusBorderColor']);
     selBorderColor = _parseColor(media.rawAttributes['selBorderColor']);
-    final left = double.tryParse(leftStr.replaceAll('%', '')) ?? 0.0;
-    final top = double.tryParse(topStr.replaceAll('%', '')) ?? 0.0;
-    final width = double.tryParse(widthStr.replaceAll('%', '')) ?? 100.0;
-    final height = double.tryParse(heightStr.replaceAll('%', '')) ?? 100.0;
-    rect = Rect.fromLTWH(left, top, width, height);
   }
 
   Color _parseColor(String? colorStr) {
@@ -87,6 +89,15 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
       case 'white': return Colors.white;
       default: return Colors.transparent;
     }
+  }
+
+  double _resolveDim(String val, double parentDim) {
+    final trimmed = val.trim();
+    if (trimmed.endsWith('%')) {
+      final pct = double.tryParse(trimmed.substring(0, trimmed.length - 1)) ?? 0.0;
+      return parentDim * pct / 100.0;
+    }
+    return double.tryParse(trimmed) ?? 0.0;
   }
 
   Future<String> loadContent(String path) async {
@@ -112,6 +123,16 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final parentWidth = size.width;
+    final parentHeight = size.height;
+
+    final left = _resolveDim(leftStr, parentWidth);
+    final top = _resolveDim(topStr, parentHeight);
+    final width = _resolveDim(widthStr, parentWidth);
+    final height = _resolveDim(heightStr, parentHeight);
+    rect = Rect.fromLTWH(left, top, width, height);
+
     final content = Visibility(
       visible: visible,
       child: Opacity(
@@ -129,7 +150,7 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
         ),
       ),
     );
-    if (rect == Rect.zero) {
+    if (!isPositioned || rect == Rect.zero) {
       return content;
     }
     return Positioned.fromRect(
