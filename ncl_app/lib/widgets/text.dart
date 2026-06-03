@@ -16,7 +16,7 @@ class TextWidgetState extends BaseWidgetState<TextWidget> {
   void initState() {
     super.initState();
     initPlayer(widget.uri);
-    parseAttributes(widget.media);
+    parseProperties(widget.media);
   }
 
   @override

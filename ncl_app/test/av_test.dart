@@ -88,11 +88,14 @@ void main() {
     expect(find.byType(VideoPlayer), findsOneWidget);
   });
 
-  testWidgets('BaseWidgetState visual attributes mapping tests', (WidgetTester tester) async {
+  testWidgets('BaseWidgetState visual attributes and properties mapping tests', (WidgetTester tester) async {
     final doc = NCLDocument.fromXML('''
 <ncl>
   <body>
-    <media id="m1" src="video.mp4" left="10" top="20" width="150" height="250" bgColor="blue" focusBorderColor="red" selBorderColor="green"/>
+    <media id="m1" src="video.mp4" focusBorderColor="red" selBorderColor="green">
+      <property name="bounds" value="10,20,150,250"/>
+      <property name="background" value="blue"/>
+    </media>
   </body>
 </ncl>
 ''');
@@ -120,8 +123,113 @@ void main() {
     expect(positioned.height, 250.0);
 
     final state = tester.state<AVWidgetState>(find.byType(AVWidget));
-    expect(state.bgColor, Colors.blue);
+    expect(state.background, Colors.blue);
     expect(state.focusBorderColor, Colors.red);
     expect(state.selBorderColor, Colors.green);
+  });
+
+  testWidgets('BaseWidgetState default visual attributes when omitted', (WidgetTester tester) async {
+    final doc = NCLDocument.fromXML('''
+<ncl>
+  <body>
+    <media id="m1" src="video.mp4"/>
+  </body>
+</ncl>
+''');
+    final media = doc.getBody().getNodes().first as Media;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Stack(
+            children: [
+              AVWidget(
+                uri: 'video.mp4',
+                media: media,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final Positioned positioned = tester.widget(find.byType(Positioned));
+    expect(positioned.left, 0.0);
+    expect(positioned.top, 0.0);
+    expect(positioned.width, 100.0);
+    expect(positioned.height, 100.0);
+  });
+
+  testWidgets('BaseWidgetState bounds and background properties mapping tests', (WidgetTester tester) async {
+    final doc = NCLDocument.fromXML('''
+<ncl>
+  <body>
+    <media id="m1" src="video.mp4">
+      <property name="bounds" value="10,20,150,250"/>
+      <property name="background" value="blue"/>
+    </media>
+  </body>
+</ncl>
+''');
+    final media = doc.getBody().getNodes().first as Media;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Stack(
+            children: [
+              AVWidget(
+                uri: 'video.mp4',
+                media: media,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final Positioned positioned = tester.widget(find.byType(Positioned));
+    expect(positioned.left, 10.0);
+    expect(positioned.top, 20.0);
+    expect(positioned.width, 150.0);
+    expect(positioned.height, 250.0);
+
+    final state = tester.state<AVWidgetState>(find.byType(AVWidget));
+    expect(state.background, Colors.blue);
+  });
+
+  testWidgets('ImageWidget rendering without source URI', (WidgetTester tester) async {
+    final doc = NCLDocument.fromXML('''
+<ncl>
+  <body>
+    <media id="m1" type="image/png">
+      <property name="background" value="green"/>
+      <property name="bounds" value="0,80,20,20"/>
+    </media>
+  </body>
+</ncl>
+''');
+    final media = doc.getBody().getNodes().first as Media;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Stack(
+            children: [
+              ImageWidget(
+                uri: '',
+                media: media,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(Image), findsNothing);
+    expect(find.byIcon(Icons.error), findsNothing);
+
+    final state = tester.state<ImageWidgetState>(find.byType(ImageWidget));
+    expect(state.background, Colors.green);
   });
 }

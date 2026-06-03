@@ -16,7 +16,7 @@ class ImageWidgetState extends BaseWidgetState<ImageWidget> {
   void initState() {
     super.initState();
     initPlayer(widget.uri);
-    parseAttributes(widget.media);
+    parseProperties(widget.media);
   }
 
   @override

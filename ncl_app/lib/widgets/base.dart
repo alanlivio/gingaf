@@ -10,7 +10,7 @@ import 'text.dart';
 import 'av.dart';
 
 abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
-  Color bgColor = Colors.transparent;
+  Color background = Colors.transparent;
   Rect rect = Rect.zero;
   Duration? duration;
   bool debug = false;
@@ -31,16 +31,34 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
     this.uri = uri;
   }
 
-  void parseAttributes(Media? media) {
+  void parseProperties(Media? media) {
     if (media == null) return;
     id = media.id;
-    final leftStr = media.rawAttributes['left'] ?? '';
-    final topStr = media.rawAttributes['top'] ?? '';
-    final widthStr = media.rawAttributes['width'] ?? '';
-    final heightStr = media.rawAttributes['height'] ?? '';
+    String? backgroundVal;
+    String? boundsVal;
+    for (var prop in media.getProperties()) {
+      if (prop.name == 'background') {
+        backgroundVal = prop.value;
+      } else if (prop.name == 'bounds') {
+        boundsVal = prop.value;
+      }
+    }
+    String leftStr = '0%';
+    String topStr = '0%';
+    String widthStr = '100%';
+    String heightStr = '100%';
+    if (boundsVal != null) {
+      final boundsParts = boundsVal.split(',');
+      if (boundsParts.length == 4) {
+        leftStr = boundsParts[0].trim();
+        topStr = boundsParts[1].trim();
+        widthStr = boundsParts[2].trim();
+        heightStr = boundsParts[3].trim();
+      }
+    }
     final visibleStr = media.rawAttributes['visible'] ?? 'true';
     visible = visibleStr.toLowerCase() == 'true';
-    bgColor = _parseColor(media.rawAttributes['bgColor'] ?? media.rawAttributes['backgroundColor']);
+    background = _parseColor(backgroundVal);
     focusBorderColor = _parseColor(media.rawAttributes['focusBorderColor']);
     selBorderColor = _parseColor(media.rawAttributes['selBorderColor']);
     final left = double.tryParse(leftStr.replaceAll('%', '')) ?? 0.0;
@@ -100,7 +118,7 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
         opacity: alpha / 255.0,
         child: Container(
           decoration: BoxDecoration(
-            color: bgColor,
+            color: background,
             border: selBorderColor != Colors.transparent
                 ? Border.all(color: selBorderColor, width: 3.0)
                 : (focusBorderColor != Colors.transparent

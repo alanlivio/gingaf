@@ -28,7 +28,7 @@ class AVWidgetState extends BaseWidgetState<AVWidget> {
   void initState() {
     super.initState();
     initPlayer(widget.uri);
-    parseAttributes(widget.media);
+    parseProperties(widget.media);
     _initVideo();
   }
 
