@@ -21,6 +21,9 @@ class ImageWidgetState extends BaseWidgetState<ImageWidget> {
 
   @override
   Widget buildWidgetContent(BuildContext context) {
+    if (uri.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return Center(
       child: Image.network(
         uri,

@@ -120,9 +120,11 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
     final List<Widget> widgets = [];
     for (var media in activeMedia) {
       final src = media.rawAttributes['src'] ?? '';
-      final contentPath = src.startsWith('http')
-          ? src
-          : (src.contains('/') ? src : "$nclBase$src");
+      final contentPath = src.isEmpty
+          ? ''
+          : (src.startsWith('http')
+              ? src
+              : (src.contains('/') ? src : "$nclBase$src"));
 
       widgets.add(
         KeyedSubtree(
