@@ -1,6 +1,7 @@
 # gingaf
 
-Multi-platform Ginga engine implementation for Web and Desktop. It supports Ginga-NCL andGinga- HTML runtimes.
+Ginga is the interactive midleware for TV systems standadise by ITU-T and SBTVD.
+Gingaf is a multi-platform flutter-based Ginga implementation, which supports Ginga-NCL and Ginga-HTML runtimes.
 
 To run applications:
 

@@ -22,14 +22,13 @@ test:
 	cd ccws && flutter test
 	flutter test
 
-APP_FILE := $(if $(app),$(if $(findstring examples/,$(app)),,examples/)$(app)$(if $(findstring .ncl,$(app)),,.ncl))
-
 check-app:
-ifeq ($(app),)
-	$(error Please specify app (e.g. app=video))
-endif
+	$(if $(app),,$(error Please specify app (e.g. app=video.ncl)))
+	$(eval APP_FILE := $(if $(findstring examples/,$(app)),$(app),examples/$(app)))
+	$(eval APP_FILE := $(APP_FILE)$(if $(filter %.ncl %.html,$(APP_FILE)),,.ncl))
+	$(if $(wildcard $(APP_FILE)),,$(error File $(APP_FILE) does not exist))
 
-run-example: build/windows/x64/runner/Release/gingaf.exe check-app
+run-example: check-app build/windows/x64/runner/Release/gingaf.exe
 	@echo ======================================================================
 	@echo Running Example: $(APP_FILE)
 	@echo ======================================================================
