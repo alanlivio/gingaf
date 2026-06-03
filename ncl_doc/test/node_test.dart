@@ -47,6 +47,13 @@ void main() {
       expect(event1.type, EventType.PRESENTATION);
     });
 
+    test('getAreaEventState returns state of the area event', () {
+      final media = Media(id: 'm1');
+      expect(media.getAreaEventState('a1'), State.SLEEPING);
+      media.getAreaEvent('a1').state = State.OCCURRING;
+      expect(media.getAreaEventState('a1'), State.OCCURRING);
+    });
+
     test('doAction', () {
       final media = Media(id: 'm1');
       final event = media.getMainEvent();

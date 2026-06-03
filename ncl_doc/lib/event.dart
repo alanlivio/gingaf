@@ -10,6 +10,7 @@ class Event {
   final EventType type;
   final Node targetNode;
   final String? propertyName;
+  final String? interfaceId;
   final bool isMain;
   State state = State.SLEEPING;
 
@@ -17,6 +18,7 @@ class Event {
     required this.type,
     required this.targetNode,
     this.propertyName,
+    this.interfaceId,
     this.isMain = false,
   });
 

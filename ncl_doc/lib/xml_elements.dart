@@ -62,8 +62,20 @@ abstract class Node extends NCLXMLElement {
     targetNode: this,
     isMain: true,
   );
+  final Map<String, Event> _areaEvents = {};
   Event getMainEvent() => _mainEvt;
   State getMainState() => _mainEvt.state;
+  Event getAreaEvent(String areaId) {
+    return _areaEvents.putIfAbsent(
+      areaId,
+      () => Event(
+        type: EventType.PRESENTATION,
+        targetNode: this,
+        interfaceId: areaId,
+      ),
+    );
+  }
+  State getAreaEventState(String areaId) => getAreaEvent(areaId).state;
   List<Property> getProperties() => children.whereType<Property>().toList();
   List<Area> getAreas() => children.whereType<Area>().toList();
   Node({required super.id, super.rawAttributes});
