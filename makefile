@@ -1,4 +1,4 @@
-.PHONY: all build build-windows build-web test clean run-example run-example-headless run-mainav check-app
+.PHONY: all build build-windows build-web test clean run-example run-example-headless run-mainav check-app download-puc-examples
 
 all: build
 
@@ -51,3 +51,8 @@ clean:
 	cd ncl_app && flutter clean
 	cd ccws && flutter clean
 	flutter clean
+
+download-puc-examples:
+	python scripts/download_puc_examples.py
+
+

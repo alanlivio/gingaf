@@ -33,3 +33,9 @@ For easy, you can use `make run-example-headless`. See below.
 ```powershell
 make run-example-headless app=video.ncl
 ```
+
+### Download PUC-Rio Examples
+
+```powershell
+make download-puc-examples
+```
