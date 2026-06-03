@@ -43,5 +43,5 @@ nuget install Microsoft.Web.WebView2 -Version 1.0.1210.39 -ExcludeVersion -Outpu
 Execute the test suite for core logic and integration:
 
 ```powershell
-flutter test
+make test
 ```

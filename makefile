@@ -1,4 +1,4 @@
-.PHONY: all build build-windows build-web test clean run-examples run-examples-ncl-headless 
+.PHONY: all build build-windows build-web test clean run-example run-example-headless run-mainav check-app
 
 all: build
 
@@ -22,32 +22,30 @@ test:
 	cd ccws && flutter test
 	flutter test
 
-NCL_EXAMPLES := $(wildcard examples/*.ncl)
-HEADLESS_EXAMPLES := $(addsuffix -headless, $(NCL_EXAMPLES))
+APP_FILE := $(if $(app),$(if $(findstring examples/,$(app)),,examples/)$(app)$(if $(findstring .ncl,$(app)),,.ncl))
 
-run-examples: $(NCL_EXAMPLES)
+check-app:
+ifeq ($(app),)
+	$(error Please specify app (e.g. app=video))
+endif
 
-run-examples-headless: $(HEADLESS_EXAMPLES)
-
-$(NCL_EXAMPLES): build/windows/x64/runner/Release/gingaf.exe
+run-example: build/windows/x64/runner/Release/gingaf.exe check-app
 	@echo ======================================================================
-	@echo Running Example: $@
+	@echo Running Example: $(APP_FILE)
 	@echo ======================================================================
-	@set APP=$@&& start /wait .\build\windows\x64\runner\Release\gingaf.exe
+	@set APP=$(APP_FILE)&& start /wait .\build\windows\x64\runner\Release\gingaf.exe
+
+run-example-headless: check-app
+	@echo ======================================================================
+	@echo Running Headless NCL Example: $(APP_FILE)
+	@echo ======================================================================
+	@dart ./ncl_doc/lib/cli.dart $(APP_FILE)
 
 run-mainav: build/windows/x64/runner/Release/gingaf.exe
 	@echo ======================================================================
 	@echo Running MainAV Test
 	@echo ======================================================================
 	@set APP=&& set MAINAV=https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4&& start /wait .\build\windows\x64\runner\Release\gingaf.exe
-
-$(HEADLESS_EXAMPLES): %-headless:
-	@echo ======================================================================
-	@echo Running Headless NCL Example: $*
-	@echo ======================================================================
-	@dart ./ncl_doc/lib/cli.dart $*
-
-.PHONY: $(NCL_EXAMPLES) $(HEADLESS_EXAMPLES) run-examples run-examples-headless
 
 clean:
 	cd ncl_doc && flutter clean
