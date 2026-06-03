@@ -184,5 +184,93 @@ void main() {
       expect(doc.getNodeById('video_main')?.getMainState(), State.SLEEPING);
       expect(doc.getBodyState(), State.SLEEPING);
     });
+
+    test('area timing triggers begin and end events', () {
+      const xml = '''
+<ncl>
+  <body>
+    <port id="p1" component="video_main"/>
+    <media id="video_main" src="main.mp4">
+      <area id="seg1" begin="10s" end="20s" />
+    </media>
+  </body>
+</ncl>
+''';
+      final doc = NCLDocument.fromXML(xml);
+      doc.start();
+      final video = doc.getNodeById('video_main')!;
+      final areaEvent = video.getAreaEvent('seg1');
+      expect(video.getMainState(), State.OCCURRING);
+      expect(areaEvent.state, State.SLEEPING);
+
+      doc.tick(5000);
+      expect(areaEvent.state, State.SLEEPING);
+
+      doc.tick(5000);
+      expect(areaEvent.state, State.OCCURRING);
+
+      doc.tick(9000);
+      expect(areaEvent.state, State.OCCURRING);
+
+      doc.tick(1000);
+      expect(areaEvent.state, State.SLEEPING);
+    });
+
+    test('area begin triggers causal link to start another media', () {
+      const xml = '''
+<ncl>
+  <body>
+    <port id="p1" component="video_main"/>
+    <media id="video_main" src="main.mp4">
+      <area id="seg1" begin="5s" />
+    </media>
+    <media id="m2" src="image.png"/>
+    <link id="l1">
+      <bind role="onBegin" component="video_main" interface="seg1"/>
+      <bind role="start" component="m2"/>
+    </link>
+  </body>
+</ncl>
+''';
+      final doc = NCLDocument.fromXML(xml);
+      doc.start();
+      expect(doc.getNodeById('video_main')?.getMainState(), State.OCCURRING);
+      expect(doc.getNodeById('m2')?.getMainState(), State.SLEEPING);
+
+      doc.tick(4000);
+      expect(doc.getNodeById('m2')?.getMainState(), State.SLEEPING);
+
+      doc.tick(1000);
+      expect(doc.getNodeById('m2')?.getMainState(), State.OCCURRING);
+    });
+
+    test('area end triggers causal link to stop another media', () {
+      const xml = '''
+<ncl>
+  <body>
+    <port id="p1" component="video_main"/>
+    <port id="p2" component="m2"/>
+    <media id="video_main" src="main.mp4">
+      <area id="seg1" begin="5s" end="10s" />
+    </media>
+    <media id="m2" src="image.png"/>
+    <link id="l1">
+      <bind role="onEnd" component="video_main" interface="seg1"/>
+      <bind role="stop" component="m2"/>
+    </link>
+  </body>
+</ncl>
+''';
+      final doc = NCLDocument.fromXML(xml);
+      doc.start();
+      expect(doc.getNodeById('video_main')?.getMainState(), State.OCCURRING);
+      expect(doc.getNodeById('m2')?.getMainState(), State.OCCURRING);
+
+      doc.tick(9000);
+      expect(doc.getNodeById('m2')?.getMainState(), State.OCCURRING);
+
+      doc.tick(1000);
+      expect(doc.getNodeById('m2')?.getMainState(), State.SLEEPING);
+    });
   });
 }

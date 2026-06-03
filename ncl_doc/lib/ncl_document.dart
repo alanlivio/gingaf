@@ -70,7 +70,16 @@ class NCLDocument {
   void _gatherTimedNodes() {
     void gather(Composition comp) {
       for (var node in comp.getNodes()) {
-        if (node.explicitDurMs != null) {
+        bool isTimed = node.explicitDurMs != null;
+        if (!isTimed) {
+          for (var area in node.getAreas()) {
+            if (area.begin != null || area.end != null) {
+              isTimed = true;
+              break;
+            }
+          }
+        }
+        if (isTimed) {
           _timedNodes.add(node);
         }
         if (node is Composition) {
@@ -149,8 +158,27 @@ class NCLDocument {
     if (delta > 0) {
       for (var node in _timedNodes) {
         if (node.getMainState() == State.OCCURRING) {
-          node.time += delta;
-          if (node.time >= node.explicitDurMs!) {
+          int t1 = node.time;
+          int t2 = t1 + delta;
+          node.time = t2;
+
+          for (var area in node.getAreas()) {
+            final beginMs = _parseTimeMs(area.begin);
+            final endMs = _parseTimeMs(area.end);
+
+            if (beginMs != null) {
+              if (t1 < beginMs && t2 >= beginMs) {
+                _stackAction(node.getAreaEvent(area.id), ActionType.START);
+              }
+            }
+            if (endMs != null) {
+              if (t1 < endMs && t2 >= endMs) {
+                _stackAction(node.getAreaEvent(area.id), ActionType.STOP);
+              }
+            }
+          }
+
+          if (node.explicitDurMs != null && t2 >= node.explicitDurMs!) {
             _logger.info(
               '[Clock: ${(targetTime / 1000).toStringAsFixed(3)}s] Node "${node.id}" reached explicit duration (${node.explicitDurMs}ms)',
             );
@@ -168,25 +196,39 @@ class NCLDocument {
       final prevState = actionItem.event.state;
       actionItem.event.doAction(actionItem.action);
       final newState = actionItem.event.state;
-      if (actionItem.event.isMain && newState != prevState) {
+      if (newState != prevState) {
+        final nodeId = actionItem.event.targetNode.id;
+        final interfaceId = actionItem.event.interfaceId;
         _logger.info(
-          '[Clock: ${(virtualClock / 1000).toStringAsFixed(3)}s] Node "${actionItem.event.targetNode.id}" changed state: ${Event.getEventStateAsString(prevState)} -> ${Event.getEventStateAsString(newState)}',
+          '[Clock: ${(virtualClock / 1000).toStringAsFixed(3)}s] Node "$nodeId"${interfaceId != null ? ' (area $interfaceId)' : ''} changed state: ${Event.getEventStateAsString(prevState)} -> ${Event.getEventStateAsString(newState)}',
         );
-        if (newState == State.OCCURRING) {
-          actionItem.event.targetNode.time = 0;
-          if (actionItem.event.targetNode is Context) {
-            _stackPorts(actionItem.event.targetNode as Context);
-          }
-        }
-        _triggerLinks(actionItem.event.targetNode.id, newState);
-        final parent = actionItem.event.targetNode.parent;
-        if (parent is Context) {
+
+        _triggerLinks(nodeId, newState, interfaceId);
+
+        if (actionItem.event.isMain) {
           if (newState == State.OCCURRING) {
-            parent.activeNodes++;
+            actionItem.event.targetNode.time = 0;
+            if (actionItem.event.targetNode is Context) {
+              _stackPorts(actionItem.event.targetNode as Context);
+            }
           } else if (newState == State.SLEEPING) {
-            if (parent.activeNodes > 0) parent.activeNodes--;
-            if (parent.activeNodes == 0) {
-              _stackMainEvtAction(parent, ActionType.STOP);
+            for (var area in actionItem.event.targetNode.getAreas()) {
+              final areaEvt = actionItem.event.targetNode.getAreaEvent(area.id);
+              if (areaEvt.state != State.SLEEPING) {
+                _stackAction(areaEvt, ActionType.STOP);
+              }
+            }
+          }
+
+          final parent = actionItem.event.targetNode.parent;
+          if (parent is Context) {
+            if (newState == State.OCCURRING) {
+              parent.activeNodes++;
+            } else if (newState == State.SLEEPING) {
+              if (parent.activeNodes > 0) parent.activeNodes--;
+              if (parent.activeNodes == 0) {
+                _stackMainEvtAction(parent, ActionType.STOP);
+              }
             }
           }
         }
@@ -200,7 +242,7 @@ class NCLDocument {
     }
   }
 
-  void _triggerLinks(String targetId, State newState) {
+  void _triggerLinks(String targetId, State newState, [String? interfaceId]) {
     final node = getNodeById(targetId);
     final context = node?.parent;
 
@@ -210,22 +252,29 @@ class NCLDocument {
       bool triggered = false;
       if (newState == State.OCCURRING) {
         triggered = link.children.whereType<Bind>().any(
-          (b) => b.role == 'onBegin' && b.component == targetId,
+          (b) => b.role == 'onBegin' && b.component == targetId && b.interface == interfaceId,
         );
       } else if (newState == State.SLEEPING) {
         triggered = link.children.whereType<Bind>().any(
-          (b) => b.role == 'onEnd' && b.component == targetId,
+          (b) => b.role == 'onEnd' && b.component == targetId && b.interface == interfaceId,
         );
       }
 
       if (triggered) {
-        for (var bind in link.children.whereType<Bind>().where(
-          (b) => b.role == 'start',
-        )) {
-          if (bind.component != null) {
-            final bindNode = getNodeById(bind.component!);
-            if (bindNode != null) {
-              _stackMainEvtAction(bindNode, ActionType.START);
+        for (var bind in link.children.whereType<Bind>()) {
+          final actionStr = bind.role;
+          if (actionStr != null &&
+              (actionStr == 'start' ||
+                  actionStr == 'stop' ||
+                  actionStr == 'abort' ||
+                  actionStr == 'pause' ||
+                  actionStr == 'resume')) {
+            if (bind.component != null) {
+              final bindNode = getNodeById(bind.component!);
+              if (bindNode != null) {
+                final actionType = Event.getStringAsActionType(actionStr);
+                _stackMainEvtAction(bindNode, actionType);
+              }
             }
           }
         }
@@ -283,5 +332,18 @@ class NCLDocument {
     }
 
     stopNode(_body);
+  }
+
+  int? _parseTimeMs(String? timeStr) {
+    if (timeStr == null) return null;
+    if (timeStr.endsWith('ms')) {
+      return int.tryParse(timeStr.replaceAll('ms', ''));
+    } else if (timeStr.endsWith('s')) {
+      final s = double.tryParse(timeStr.replaceAll('s', ''));
+      if (s != null) {
+        return (s * 1000).toInt();
+      }
+    }
+    return int.tryParse(timeStr);
   }
 }
