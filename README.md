@@ -5,13 +5,13 @@
 To run Ginga-NCL or Ginga-HTML applications with GUI, do at `ginga/`:
 
 ```bash
-flutter run -d <device> --dart-define="APP=<path_to_file>"
+flutter run -d <chrome,windows> --dart-define="APP=<path_to_file>"
 ```
 
 To run Ginga-NCL application headless (no-GUI), do at `ncl_doc`:
 
 ```bash
-dart ./ncl_doc/lib/cli.dart <path_to_file>
+dart ./lib/main.dart <path_to_file>
 ```
 
 - For environment setup and technical architecture details, see [SETUP.md](SETUP.md).

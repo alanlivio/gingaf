@@ -17,7 +17,7 @@ void main(List<String> arguments) {
 
   if (arguments.isEmpty) {
     _logger.info(
-      'Usage: dart ncl_doc/lib/cli.dart <file.ncl> [ticksPerSecond (default: 1)]',
+      'Usage: dart ncl_doc/lib/main.dart <file.ncl> [ticksPerSecond (default: 1)]',
     );
     exit(1);
   }

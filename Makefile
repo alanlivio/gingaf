@@ -36,7 +36,7 @@ run-example-headless: check-app
 	@echo ======================================================================
 	@echo Running Headless NCL Example: $(APP_FILE)
 	@echo ======================================================================
-	@dart ./ncl_doc/lib/cli.dart $(APP_FILE)
+	@dart ./ncl_doc/lib/main.dart $(APP_FILE)
 
 run-mainav: ginga/build/windows/x64/runner/Release/gingaf.exe
 	@echo ======================================================================
