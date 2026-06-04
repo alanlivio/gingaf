@@ -53,6 +53,6 @@ clean:
 	flutter clean
 
 download-puc-examples:
-	python scripts/download_puc_examples.py
+	python examples/download_puc_examples.py
 
 
