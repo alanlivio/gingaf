@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ncl_app/ncl_app.dart';
+import 'package:gingaf/ncl/ncl_app.dart';
 
 class MockAssetBundle extends CachingAssetBundle {
   final Map<String, String> assets;

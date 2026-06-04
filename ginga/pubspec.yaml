@@ -9,15 +9,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  ncl_app:
-    path: ncl_app
-  ccws:
-    path: ccws
   cupertino_icons: ^1.0.2
   webview_all: ^1.0.3
   logging: ^1.3.0
   video_player: ^2.8.6
   video_player_win: ^3.2.2
+  shelf: ^1.4.1
+  shelf_router: ^1.1.4
+  http: ^1.1.0
+  ncl_doc:
+    path: ../ncl_doc
 
 dev_dependencies:
   flutter_test:
@@ -32,4 +33,4 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - examples/
+    - ../examples/

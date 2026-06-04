@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gingaf/main.dart';
+import 'package:gingaf/ginga.dart';
 
 void main() {
   group('GingaConfig Logic Tests', () {
@@ -31,5 +31,4 @@ void main() {
       expect(GingaConfig('').appPath, isNull);
     });
   });
-
 }

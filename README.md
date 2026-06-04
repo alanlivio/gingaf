@@ -1,17 +1,14 @@
 # gingaf
 
-Ginga is the interactive midleware for TV systems standadise by ITU-T and SBTVD.
-Gingaf is a multi-platform flutter-based Ginga implementation, which supports Ginga-NCL and Ginga-HTML runtimes.
+`gingaf` is a multi-platform implementation of the interactive TV standard Ginga done by ITU-T and SBTVD.
 
-To run Ginga-NCL or Ginga-HTML applications with GUI, run:
+To run Ginga-NCL or Ginga-HTML applications with GUI, do at `ginga/`:
 
 ```bash
 flutter run -d <device> --dart-define="APP=<path_to_file>"
 ```
 
-- **`APP`**: Path to the `.ncl` or `.html` file, relative to `gingaf/`.
-
-To run Ginga-NCL application headless (no-GUI), run:
+To run Ginga-NCL application headless (no-GUI), do at `ncl_doc`:
 
 ```bash
 dart ./ncl_doc/lib/cli.dart <path_to_file>

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:ncl_app/widgets/base.dart';
+import 'package:gingaf/ncl/widgets/base.dart';
 import 'package:webview_all/webview_all.dart';
 
 final _logger = Logger('ginga-html');
