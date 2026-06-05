@@ -1,9 +1,8 @@
 import 'package:xml/xml.dart';
-import 'schema.dart';
-import 'ncl_document.dart';
+
 import 'mimetype.dart';
-
-
+import 'ncl_document.dart';
+import 'schema.dart';
 
 class NCLParser {
   final Schema schema = Schema();
@@ -34,19 +33,20 @@ class NCLParser {
     return (head, body);
   }
 
-  NCLXMLElement? _parseNode(XmlElement node) {
+  Element? _parseNode(XmlElement node) {
     Map<String, String> attrs = {
       for (var attr in node.attributes) attr.name.local: attr.value,
     };
     String id = attrs['id'] ?? '';
 
-    final NCLXMLElement element;
+    final Element element;
     switch (node.name.local) {
       case 'media':
         final src = attrs['src'] ?? '';
         final type = attrs['type'] ?? '';
         final mimeType = type.isNotEmpty ? type : getMimeTypeFromExtension(src);
-        if (mimeType == 'application/x-ncl-settings' || mimeType == 'application/x-ginga-settings') {
+        if (mimeType == 'application/x-ncl-settings' ||
+            mimeType == 'application/x-ginga-settings') {
           element = Settings(id: id, rawAttributes: attrs, mimeType: mimeType);
         } else {
           element = Media(id: id, rawAttributes: attrs, mimeType: mimeType);
@@ -54,7 +54,10 @@ class NCLParser {
         break;
       case 'context':
       case 'body':
-        element = Context(id: id.isNotEmpty ? id : node.name.local, rawAttributes: attrs);
+        element = Context(
+          id: id.isNotEmpty ? id : node.name.local,
+          rawAttributes: attrs,
+        );
         break;
       case 'region':
         element = Region(id: id, rawAttributes: attrs);
@@ -88,8 +91,7 @@ class NCLParser {
         element = Settings(id: id, rawAttributes: attrs);
         break;
       default:
-        // Generic element for structural nodes like <ncl>, <head>, <body>
-        element = NCLXMLElement(
+        element = Element(
           id: id.isNotEmpty ? id : node.name.local,
           rawAttributes: attrs,
         );
@@ -141,4 +143,3 @@ class NCLParser {
     return errors;
   }
 }
-

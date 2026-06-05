@@ -4,14 +4,15 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 
+
 import 'event.dart';
 import 'parser.dart';
-import 'xml_elements.dart';
+import 'elements.dart';
 
 export 'event.dart';
 export 'lua.dart';
 export 'parser.dart';
-export 'xml_elements.dart';
+export 'elements.dart';
 
 
 
@@ -27,7 +28,7 @@ class NCLDocument {
   final List<Action> _actionStack = [];
   final List<Node> _timedNodes = [];
 
-  factory NCLDocument.fromBodyElements(List<NCLXMLElement> elements) {
+  factory NCLDocument.fromBodyElements(List<Element> elements) {
     final body = Context(id: 'body');
     body.children.addAll(elements);
     for (var el in elements) {

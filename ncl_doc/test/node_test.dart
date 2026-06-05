@@ -1,4 +1,4 @@
-import 'package:ncl_doc/xml_elements.dart';
+import 'package:ncl_doc/elements.dart';
 import 'package:ncl_doc/event.dart';
 import 'package:test/test.dart';
 
