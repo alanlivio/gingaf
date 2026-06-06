@@ -58,6 +58,7 @@ void main() {
 
     test('default Settings is created if none is provided', () {
       final doc = NCLDocument.fromBodyElements([]);
+      doc.start();
       final settings = doc.getSettings();
       expect(settings, isNotNull);
       expect(settings.id, '__settings__');
@@ -71,6 +72,7 @@ void main() {
         rawAttributes: const {'id': 'p1', 'component': 'm1'},
       );
       final doc = NCLDocument.fromBodyElements([media, port]);
+      doc.start();
 
       // Expect 2 because Settings now extends Media and a default_settings is added
       expect(doc.getBody().getNodes().whereType<Media>().length, 2);
@@ -82,7 +84,25 @@ void main() {
     test('getSettings is returned correctly when provided', () {
       final settings = Settings(rawAttributes: const {'id': 's1'});
       final doc = NCLDocument.fromBodyElements([settings]);
+      doc.start();
       expect(doc.getSettings(), settings);
+    });
+
+    test('baseURI and fromXML / fromBodyElements', () {
+      final doc1 = NCLDocument.fromXML('<ncl><body></body></ncl>', baseURI: Uri.parse('some_uri/'));
+      expect(doc1.baseURI, Uri.parse('some_uri/'));
+
+      final doc2 = NCLDocument.fromBodyElements([]);
+      expect(doc2.baseURI, Uri.parse('.'));
+    });
+
+    test('resolving relative media path against file baseURI', () {
+      final doc = NCLDocument.fromXML(
+        '<ncl><body><media id="m1" src="video.mp4" /></body></ncl>',
+        baseURI: Uri.parse('file:///C:/Users/test/video.ncl'),
+      );
+      final media = doc.getNodeById('m1') as Media;
+      expect(media.uri, 'file:///C:/Users/test/video.mp4');
     });
   });
 }

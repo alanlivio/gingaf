@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
@@ -50,8 +51,10 @@ class NCLAppState extends NCLMediaState<NCLApp> {
         setState(() {});
       }
 
-      final String nclData = await loadContent(widget.uri);
-      final doc = NCLDocument.fromXML(nclData);
+      final uri = widget.uri.startsWith('http')
+          ? Uri.parse(widget.uri)
+          : (kIsWeb ? Uri.parse(widget.uri) : Uri.file(widget.uri));
+      final doc = NCLDocument.fromURI(uri);
 
       nclDocument = doc;
       doc.start();
@@ -110,24 +113,10 @@ class NCLAppState extends NCLMediaState<NCLApp> {
 
   @override
   Widget buildWidgetContent(BuildContext context) {
-    final String nclBase = widget.uri.contains('/')
-        ? widget.uri.substring(0, widget.uri.lastIndexOf('/') + 1)
-        : "";
-
     final activeMedia = nclDocument?.getActiveMedia() ?? [];
 
     final List<Widget> widgets = [];
     for (var media in activeMedia) {
-      final src = media.rawAttributes['src'] ?? '';
-      final contentPath = src.isEmpty
-          ? ''
-          : (src.startsWith('http')
-              ? src
-              : (src.contains('/') ? src : "$nclBase$src"));
-      if (contentPath.isNotEmpty) {
-        media.uri = contentPath;
-      }
-
       widgets.add(
         KeyedSubtree(
           key: ValueKey(media.id ?? ''),

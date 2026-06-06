@@ -6,8 +6,9 @@ import 'schema.dart';
 
 class NCLParser {
   final Schema schema = Schema();
+  final Uri baseURI;
 
-  NCLParser();
+  NCLParser({Uri? baseURI}) : baseURI = baseURI ?? Uri.parse('.');
 
   (Head, Body) parseString(String xmlString) {
     final document = XmlDocument.parse(xmlString);
@@ -43,11 +44,22 @@ class NCLParser {
         final src = attrs['src'] ?? '';
         final type = attrs['type'] ?? '';
         final mimeType = type.isNotEmpty ? type : getMimeTypeFromExtension(src);
+        final String uri;
+        if (src.isEmpty) {
+          uri = '';
+        } else {
+          final resolvedSrc = src.replaceAll('\\', '/');
+          uri = baseURI.resolve(resolvedSrc).toString();
+        }
         if (mimeType == 'application/x-ncl-settings' ||
             mimeType == 'application/x-ginga-settings') {
           element = Settings(rawAttributes: attrs, mimeType: mimeType);
         } else {
-          element = Media(rawAttributes: attrs, mimeType: mimeType);
+          final media = Media(rawAttributes: attrs, mimeType: mimeType);
+          if (uri.isNotEmpty) {
+            media.uri = uri;
+          }
+          element = media;
         }
         break;
       case 'context':

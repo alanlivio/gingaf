@@ -1,20 +1,18 @@
 library;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:logging/logging.dart';
 
-
+import 'elements.dart';
 import 'event.dart';
 import 'parser.dart';
-import 'elements.dart';
 
+export 'elements.dart';
 export 'event.dart';
 export 'lua.dart';
 export 'parser.dart';
-export 'elements.dart';
-
-
 
 final _logger = Logger('ncl_doc');
 
@@ -22,6 +20,7 @@ class NCLDocument {
   late final Head? _head;
   late final Context _body;
   late final Settings _settings;
+  final Uri baseURI;
 
   int virtualClock = 0;
   bool isPlaying = false;
@@ -36,18 +35,25 @@ class NCLDocument {
         el.parent = body;
       }
     }
-    return NCLDocument(body: body);
+    return NCLDocument._(body: body);
   }
 
-  factory NCLDocument.fromXML(String xml) {
-    final (head, body) = NCLParser().parseString(xml);
-    return NCLDocument(head: head, body: body);
+  factory NCLDocument.fromXML(String xml, {Uri? baseURI}) {
+    final (head, body) = NCLParser(baseURI: baseURI).parseString(xml);
+    return NCLDocument._(head: head, body: body, baseURI: baseURI);
   }
 
-  NCLDocument({Head? head, required Body body}) {
+  factory NCLDocument.fromURI(Uri uri) {
+    final path = uri.isScheme('file') ? uri.toFilePath() : uri.path;
+    final file = File(path);
+    final xml = file.readAsStringSync();
+    return NCLDocument.fromXML(xml, baseURI: uri);
+  }
+
+  NCLDocument._({Head? head, required Body body, Uri? baseURI})
+      : baseURI = baseURI ?? Uri.parse('.') {
     _head = head;
     _body = body;
-    _init();
   }
 
   void _init() {
@@ -169,7 +175,10 @@ class NCLDocument {
 
             if (beginMs != null) {
               if (t1 < beginMs && t2 >= beginMs) {
-                _stackAction(node.getAreaEvent(area.id ?? ''), ActionType.START);
+                _stackAction(
+                  node.getAreaEvent(area.id ?? ''),
+                  ActionType.START,
+                );
               }
             }
             if (endMs != null) {
@@ -214,7 +223,9 @@ class NCLDocument {
             }
           } else if (newState == State.SLEEPING) {
             for (var area in actionItem.event.targetNode.getAreas()) {
-              final areaEvt = actionItem.event.targetNode.getAreaEvent(area.id ?? '');
+              final areaEvt = actionItem.event.targetNode.getAreaEvent(
+                area.id ?? '',
+              );
               if (areaEvt.state != State.SLEEPING) {
                 _stackAction(areaEvt, ActionType.STOP);
               }
@@ -254,11 +265,17 @@ class NCLDocument {
       bool triggered = false;
       if (newState == State.OCCURRING) {
         triggered = link.children.whereType<Bind>().any(
-          (b) => b.role == 'onBegin' && b.component == targetId && b.interface == interfaceId,
+          (b) =>
+              b.role == 'onBegin' &&
+              b.component == targetId &&
+              b.interface == interfaceId,
         );
       } else if (newState == State.SLEEPING) {
         triggered = link.children.whereType<Bind>().any(
-          (b) => b.role == 'onEnd' && b.component == targetId && b.interface == interfaceId,
+          (b) =>
+              b.role == 'onEnd' &&
+              b.component == targetId &&
+              b.interface == interfaceId,
         );
       }
 
@@ -294,6 +311,7 @@ class NCLDocument {
 
   void start() {
     _logger.info('[Clock: ${virtualClock / 1000}s] NCLDocument will start');
+    _init();
     isPlaying = true;
     tick();
   }
