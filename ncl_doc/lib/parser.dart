@@ -14,7 +14,7 @@ class NCLParser {
     final root = document.rootElement;
 
     Head head = [];
-    Body body = Context(id: 'body');
+    Body body = Context(rawAttributes: const {'id': 'body'});
 
     for (var childNode in root.children.whereType<XmlElement>()) {
       if (childNode.name.local == 'head') {
@@ -37,7 +37,7 @@ class NCLParser {
     Map<String, String> attrs = {
       for (var attr in node.attributes) attr.name.local: attr.value,
     };
-    String id = attrs['id'] ?? '';
+    final String id = attrs['id'] ?? '';
 
     final Element element;
     switch (node.name.local) {
@@ -47,54 +47,54 @@ class NCLParser {
         final mimeType = type.isNotEmpty ? type : getMimeTypeFromExtension(src);
         if (mimeType == 'application/x-ncl-settings' ||
             mimeType == 'application/x-ginga-settings') {
-          element = Settings(id: id, rawAttributes: attrs, mimeType: mimeType);
+          element = Settings(rawAttributes: attrs, mimeType: mimeType);
         } else {
-          element = Media(id: id, rawAttributes: attrs, mimeType: mimeType);
+          element = Media(rawAttributes: attrs, mimeType: mimeType);
         }
         break;
       case 'context':
       case 'body':
-        element = Context(
-          id: id.isNotEmpty ? id : node.name.local,
-          rawAttributes: attrs,
-        );
+        element = Context(rawAttributes: attrs);
         break;
       case 'region':
-        element = Region(id: id, rawAttributes: attrs);
+        element = Region(rawAttributes: attrs);
         break;
       case 'descriptor':
-        element = Descriptor(id: id, rawAttributes: attrs);
+        element = Descriptor(rawAttributes: attrs);
         break;
       case 'link':
-        element = Link(id: id, rawAttributes: attrs);
+        element = Link(rawAttributes: attrs);
         break;
       case 'connector':
       case 'causalConnector':
-        element = Connector(id: id, rawAttributes: attrs);
+        element = Connector(rawAttributes: attrs);
         break;
       case 'port':
-        element = Port(id: id, rawAttributes: attrs);
+        element = Port(rawAttributes: attrs);
         break;
       case 'bind':
         element = Bind(rawAttributes: attrs);
         break;
       case 'property':
-        element = Property(id: id, rawAttributes: attrs);
+        element = Property(rawAttributes: attrs);
         break;
       case 'area':
-        element = Area(id: id, rawAttributes: attrs);
+        element = Area(rawAttributes: attrs);
         break;
       case 'switch':
-        element = Switch(id: id, rawAttributes: attrs);
+        element = Switch(rawAttributes: attrs);
         break;
       case 'settings':
-        element = Settings(id: id, rawAttributes: attrs);
+        element = Settings(rawAttributes: attrs);
+        break;
+      case 'head':
+      case 'regionBase':
+      case 'descriptorBase':
+      case 'connectorBase':
+        element = Element(rawAttributes: attrs);
         break;
       default:
-        element = Element(
-          id: id.isNotEmpty ? id : node.name.local,
-          rawAttributes: attrs,
-        );
+        return null;
     }
 
     for (var childNode in node.children.whereType<XmlElement>()) {

@@ -23,8 +23,8 @@ void main() {
     });
 
     test('automatic start via Port', () {
-      final media = Media(id: 'm1');
-      final port = Port(id: 'p1', rawAttributes: {'component': 'm1'});
+      final media = Media(rawAttributes: const {'id': 'm1'});
+      final port = Port(rawAttributes: const {'id': 'p1', 'component': 'm1'});
       final doc = NCLDocument.fromBodyElements([media, port]);
       doc.start();
       expect(doc.getBodyState(), State.OCCURRING);
@@ -35,15 +35,15 @@ void main() {
     });
 
     test('causal link between two media', () {
-      final m1 = Media(id: 'm1');
-      final m2 = Media(id: 'm2');
-      final port = Port(id: 'p1', rawAttributes: {'component': 'm1'});
-      final link = Link(id: 'l1');
+      final m1 = Media(rawAttributes: const {'id': 'm1'});
+      final m2 = Media(rawAttributes: const {'id': 'm2'});
+      final port = Port(rawAttributes: const {'id': 'p1', 'component': 'm1'});
+      final link = Link(rawAttributes: const {'id': 'l1'});
       link.children.add(
-        Bind(rawAttributes: {'role': 'onBegin', 'component': 'm1'}),
+        Bind(rawAttributes: const {'role': 'onBegin', 'component': 'm1'}),
       );
       link.children.add(
-        Bind(rawAttributes: {'role': 'start', 'component': 'm2'}),
+        Bind(rawAttributes: const {'role': 'start', 'component': 'm2'}),
       );
       final doc = NCLDocument.fromBodyElements([m1, m2, port, link]);
       doc.start();
@@ -65,12 +65,10 @@ void main() {
 
     test('NCLDocument Composition', () {
       final media = Media(
-        id: 'm1',
-        rawAttributes: {'id': 'm1', 'src': 'v.mp4'},
+        rawAttributes: const {'id': 'm1', 'src': 'v.mp4'},
       );
       final port = Port(
-        id: 'p1',
-        rawAttributes: {'id': 'p1', 'component': 'm1'},
+        rawAttributes: const {'id': 'p1', 'component': 'm1'},
       );
       final doc = NCLDocument.fromBodyElements([media, port]);
 
@@ -82,7 +80,7 @@ void main() {
     });
 
     test('getSettings is returned correctly when provided', () {
-      final settings = Settings(id: 's1');
+      final settings = Settings(rawAttributes: const {'id': 's1'});
       final doc = NCLDocument.fromBodyElements([settings]);
       expect(doc.getSettings(), settings);
     });

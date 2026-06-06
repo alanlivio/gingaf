@@ -5,52 +5,55 @@ typedef Body = Context;
 
 class Element {
   final Map<String, String> rawAttributes;
-  final String id;
+  String? get id => rawAttributes['id'];
   final List<Element> children = [];
 
-  Element({required this.id, this.rawAttributes = const {}});
+  Element({this.rawAttributes = const {}});
 }
 
 class Port extends Element {
   String? get component => rawAttributes['component'];
   String? get interface => rawAttributes['interface'];
-  Port({required super.id, super.rawAttributes});
+  Port({super.rawAttributes});
 }
 
 class Bind extends Element {
   String? get role => rawAttributes['role'];
   String? get component => rawAttributes['component'];
   String? get interface => rawAttributes['interface'];
-  Bind({String? id, super.rawAttributes})
-    : super(id: id ?? 'bind_${rawAttributes['role']}');
+
+  @override
+  String? get id => rawAttributes['id'] ?? 'bind_$role';
+
+  Bind({super.rawAttributes});
 }
 
 class Property extends Element {
   String? get name => rawAttributes['name'];
   String? get value => rawAttributes['value'];
-  Property({required super.id, super.rawAttributes});
+  Property({super.rawAttributes});
 }
 
 class Area extends Element {
   String? get begin => rawAttributes['begin'];
   String? get end => rawAttributes['end'];
-  Area({required super.id, super.rawAttributes});
+  Area({super.rawAttributes});
 }
 
 class Link extends Element {
-  Link({required super.id, super.rawAttributes});
+  Link({super.rawAttributes});
 }
 
 class Descriptor extends Element {
-  Descriptor({required super.id, super.rawAttributes});
+  Descriptor({super.rawAttributes});
 }
 
 class Region extends Element {
-  Region({required super.id, super.rawAttributes});
+  Region({super.rawAttributes});
 }
 
 class Connector extends Element {
-  Connector({required super.id, super.rawAttributes});
+  Connector({super.rawAttributes});
 }
 
 abstract class Node extends Element {
@@ -78,30 +81,37 @@ abstract class Node extends Element {
   State getAreaEventState(String areaId) => getAreaEvent(areaId).state;
   List<Property> getProperties() => children.whereType<Property>().toList();
   List<Area> getAreas() => children.whereType<Area>().toList();
-  Node({required super.id, super.rawAttributes});
+  Node({super.rawAttributes});
 }
 
 abstract class Composition extends Node {
   int activeNodes = 0;
   List<Node> getNodes() => children.whereType<Node>().toList();
-  Composition({required super.id, super.rawAttributes});
+  Composition({super.rawAttributes});
 }
 
 class Context extends Composition {
   List<Port> getPorts() => children.whereType<Port>().toList();
   List<Link> getLinks() => children.whereType<Link>().toList();
-  Context({required super.id, super.rawAttributes});
+  Context({super.rawAttributes});
 }
 
 class Switch extends Composition {
-  Switch({required super.id, super.rawAttributes});
+  Switch({super.rawAttributes});
 }
 
 class Media extends Node {
   final String mimeType;
-  Media({required super.id, super.rawAttributes, this.mimeType = 'application/octet-stream'});
+  String uri = '';
+  String? get src => rawAttributes['src'];
+  Media({super.rawAttributes, this.mimeType = 'application/octet-stream'}) {
+    final srcVal = src;
+    if (srcVal != null && srcVal.isNotEmpty) {
+      uri = srcVal;
+    }
+  }
 }
 
 class Settings extends Media {
-  Settings({required super.id, super.rawAttributes, super.mimeType = 'application/x-ncl-settings'});
+  Settings({super.rawAttributes, super.mimeType = 'application/x-ncl-settings'});
 }

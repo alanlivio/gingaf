@@ -29,7 +29,7 @@ class NCLDocument {
   final List<Node> _timedNodes = [];
 
   factory NCLDocument.fromBodyElements(List<Element> elements) {
-    final body = Context(id: 'body');
+    final body = Context(rawAttributes: const {'id': 'body'});
     body.children.addAll(elements);
     for (var el in elements) {
       if (el is Node) {
@@ -62,7 +62,7 @@ class NCLDocument {
     if (settingsList.isNotEmpty) {
       _settings = settingsList.first;
     } else {
-      _settings = Settings(id: '__settings__');
+      _settings = Settings(rawAttributes: const {'id': '__settings__'});
       _body.children.add(_settings);
       _settings.parent = _body;
     }
@@ -169,12 +169,12 @@ class NCLDocument {
 
             if (beginMs != null) {
               if (t1 < beginMs && t2 >= beginMs) {
-                _stackAction(node.getAreaEvent(area.id), ActionType.START);
+                _stackAction(node.getAreaEvent(area.id ?? ''), ActionType.START);
               }
             }
             if (endMs != null) {
               if (t1 < endMs && t2 >= endMs) {
-                _stackAction(node.getAreaEvent(area.id), ActionType.STOP);
+                _stackAction(node.getAreaEvent(area.id ?? ''), ActionType.STOP);
               }
             }
           }
@@ -214,7 +214,7 @@ class NCLDocument {
             }
           } else if (newState == State.SLEEPING) {
             for (var area in actionItem.event.targetNode.getAreas()) {
-              final areaEvt = actionItem.event.targetNode.getAreaEvent(area.id);
+              final areaEvt = actionItem.event.targetNode.getAreaEvent(area.id ?? '');
               if (areaEvt.state != State.SLEEPING) {
                 _stackAction(areaEvt, ActionType.STOP);
               }
@@ -243,7 +243,8 @@ class NCLDocument {
     }
   }
 
-  void _triggerLinks(String targetId, State newState, [String? interfaceId]) {
+  void _triggerLinks(String? targetId, State newState, [String? interfaceId]) {
+    if (targetId == null) return;
     final node = getNodeById(targetId);
     final context = node?.parent;
 
