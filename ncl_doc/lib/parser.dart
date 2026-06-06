@@ -37,8 +37,6 @@ class NCLParser {
     Map<String, String> attrs = {
       for (var attr in node.attributes) attr.name.local: attr.value,
     };
-    final String id = attrs['id'] ?? '';
-
     final Element element;
     switch (node.name.local) {
       case 'media':

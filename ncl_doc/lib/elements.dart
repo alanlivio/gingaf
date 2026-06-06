@@ -7,7 +7,6 @@ class Element {
   final Map<String, String> rawAttributes;
   String? get id => rawAttributes['id'];
   final List<Element> children = [];
-
   Element({this.rawAttributes = const {}});
 }
 
@@ -21,10 +20,6 @@ class Bind extends Element {
   String? get role => rawAttributes['role'];
   String? get component => rawAttributes['component'];
   String? get interface => rawAttributes['interface'];
-
-  @override
-  String? get id => rawAttributes['id'] ?? 'bind_$role';
-
   Bind({super.rawAttributes});
 }
 
@@ -78,6 +73,7 @@ abstract class Node extends Element {
       ),
     );
   }
+
   State getAreaEventState(String areaId) => getAreaEvent(areaId).state;
   List<Property> getProperties() => children.whereType<Property>().toList();
   List<Area> getAreas() => children.whereType<Area>().toList();
@@ -104,14 +100,12 @@ class Media extends Node {
   final String mimeType;
   String uri = '';
   String? get src => rawAttributes['src'];
-  Media({super.rawAttributes, this.mimeType = 'application/octet-stream'}) {
-    final srcVal = src;
-    if (srcVal != null && srcVal.isNotEmpty) {
-      uri = srcVal;
-    }
-  }
+  Media({super.rawAttributes, this.mimeType = 'application/octet-stream'});
 }
 
 class Settings extends Media {
-  Settings({super.rawAttributes, super.mimeType = 'application/x-ncl-settings'});
+  Settings({
+    super.rawAttributes,
+    super.mimeType = 'application/x-ncl-settings',
+  });
 }

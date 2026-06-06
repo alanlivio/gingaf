@@ -93,8 +93,7 @@ void main() {
       final link = body.children.firstWhere((e) => e.id == 'l1') as Link;
       expect(link, isA<Link>());
 
-      final bind =
-          link.children.firstWhere((e) => e.id == 'bind_onBegin') as Bind;
+      final bind = link.children.whereType<Bind>().first;
       expect(bind, isA<Bind>());
       expect(bind.role, 'onBegin');
       expect(bind.component, 'm1');
