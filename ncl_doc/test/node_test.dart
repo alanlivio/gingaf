@@ -129,12 +129,38 @@ void main() {
     });
 
     test('Media Initialization', () {
-      final media = Media(
-        rawAttributes: const {'id': 'm1', 'src': 'video.mp4', 'type': 'video/mp4'},
+      final mediaDefault = Media(
+        rawAttributes: const {'id': 'm1'},
       );
-      expect(media.id, 'm1');
-      expect(media.src, 'video.mp4');
-      expect(media.rawAttributes['type'], 'video/mp4');
+      expect(mediaDefault.id, 'm1');
+      expect(mediaDefault.uri, '');
+      expect(mediaDefault.mimeType, 'application/x-ginga-time');
+
+      final mediaCustom = Media(
+        rawAttributes: const {'id': 'm2', 'src': 'video.mp4'},
+        uri: 'file:///video.mp4',
+        mimeType: 'video/mp4',
+      );
+      expect(mediaCustom.id, 'm2');
+      expect(mediaCustom.src, 'video.mp4');
+      expect(mediaCustom.uri, 'file:///video.mp4');
+      expect(mediaCustom.mimeType, 'video/mp4');
+
+      final mediaCustomUriOnly = Media(
+        rawAttributes: const {'id': 'm3'},
+        uri: 'file:///audio.mp3',
+      );
+      expect(mediaCustomUriOnly.id, 'm3');
+      expect(mediaCustomUriOnly.uri, 'file:///audio.mp3');
+      expect(mediaCustomUriOnly.mimeType, 'application/x-ginga-time');
+
+      final mediaCustomMimeOnly = Media(
+        rawAttributes: const {'id': 'm4'},
+        mimeType: 'image/png',
+      );
+      expect(mediaCustomMimeOnly.id, 'm4');
+      expect(mediaCustomMimeOnly.uri, '');
+      expect(mediaCustomMimeOnly.mimeType, 'image/png');
     });
 
     test('Settings Initialization', () {

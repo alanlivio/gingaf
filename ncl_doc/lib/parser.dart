@@ -43,23 +43,20 @@ class NCLParser {
       case 'media':
         final src = attrs['src'] ?? '';
         final type = attrs['type'] ?? '';
-        final mimeType = type.isNotEmpty ? type : getMimeTypeFromExtension(src);
-        final String uri;
-        if (src.isEmpty) {
-          uri = '';
+        if (src.isEmpty && type.isEmpty) {
+          element = Media(rawAttributes: attrs);
+        } else if (type == 'application/x-ncl-settings' ||
+            type == 'application/x-ginga-settings') {
+          element = Settings(rawAttributes: attrs, mimeType: type);
         } else {
           final resolvedSrc = src.replaceAll('\\', '/');
-          uri = baseURI.resolve(resolvedSrc).toString();
-        }
-        if (mimeType == 'application/x-ncl-settings' ||
-            mimeType == 'application/x-ginga-settings') {
-          element = Settings(rawAttributes: attrs, mimeType: mimeType);
-        } else {
-          final media = Media(rawAttributes: attrs, mimeType: mimeType);
-          if (uri.isNotEmpty) {
-            media.uri = uri;
-          }
-          element = media;
+          final uri = src.isNotEmpty
+              ? baseURI.resolve(resolvedSrc).toString()
+              : '';
+          final mimeType = type.isNotEmpty
+              ? type
+              : getMimeTypeFromExtension(src);
+          element = Media(rawAttributes: attrs, uri: uri, mimeType: mimeType);
         }
         break;
       case 'context':

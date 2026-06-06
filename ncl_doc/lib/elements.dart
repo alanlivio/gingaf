@@ -98,9 +98,13 @@ class Switch extends Composition {
 
 class Media extends Node {
   final String mimeType;
-  String uri = '';
+  final String uri;
   String? get src => rawAttributes['src'];
-  Media({super.rawAttributes, this.mimeType = 'application/octet-stream'});
+  Media({
+    super.rawAttributes,
+    this.uri = '',
+    this.mimeType = 'application/x-ginga-time',
+  });
 }
 
 class Settings extends Media {

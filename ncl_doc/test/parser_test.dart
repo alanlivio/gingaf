@@ -165,5 +165,34 @@ void main() {
       expect(mediaList[0].rawAttributes['src'], equals('main.lua'));
       expect(mediaList[1].rawAttributes['src'], equals('index.html'));
     });
+
+    test('instantiates Media and Settings correctly', () {
+      const xml = '''
+<ncl>
+  <body>
+    <media id="content" src="video.mp4" />
+    <media id="time" />
+    <media id="settings" type="application/x-ginga-settings" />
+  </body>
+</ncl>
+''';
+      final (_, body) = parser.parseString(xml);
+      final mediaList = body.children.whereType<Media>().toList();
+
+      expect(mediaList.length, 3);
+
+      final contentNode = mediaList.firstWhere((e) => e.id == 'content');
+      expect(contentNode, isA<Media>());
+      expect(contentNode.uri, isNotEmpty);
+      expect(contentNode.mimeType, 'video/mp4');
+
+      final timeNode = mediaList.firstWhere((e) => e.id == 'time');
+      expect(timeNode, isA<Media>());
+      expect(timeNode.uri, isEmpty);
+      expect(timeNode.mimeType, 'application/x-ginga-time');
+
+      final settingsNode = mediaList.firstWhere((e) => e.id == 'settings');
+      expect(settingsNode, isA<Settings>());
+    });
   });
 }
