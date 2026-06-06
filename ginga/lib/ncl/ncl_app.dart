@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
 
-import 'widgets/base.dart';
+import 'widgets/ncl_media_state.dart';
 
 export 'widgets/av.dart';
-export 'widgets/base.dart';
+export 'widgets/ncl_media_state.dart';
 export 'widgets/image.dart';
 export 'widgets/lua.dart';
 export 'widgets/ssml.dart';
@@ -29,7 +29,7 @@ class NCLApp extends StatefulWidget {
   State<NCLApp> createState() => NCLAppState();
 }
 
-class NCLAppState extends BaseWidgetState<NCLApp> {
+class NCLAppState extends NCLMediaState<NCLApp> {
   NCLDocument? nclDocument;
   Timer? _ticker;
   String errorMsg = "";
@@ -39,7 +39,6 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
   void initState() {
     super.initState();
     _logger.info("Starting NCL application: ${widget.uri}");
-    initPlayer(widget.uri);
     _startApplication();
   }
 
@@ -125,15 +124,14 @@ class NCLAppState extends BaseWidgetState<NCLApp> {
           : (src.startsWith('http')
               ? src
               : (src.contains('/') ? src : "$nclBase$src"));
+      if (contentPath.isNotEmpty) {
+        media.uri = contentPath;
+      }
 
       widgets.add(
         KeyedSubtree(
-          key: ValueKey(media.id),
-          child: WidgetFactory.createWidget(
-                media.mimeType,
-                contentPath,
-                media: media,
-              ) ??
+          key: ValueKey(media.id ?? ''),
+          child: WidgetFactory.createMediaWidget(media) ??
               const SizedBox.shrink(),
         ),
       );

@@ -9,10 +9,9 @@ import 'ssml.dart';
 import 'text.dart';
 import 'av.dart';
 
-abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
+abstract class NCLMediaState<T extends StatefulWidget> extends State<T> {
   Color background = Colors.transparent;
   Rect rect = Rect.zero;
-  Duration? duration;
   bool debug = false;
   bool visible = true;
   int alpha = 255;
@@ -23,18 +22,12 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
   int focusBorderWidth = 0;
   int focusBorderTransparency = 0;
   Color selBorderColor = Colors.transparent;
-  String type = "";
-  String uri = "";
   String? id;
   String leftStr = '0%';
   String topStr = '0%';
   String widthStr = '100%';
   String heightStr = '100%';
   bool isPositioned = false;
-
-  void initPlayer(String uri) {
-    this.uri = uri;
-  }
 
   void parseProperties(Media? media) {
     if (media == null) return;
@@ -119,7 +112,7 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
     return await bundle.loadString(path);
   }
 
-  String get playerKey => id ?? uri;
+  String get playerKey => id ?? '';
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +157,9 @@ abstract class BaseWidgetState<T extends StatefulWidget> extends State<T> {
 
 class WidgetFactory {
 
-  static Widget? createWidget(String mimeType, String uri, {Media? media}) {
+  static Widget? createMediaWidget(Media media) {
+    final mimeType = media.mimeType;
+    final uri = media.uri;
     if (mimeType.startsWith('video/') || mimeType.startsWith('audio/') || mimeType.contains('video') || mimeType.contains('audio')) {
       return AVWidget(uri: uri, media: media);
     }

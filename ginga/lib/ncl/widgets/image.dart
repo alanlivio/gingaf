@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
-import 'base.dart';
+import 'ncl_media_state.dart';
 
 class ImageWidget extends StatefulWidget {
   final String uri;
@@ -11,21 +11,20 @@ class ImageWidget extends StatefulWidget {
   State<ImageWidget> createState() => ImageWidgetState();
 }
 
-class ImageWidgetState extends BaseWidgetState<ImageWidget> {
+class ImageWidgetState extends NCLMediaState<ImageWidget> {
   @override
   void initState() {
     super.initState();
-    initPlayer(widget.uri);
     parseProperties(widget.media);
   }
 
   @override
   Widget buildWidgetContent(BuildContext context) {
-    if (uri.isEmpty) {
+    if (widget.uri.isEmpty) {
       return const SizedBox.shrink();
     }
     return Image.network(
-      uri,
+      widget.uri,
       fit: BoxFit.fill,
       width: double.infinity,
       height: double.infinity,

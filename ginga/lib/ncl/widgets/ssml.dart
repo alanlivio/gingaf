@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
-import 'base.dart';
+import 'ncl_media_state.dart';
 
 class SsmlWidget extends StatefulWidget {
   final String uri;
@@ -11,11 +11,10 @@ class SsmlWidget extends StatefulWidget {
   State<SsmlWidget> createState() => SsmlWidgetState();
 }
 
-class SsmlWidgetState extends BaseWidgetState<SsmlWidget> {
+class SsmlWidgetState extends NCLMediaState<SsmlWidget> {
   @override
   void initState() {
     super.initState();
-    initPlayer(widget.uri);
     parseProperties(widget.media);
   }
 

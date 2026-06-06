@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
-import 'base.dart';
+import 'ncl_media_state.dart';
 
 class LuaWidget extends StatefulWidget {
   final String uri;
@@ -11,14 +11,13 @@ class LuaWidget extends StatefulWidget {
   State<LuaWidget> createState() => LuaWidgetState();
 }
 
-class LuaWidgetState extends BaseWidgetState<LuaWidget> {
+class LuaWidgetState extends NCLMediaState<LuaWidget> {
   late NCLua _engine;
   final CanvasState canvasState = CanvasState();
 
   @override
   void initState() {
     super.initState();
-    initPlayer(widget.uri);
     parseProperties(widget.media);
     _engine = NCLua(delegate: canvasState);
 
@@ -32,7 +31,7 @@ class LuaWidgetState extends BaseWidgetState<LuaWidget> {
   Future<void> _runScript() async {
     canvasState.reset();
     try {
-      final script = await loadContent(uri);
+      final script = await loadContent(widget.uri);
       _engine.execute(script);
     } catch (e) {
       debugPrint("Lua Runtime Error: $e");

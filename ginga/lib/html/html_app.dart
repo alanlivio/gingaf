@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:gingaf/ncl/widgets/base.dart';
+import 'package:gingaf/ncl/widgets/ncl_media_state.dart';
 import 'package:webview_all/webview_all.dart';
 
 final _logger = Logger('ginga-html');
@@ -18,7 +18,7 @@ class HTMLApp extends StatefulWidget {
   State<HTMLApp> createState() => HTMLAppState();
 }
 
-class HTMLAppState extends BaseWidgetState<HTMLApp> {
+class HTMLAppState extends NCLMediaState<HTMLApp> {
   late final WebViewController _controller;
   bool _initialized = false;
   bool _loadStarted = false;
@@ -33,8 +33,6 @@ class HTMLAppState extends BaseWidgetState<HTMLApp> {
     widget.javaScriptChannels?.forEach((name, callback) {
       _controller.addJavaScriptChannel(name, onMessageReceived: callback);
     });
-
-    initPlayer(widget.uri);
   }
 
   @override

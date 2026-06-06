@@ -88,7 +88,7 @@ void main() {
     expect(find.byType(VideoPlayer), findsOneWidget);
   });
 
-  testWidgets('BaseWidgetState visual attributes and properties mapping tests', (WidgetTester tester) async {
+  testWidgets('NCLMediaState visual attributes and properties mapping tests', (WidgetTester tester) async {
     final doc = NCLDocument.fromXML('''
 <ncl>
   <body>
@@ -128,7 +128,7 @@ void main() {
     expect(state.selBorderColor, Colors.green);
   });
 
-  testWidgets('BaseWidgetState default visual attributes when omitted', (WidgetTester tester) async {
+  testWidgets('NCLMediaState default visual attributes when omitted', (WidgetTester tester) async {
     final doc = NCLDocument.fromXML('''
 <ncl>
   <body>
@@ -161,7 +161,7 @@ void main() {
     expect(positioned.height, size.height);
   });
 
-  testWidgets('BaseWidgetState bounds and background properties mapping tests', (WidgetTester tester) async {
+  testWidgets('NCLMediaState bounds and background properties mapping tests', (WidgetTester tester) async {
     final doc = NCLDocument.fromXML('''
 <ncl>
   <body>

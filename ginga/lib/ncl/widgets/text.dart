@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
-import 'base.dart';
+import 'ncl_media_state.dart';
 
 class TextWidget extends StatefulWidget {
   final String uri;
@@ -11,11 +11,10 @@ class TextWidget extends StatefulWidget {
   State<TextWidget> createState() => TextWidgetState();
 }
 
-class TextWidgetState extends BaseWidgetState<TextWidget> {
+class TextWidgetState extends NCLMediaState<TextWidget> {
   @override
   void initState() {
     super.initState();
-    initPlayer(widget.uri);
     parseProperties(widget.media);
   }
 

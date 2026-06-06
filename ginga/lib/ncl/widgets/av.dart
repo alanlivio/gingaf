@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
 import 'package:video_player/video_player.dart';
-import 'base.dart';
+import 'ncl_media_state.dart';
 
 class AVWidget extends StatefulWidget {
   final String uri;
@@ -19,7 +19,7 @@ class AVWidget extends StatefulWidget {
   State<AVWidget> createState() => AVWidgetState();
 }
 
-class AVWidgetState extends BaseWidgetState<AVWidget> {
+class AVWidgetState extends NCLMediaState<AVWidget> {
   late VideoPlayerController _controller;
   bool _initialized = false;
   bool _isCompleted = false;
@@ -27,7 +27,6 @@ class AVWidgetState extends BaseWidgetState<AVWidget> {
   @override
   void initState() {
     super.initState();
-    initPlayer(widget.uri);
     parseProperties(widget.media);
     _initVideo();
   }
