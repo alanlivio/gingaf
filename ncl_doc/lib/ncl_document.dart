@@ -151,10 +151,12 @@ class NCLDocument {
     }
   }
 
-  void tick([int incrementMs = 0]) {
+  Set<Media> tick([int incrementMs = 0]) {
     _updateTimedNodesClock(incrementMs);
-    _executeActionStack();
+    final changedNodes = _executeActionStack();
     _checkIsPlaying();
+
+    return changedNodes.whereType<Media>().toSet();
   }
 
   void _updateTimedNodesClock(int incrementMs) {
@@ -200,7 +202,8 @@ class NCLDocument {
     }
   }
 
-  void _executeActionStack() {
+  Set<Node> _executeActionStack() {
+    final changedNodes = <Node>{};
     while (_actionStack.isNotEmpty) {
       final actionItem = _actionStack.removeAt(0);
       final prevState = actionItem.event.state;
@@ -214,6 +217,7 @@ class NCLDocument {
         );
 
         _triggerLinks(nodeId, newState, interfaceId);
+        changedNodes.add(actionItem.event.targetNode);
 
         if (actionItem.event.isMain) {
           if (newState == State.OCCURRING) {
@@ -246,6 +250,7 @@ class NCLDocument {
         }
       }
     }
+    return changedNodes;
   }
 
   void _checkIsPlaying() {

@@ -33,7 +33,8 @@ void main() {
         ''';
       final doc = NCLDocument.fromXML(xmlString);
       doc.start();
-      doc.tick(10);
+      final changed0 = doc.tick(10);
+      expect(changed0, isEmpty);
       expect(doc.getNodeById('video1')?.getMainState(), State.SLEEPING);
       doc.stop();
       expect(doc.getNodeById('video1')?.getMainState(), State.SLEEPING);
@@ -94,7 +95,8 @@ void main() {
       expect(doc.virtualClock, 0);
       expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
       expect(doc.getBodyState(), State.OCCURRING);
-      doc.tick(1);
+      final changed1 = doc.tick(1);
+      expect(changed1, isEmpty);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
@@ -115,7 +117,8 @@ void main() {
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
       expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
-      doc.tick(1);
+      final changed2 = doc.tick(1);
+      expect(changed2, isEmpty);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
@@ -136,7 +139,8 @@ void main() {
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
       expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
-      doc.tick(1);
+      final changed3 = doc.tick(1);
+      expect(changed3, isEmpty);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
@@ -178,7 +182,8 @@ void main() {
       expect(doc.virtualClock, 0);
       expect(doc.getNodeById('video_main')?.getMainState(), State.OCCURRING);
       expect(doc.getBodyState(), State.OCCURRING);
-      doc.tick(1);
+      final changed4 = doc.tick(1);
+      expect(changed4, isEmpty);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getNodeById('video_main')?.getMainState(), State.SLEEPING);
@@ -203,16 +208,20 @@ void main() {
       expect(video.getMainState(), State.OCCURRING);
       expect(areaEvent.state, State.SLEEPING);
 
-      doc.tick(5000);
+      final changed5a = doc.tick(5000);
+      expect(changed5a, isEmpty);
       expect(areaEvent.state, State.SLEEPING);
 
-      doc.tick(5000);
+      final changed5b = doc.tick(5000);
+      expect(changed5b, isNotEmpty);
       expect(areaEvent.state, State.OCCURRING);
 
-      doc.tick(9000);
+      final changed5c = doc.tick(9000);
+      expect(changed5c, isEmpty);
       expect(areaEvent.state, State.OCCURRING);
 
-      doc.tick(1000);
+      final changed5d = doc.tick(1000);
+      expect(changed5d, isNotEmpty);
       expect(areaEvent.state, State.SLEEPING);
     });
 
@@ -237,10 +246,12 @@ void main() {
       expect(doc.getNodeById('video_main')?.getMainState(), State.OCCURRING);
       expect(doc.getNodeById('m2')?.getMainState(), State.SLEEPING);
 
-      doc.tick(4000);
+      final changed6a = doc.tick(4000);
+      expect(changed6a, isEmpty);
       expect(doc.getNodeById('m2')?.getMainState(), State.SLEEPING);
 
-      doc.tick(1000);
+      final changed6b = doc.tick(1000);
+      expect(changed6b, isNotEmpty);
       expect(doc.getNodeById('m2')?.getMainState(), State.OCCURRING);
     });
 
@@ -266,10 +277,12 @@ void main() {
       expect(doc.getNodeById('video_main')?.getMainState(), State.OCCURRING);
       expect(doc.getNodeById('m2')?.getMainState(), State.OCCURRING);
 
-      doc.tick(9000);
+      final changed7a = doc.tick(9000);
+      expect(changed7a, isNotEmpty);
       expect(doc.getNodeById('m2')?.getMainState(), State.OCCURRING);
 
-      doc.tick(1000);
+      final changed7b = doc.tick(1000);
+      expect(changed7b, isNotEmpty);
       expect(doc.getNodeById('m2')?.getMainState(), State.SLEEPING);
     });
   });

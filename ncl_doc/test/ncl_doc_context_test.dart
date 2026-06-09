@@ -19,7 +19,8 @@ void main() {
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
       expect(doc.getNodeById('ctx1')?.getMainState(), State.OCCURRING);
-      doc.tick(1);
+      final changed = doc.tick(1);
+      expect(changed, isEmpty);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getNodeById('ctx1')?.getMainState(), State.SLEEPING);

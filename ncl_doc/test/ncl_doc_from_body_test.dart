@@ -7,18 +7,22 @@ void main() {
       final doc = NCLDocument.fromBodyElements([]);
       expect(doc.virtualClock, 0);
       doc.start();
-      doc.tick(10);
+      final changed1 = doc.tick(10);
+      expect(changed1, isEmpty);
       expect(doc.virtualClock, 10);
-      doc.tick(1);
+      final changed2 = doc.tick(1);
+      expect(changed2, isEmpty);
       expect(doc.virtualClock, 11);
     });
 
     test('tick does not go backwards', () {
       final doc = NCLDocument.fromBodyElements([]);
       doc.start();
-      doc.tick(100);
+      final changed3 = doc.tick(100);
+      expect(changed3, isEmpty);
       expect(doc.virtualClock, 100);
-      doc.tick(0);
+      final changed4 = doc.tick(0);
+      expect(changed4, isEmpty);
       expect(doc.virtualClock, 100);
     });
 
@@ -65,12 +69,8 @@ void main() {
     });
 
     test('NCLDocument Composition', () {
-      final media = Media(
-        rawAttributes: const {'id': 'm1', 'src': 'v.mp4'},
-      );
-      final port = Port(
-        rawAttributes: const {'id': 'p1', 'component': 'm1'},
-      );
+      final media = Media(rawAttributes: const {'id': 'm1', 'src': 'v.mp4'});
+      final port = Port(rawAttributes: const {'id': 'p1', 'component': 'm1'});
       final doc = NCLDocument.fromBodyElements([media, port]);
       doc.start();
 
@@ -89,7 +89,10 @@ void main() {
     });
 
     test('baseURI and fromXML / fromBodyElements', () {
-      final doc1 = NCLDocument.fromXML('<ncl><body></body></ncl>', baseURI: Uri.parse('some_uri/'));
+      final doc1 = NCLDocument.fromXML(
+        '<ncl><body></body></ncl>',
+        baseURI: Uri.parse('some_uri/'),
+      );
       expect(doc1.baseURI, Uri.parse('some_uri/'));
 
       final doc2 = NCLDocument.fromBodyElements([]);

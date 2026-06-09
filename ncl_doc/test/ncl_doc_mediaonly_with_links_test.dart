@@ -22,7 +22,8 @@ void main() {
       expect(doc.getBodyState(), State.OCCURRING);
       expect(doc.virtualClock, 0);
       expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
-      doc.tick(1);
+      final changed1 = doc.tick(1);
+      expect(changed1, isEmpty);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
@@ -49,7 +50,8 @@ void main() {
       expect(doc.virtualClock, 0);
       expect(doc.getNodeById('m1')?.getMainState(), State.OCCURRING);
       expect(doc.getNodeById('m2')?.getMainState(), State.OCCURRING);
-      doc.tick(1);
+      final changed2 = doc.tick(1);
+      expect(changed2, isEmpty);
       expect(doc.virtualClock, 1);
       doc.stop();
       expect(doc.getNodeById('m1')?.getMainState(), State.SLEEPING);
