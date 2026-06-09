@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
 
-import 'widgets/ncl_media_state.dart';
+import 'widgets/ncl_media_widget.dart';
 
 export 'widgets/av.dart';
-export 'widgets/ncl_media_state.dart';
+export 'widgets/ncl_media_widget.dart';
 export 'widgets/image.dart';
 export 'widgets/lua.dart';
 export 'widgets/ssml.dart';
@@ -18,23 +18,54 @@ final _logger = Logger('ginga-ncl');
 
 class NCLAppExitNotification extends Notification {}
 
-class NCLApp extends StatefulWidget {
-  final String uri;
-
+class NCLApp extends MediaWidget {
   const NCLApp({
     super.key,
-    required this.uri,
+    required super.uri,
+    super.media,
   });
 
   @override
   State<NCLApp> createState() => NCLAppState();
 }
 
-class NCLAppState extends NCLMediaState<NCLApp> {
+class NCLAppState extends MediaState<NCLApp> {
+  final Map<String, GlobalKey<MediaState>> _mediaStateKeys = {};
+  final Map<String, Widget> _cachedWidgets = {};
   NCLDocument? nclDocument;
   Timer? _ticker;
   String errorMsg = "";
   bool _loading = false;
+
+  bool _syncActiveMedia(List<Media> activeMedia) {
+    bool changed = false;
+    final currentIds = activeMedia.map((m) => m.id ?? '').toSet();
+
+    final toRemove =
+        _cachedWidgets.keys.where((id) => !currentIds.contains(id)).toList();
+    if (toRemove.isNotEmpty) changed = true;
+    for (var id in toRemove) {
+      _cachedWidgets.remove(id);
+      _mediaStateKeys.remove(id);
+    }
+
+    for (var media in activeMedia) {
+      final mediaId = media.id ?? '';
+
+      if (!_cachedWidgets.containsKey(mediaId)) {
+        changed = true;
+        final key = GlobalKey<MediaState>();
+        _mediaStateKeys[mediaId] = key;
+
+        final widget = WidgetFactory.createMediaWidget(key: key, media: media);
+
+        if (widget != null) {
+          _cachedWidgets[mediaId] = widget;
+        }
+      }
+    }
+    return changed;
+  }
 
   @override
   void initState() {
@@ -51,13 +82,16 @@ class NCLAppState extends NCLMediaState<NCLApp> {
         setState(() {});
       }
 
+      final String nclData = await loadContent(widget.uri);
       final uri = widget.uri.startsWith('http')
           ? Uri.parse(widget.uri)
           : (kIsWeb ? Uri.parse(widget.uri) : Uri.file(widget.uri));
-      final doc = NCLDocument.fromURI(uri);
+      final doc = NCLDocument.fromXML(nclData, baseURI: uri);
 
       nclDocument = doc;
       doc.start();
+
+      _syncActiveMedia(doc.getActiveMedia());
 
       if (mounted) {
         setState(() {
@@ -71,8 +105,22 @@ class NCLAppState extends NCLMediaState<NCLApp> {
               final now = DateTime.now();
               final deltaMs = now.difference(lastTick).inMilliseconds;
               lastTick = now;
-              nclDocument?.tick(deltaMs);
+              final changedMedia = nclDocument?.tick(deltaMs) ?? <Media>{};
+
               if (nclDocument != null) {
+                for (var media in changedMedia) {
+                  _mediaStateKeys[media.id ?? '']
+                      ?.currentState
+                      ?.syncProperties();
+                }
+
+                final currentActiveMedia = nclDocument!.getActiveMedia();
+                if (_syncActiveMedia(currentActiveMedia)) {
+                  if (mounted) {
+                    setState(() {});
+                  }
+                }
+
                 if (!nclDocument!.isPlaying) {
                   _ticker?.cancel();
                   _ticker = null;
@@ -81,8 +129,6 @@ class NCLAppState extends NCLMediaState<NCLApp> {
                     setState(() {});
                   }
                   NCLAppExitNotification().dispatch(context);
-                } else if (mounted) {
-                  setState(() {});
                 }
               }
             }
@@ -113,24 +159,31 @@ class NCLAppState extends NCLMediaState<NCLApp> {
 
   @override
   Widget buildWidgetContent(BuildContext context) {
-    final activeMedia = nclDocument?.getActiveMedia() ?? [];
-
-    final List<Widget> widgets = [];
-    for (var media in activeMedia) {
-      widgets.add(
-        KeyedSubtree(
-          key: ValueKey(media.id ?? ''),
-          child: WidgetFactory.createMediaWidget(media) ??
-              const SizedBox.shrink(),
+    if (nclDocument == null && _cachedWidgets.isEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: errorMsg.isNotEmpty
+              ? Text(errorMsg, style: const TextStyle(color: Colors.red))
+              : const CircularProgressIndicator(),
         ),
       );
+    }
+
+    final activeMedia = nclDocument?.getActiveMedia() ?? [];
+    final List<Widget> children = [];
+    for (var media in activeMedia) {
+      final widget = _cachedWidgets[media.id ?? ''];
+      if (widget != null) {
+        children.add(widget);
+      }
     }
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         fit: StackFit.expand,
-        children: widgets,
+        children: children,
       ),
     );
   }

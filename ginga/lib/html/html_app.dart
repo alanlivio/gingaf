@@ -3,22 +3,22 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:gingaf/ncl/widgets/ncl_media_state.dart';
+import 'package:gingaf/ncl/widgets/ncl_media_widget.dart';
 import 'package:webview_all/webview_all.dart';
 
 final _logger = Logger('ginga-html');
 
-class HTMLApp extends StatefulWidget {
-  final String uri;
+class HTMLApp extends MediaWidget {
   final Map<String, void Function(JavaScriptMessage)>? javaScriptChannels;
 
-  const HTMLApp({super.key, required this.uri, this.javaScriptChannels});
+  const HTMLApp(
+      {super.key, required super.uri, super.media, this.javaScriptChannels});
 
   @override
   State<HTMLApp> createState() => HTMLAppState();
 }
 
-class HTMLAppState extends NCLMediaState<HTMLApp> {
+class HTMLAppState extends MediaState<HTMLApp> {
   late final WebViewController _controller;
   bool _initialized = false;
   bool _loadStarted = false;

@@ -3,23 +3,20 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
 import 'package:video_player/video_player.dart';
-import 'ncl_media_state.dart';
+import 'ncl_media_widget.dart';
 
-class AVWidget extends StatefulWidget {
-  final String uri;
-  final Media? media;
-
+class AVWidget extends MediaWidget {
   const AVWidget({
     super.key,
-    required this.uri,
-    this.media,
+    required super.uri,
+    super.media,
   });
 
   @override
   State<AVWidget> createState() => AVWidgetState();
 }
 
-class AVWidgetState extends NCLMediaState<AVWidget> {
+class AVWidgetState extends MediaState<AVWidget> {
   late VideoPlayerController _controller;
   bool _initialized = false;
   bool _isCompleted = false;
@@ -48,10 +45,10 @@ class AVWidgetState extends NCLMediaState<AVWidget> {
           _isCompleted = true;
         }
       });
-      
+
       await _controller.initialize();
       await _controller.play();
-      
+
       if (mounted) {
         setState(() {
           _initialized = true;

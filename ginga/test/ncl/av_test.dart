@@ -9,7 +9,8 @@ import 'package:video_player/video_player.dart';
 
 class FakeVideoPlayerPlatform extends VideoPlayerPlatform
     with MockPlatformInterfaceMixin {
-  final StreamController<VideoEvent> events = StreamController<VideoEvent>.broadcast();
+  final StreamController<VideoEvent> events =
+      StreamController<VideoEvent>.broadcast();
 
   @override
   Future<void> init() async {}
@@ -64,7 +65,8 @@ void main() {
     VideoPlayerPlatform.instance = fakePlatform;
   });
 
-  testWidgets('AVWidget rendering initialization test', (WidgetTester tester) async {
+  testWidgets('AVWidget rendering initialization test',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -88,7 +90,8 @@ void main() {
     expect(find.byType(VideoPlayer), findsOneWidget);
   });
 
-  testWidgets('NCLMediaState visual attributes and properties mapping tests', (WidgetTester tester) async {
+  testWidgets('NCLMediaState visual attributes and properties mapping tests',
+      (WidgetTester tester) async {
     final doc = NCLDocument.fromXML('''
 <ncl>
   <body>
@@ -128,7 +131,8 @@ void main() {
     expect(state.selBorderColor, Colors.green);
   });
 
-  testWidgets('NCLMediaState default visual attributes when omitted', (WidgetTester tester) async {
+  testWidgets('NCLMediaState default visual attributes when omitted',
+      (WidgetTester tester) async {
     final doc = NCLDocument.fromXML('''
 <ncl>
   <body>
@@ -161,7 +165,8 @@ void main() {
     expect(positioned.height, size.height);
   });
 
-  testWidgets('NCLMediaState bounds and background properties mapping tests', (WidgetTester tester) async {
+  testWidgets('NCLMediaState bounds and background properties mapping tests',
+      (WidgetTester tester) async {
     final doc = NCLDocument.fromXML('''
 <ncl>
   <body>
@@ -199,7 +204,8 @@ void main() {
     expect(state.background, Colors.blue);
   });
 
-  testWidgets('ImageWidget rendering without source URI', (WidgetTester tester) async {
+  testWidgets('ImageWidget rendering without source URI',
+      (WidgetTester tester) async {
     final doc = NCLDocument.fromXML('''
 <ncl>
   <body>

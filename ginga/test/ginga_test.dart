@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gingaf/ginga.dart';
+import 'package:gingaf/ncl/ncl_app.dart';
 
 void main() {
   group('GingaConfig Logic Tests', () {
@@ -29,6 +31,20 @@ void main() {
       expect(GingaConfig('app.lua').appPath, isNull);
       expect(GingaConfig('app').appPath, isNull);
       expect(GingaConfig('').appPath, isNull);
+    });
+  });
+
+  group('Widget Tests', () {
+    testWidgets('NCLApp mounts example', (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: NCLApp(uri: '../examples/video.ncl'),
+      ));
+
+      // Use pump() instead of pumpAndSettle() because the NCLApp uses an infinite periodic timer
+      await tester.pump(const Duration(seconds: 1));
+
+      // Assert that NCLApp is in the tree
+      expect(find.byType(NCLApp), findsOneWidget);
     });
   });
 }

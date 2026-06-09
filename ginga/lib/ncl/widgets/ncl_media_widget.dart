@@ -1,15 +1,28 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
+
+import 'av.dart';
 import 'image.dart';
 import 'lua.dart';
 import 'ssml.dart';
 import 'text.dart';
-import 'av.dart';
 
-abstract class NCLMediaState<T extends StatefulWidget> extends State<T> {
+abstract class MediaWidget extends StatefulWidget {
+  final String uri;
+  final Media? media;
+
+  const MediaWidget({
+    super.key,
+    required this.uri,
+    this.media,
+  });
+}
+
+abstract class MediaState<T extends MediaWidget> extends State<T> {
   Color background = Colors.transparent;
   Rect rect = Rect.zero;
   bool debug = false;
@@ -63,6 +76,14 @@ abstract class NCLMediaState<T extends StatefulWidget> extends State<T> {
     selBorderColor = _parseColor(media.rawAttributes['selBorderColor']);
   }
 
+  void syncProperties() {
+    if (mounted) {
+      setState(() {
+        parseProperties(widget.media);
+      });
+    }
+  }
+
   Color _parseColor(String? colorStr) {
     if (colorStr == null || colorStr.isEmpty) return Colors.transparent;
     if (colorStr.startsWith('#')) {
@@ -74,20 +95,28 @@ abstract class NCLMediaState<T extends StatefulWidget> extends State<T> {
       }
     }
     switch (colorStr.toLowerCase()) {
-      case 'red': return Colors.red;
-      case 'green': return Colors.green;
-      case 'blue': return Colors.blue;
-      case 'yellow': return Colors.yellow;
-      case 'black': return Colors.black;
-      case 'white': return Colors.white;
-      default: return Colors.transparent;
+      case 'red':
+        return Colors.red;
+      case 'green':
+        return Colors.green;
+      case 'blue':
+        return Colors.blue;
+      case 'yellow':
+        return Colors.yellow;
+      case 'black':
+        return Colors.black;
+      case 'white':
+        return Colors.white;
+      default:
+        return Colors.transparent;
     }
   }
 
   double _resolveDim(String val, double parentDim) {
     final trimmed = val.trim();
     if (trimmed.endsWith('%')) {
-      final pct = double.tryParse(trimmed.substring(0, trimmed.length - 1)) ?? 0.0;
+      final pct =
+          double.tryParse(trimmed.substring(0, trimmed.length - 1)) ?? 0.0;
       return parentDim * pct / 100.0;
     }
     return double.tryParse(trimmed) ?? 0.0;
@@ -156,28 +185,30 @@ abstract class NCLMediaState<T extends StatefulWidget> extends State<T> {
 }
 
 class WidgetFactory {
-
-  static Widget? createMediaWidget(Media media) {
+  static Widget? createMediaWidget({Key? key, required Media media}) {
     final mimeType = media.mimeType;
     final uri = media.uri;
-    if (mimeType.startsWith('video/') || mimeType.startsWith('audio/') || mimeType.contains('video') || mimeType.contains('audio')) {
-      return AVWidget(uri: uri, media: media);
+    if (mimeType.startsWith('video/') ||
+        mimeType.startsWith('audio/') ||
+        mimeType.contains('video') ||
+        mimeType.contains('audio')) {
+      return AVWidget(key: key, uri: uri, media: media);
     }
     switch (mimeType) {
       case 'application/x-ncl-NCLua':
       case 'application/x-ginga-NCLua':
-        return LuaWidget(uri: uri, media: media);
+        return LuaWidget(key: key, uri: uri, media: media);
       case 'application/ssml+xml':
-        return SsmlWidget(uri: uri, media: media);
+        return SsmlWidget(key: key, uri: uri, media: media);
       case 'text/plain':
-        return TextWidget(uri: uri, media: media);
+        return TextWidget(key: key, uri: uri, media: media);
       case 'image/png':
       case 'image/jpeg':
       case 'image/gif':
       case 'image/webp':
       case 'image/bmp':
       case 'image/heic':
-        return ImageWidget(uri: uri, media: media);
+        return ImageWidget(key: key, uri: uri, media: media);
       default:
         return null;
     }

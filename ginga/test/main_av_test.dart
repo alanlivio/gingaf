@@ -8,7 +8,8 @@ import 'package:video_player/video_player.dart';
 
 class FakeVideoPlayerPlatform extends VideoPlayerPlatform
     with MockPlatformInterfaceMixin {
-  final StreamController<VideoEvent> events = StreamController<VideoEvent>.broadcast();
+  final StreamController<VideoEvent> events =
+      StreamController<VideoEvent>.broadcast();
 
   @override
   Future<void> init() async {}
@@ -63,7 +64,8 @@ void main() {
     VideoPlayerPlatform.instance = fakePlatform;
   });
 
-  testWidgets('MainAVController and MainAVWidget init, start, stop tests', (WidgetTester tester) async {
+  testWidgets('MainAVController and MainAVWidget init, start, stop tests',
+      (WidgetTester tester) async {
     final controller = MainAVController()..setMainAvUri('background.mp4');
 
     await tester.pumpWidget(

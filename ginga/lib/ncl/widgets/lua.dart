@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:ncl_doc/ncl_document.dart' hide State;
-import 'ncl_media_state.dart';
+import 'ncl_media_widget.dart';
 
-class LuaWidget extends StatefulWidget {
-  final String uri;
-  final Media? media;
-  const LuaWidget({super.key, required this.uri, this.media});
+class LuaWidget extends MediaWidget {
+  const LuaWidget({super.key, required super.uri, super.media});
 
   @override
   State<LuaWidget> createState() => LuaWidgetState();
 }
 
-class LuaWidgetState extends NCLMediaState<LuaWidget> {
+class LuaWidgetState extends MediaState<LuaWidget> {
   late NCLua _engine;
   final CanvasState canvasState = CanvasState();
 
