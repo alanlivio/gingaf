@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Action;
+import 'package:ncl_doc/event.dart' hide State;
 import 'package:video_player/video_player.dart';
 
+import '../ncl_app.dart';
 import 'ncl_media_widget.dart';
 
 class AVWidget extends MediaWidget {
@@ -48,6 +50,18 @@ class AVWidgetState extends MediaState<AVWidget> {
             _controller.value.duration.inMilliseconds > 0 &&
             _controller.value.position >= _controller.value.duration) {
           _isCompleted = true;
+          final media = widget.media;
+          if (media != null && mounted) {
+            final appState = context.findAncestorStateOfType<NCLAppState>();
+            if (appState != null && appState.nclDocument != null) {
+              appState.nclDocument!.uiQueue.add(
+                Action(
+                  event: media.getMainEvent(),
+                  action: ActionType.STOP,
+                ),
+              );
+            }
+          }
         }
       });
 

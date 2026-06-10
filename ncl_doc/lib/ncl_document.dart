@@ -25,6 +25,7 @@ class NCLDocument {
   int virtualClock = 0;
   bool isPlaying = false;
   final List<Action> _actionStack = [];
+  final List<Action> uiQueue = [];
   final List<Node> _timedNodes = [];
 
   factory NCLDocument.fromBodyElements(List<Element> elements) {
@@ -152,6 +153,10 @@ class NCLDocument {
   }
 
   Set<Media> tick([int incrementMs = 0]) {
+    if (uiQueue.isNotEmpty) {
+      _actionStack.addAll(uiQueue);
+      uiQueue.clear();
+    }
     _updateTimedNodesClock(incrementMs);
     final changedNodes = _executeActionStack();
     _checkIsPlaying();
