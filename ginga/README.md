@@ -1,17 +1,18 @@
 # gingaf
 
-A new Flutter project.
+`gingaf` is a multi-platform implementation of the interactive TV standard Ginga done by ITU-T and SBTVD.
 
-## Getting Started
+To run Ginga-NCL or Ginga-HTML applications with GUI, do at `ginga/`:
 
-This project is a starting point for a Flutter application.
+```bash
+flutter run -d <chrome,windows,emulator-XXXX> --dart-define="APP=<path_to_file>"
+```
 
-A few resources to get you started if this is your first Flutter project:
+To run Ginga-NCL application headless (no-GUI), do at `ncl_doc`:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+dart ./lib/main.dart <path_to_file>
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- For environment setup and technical architecture details, see [SETUP.md](SETUP.md).
+- For instructions on running examples, see [EXAMPLES.md](EXAMPLES.md).

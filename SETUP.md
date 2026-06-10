@@ -2,6 +2,10 @@
 
 Technical overview of the Ginga engine architecture and modular implementation.
 
+## ginga/examples link
+
+> **Note:** It is required to create a `ginga/examples` link to `examples` to allow Flutter to find it. You can do this by running `make ginga/examples`.
+
 ## Setup
 
 ### Flutter SDK
