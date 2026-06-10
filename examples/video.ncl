@@ -1,7 +1,7 @@
 <ncl>
   <body>
     <port id="init" component="sample_video"/>
-    <media id="sample_video" src="https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4" type="video/mp4">
+    <media id="sample_video" src="https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4" type="video/mp4">
       <area id="a1" begin="2s" end="4s"/>
     </media>
     <media id="green_bg" type="image/png">
@@ -11,6 +11,7 @@
     <media id="red_bg" type="image/png">
       <property name="background" value="red"/>
       <property name="bounds" value="80%,80%,20%,20%"/>
+      <property name="explicitDur" value="2s"/>
     </media>
     <link id="l1">
       <bind role="onBegin" component="sample_video" interface="a1"/>
