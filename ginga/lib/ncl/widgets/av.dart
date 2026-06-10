@@ -73,16 +73,13 @@ class AVWidgetState extends MediaState<AVWidget> {
         });
       }
 
+      if (kIsWeb) {
+        await _controller.setVolume(0.0);
+      }
       try {
         await _controller.play();
       } catch (playErr) {
         debugPrint("AVWidget play error (e.g. autoplay blocked): $playErr");
-        if (kIsWeb) {
-          await _controller.setVolume(0.0);
-          try {
-            await _controller.play();
-          } catch (_) {}
-        }
       }
     } catch (e) {
       debugPrint("AVWidget Error initializing video: $e");
