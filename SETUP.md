@@ -16,7 +16,7 @@ flutter config --enable-web
 flutter config --enable-windows-desktop
 ```
 
-### Windows
+### At windows, buding for windows and chrome
 
 The flutter requires Microsoft.VisualStudio.2019.BuildTools. The `webview_all_windows` plugin requires **Windows SDK 10.0.22621.0** (Windows 11 SDK) or later.
 Install the Windows 11 SDK via winget:
@@ -36,6 +36,12 @@ nuget sources add -Name nuget.org -Source https://api.nuget.org/v3/index.json
 New-Item -ItemType Directory -Force -Path build/windows/x64/packages
 nuget install Microsoft.Windows.ImplementationLibrary -Version 1.0.220914.1 -ExcludeVersion -OutputDirectory build/windows/x64/packages
 nuget install Microsoft.Web.WebView2 -Version 1.0.1210.39 -ExcludeVersion -OutputDirectory build/windows/x64/packages
+```
+
+### At windows, buding for android
+
+```powershell
+winget install Google.AndroidStudio
 ```
 
 ## Testing

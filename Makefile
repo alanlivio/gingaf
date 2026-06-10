@@ -22,27 +22,24 @@ test:
 
 check-app:
 	$(if $(app),,$(error Please specify app (e.g. app=video.ncl)))
-	$(eval APP_FILE := $(if $(findstring examples/,$(app)),$(app),examples/$(app)))
-	$(eval APP_FILE := $(APP_FILE)$(if $(filter %.ncl %.html,$(APP_FILE)),,.ncl))
-	$(if $(wildcard $(APP_FILE)),,$(error File $(APP_FILE) does not exist))
+	$(eval APP_EXAMPLE := $(if $(findstring examples/,$(app)),$(app),examples/$(app)))
+	$(eval APP_EXAMPLE := $(APP_EXAMPLE)$(if $(filter %.ncl %.html,$(APP_EXAMPLE)),,.ncl))
+	$(if $(wildcard $(APP_EXAMPLE)),,$(error File $(APP_EXAMPLE) does not exist))
 
-run-example: check-app ginga/build/windows/x64/runner/Release/gingaf.exe
+ginga/examples:
+	cmd /c "mklink /J ginga\\examples examples" || ln -s ../examples ginga/examples
+
+run-example: check-app ginga/examples
 	@echo ======================================================================
-	@echo Running Example: $(APP_FILE)
+	@echo Running Example: $(APP_EXAMPLE)
 	@echo ======================================================================
-	@set APP=$(APP_FILE)&& start /wait .\ginga\build\windows\x64\runner\Release\gingaf.exe
+	cd ginga && flutter run --no-pub -d windows --dart-define="APP=$(APP_EXAMPLE)"
 
 run-example-headless: check-app
 	@echo ======================================================================
-	@echo Running Headless NCL Example: $(APP_FILE)
+	@echo Running Headless NCL Example: $(APP_EXAMPLE)
 	@echo ======================================================================
-	@dart ./ncl_doc/lib/main.dart $(APP_FILE)
-
-run-mainav: ginga/build/windows/x64/runner/Release/gingaf.exe
-	@echo ======================================================================
-	@echo Running MainAV Test
-	@echo ======================================================================
-	@set APP=&& set MAINAV=https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4&& start /wait .\ginga\build\windows\x64\runner\Release\gingaf.exe
+	@dart ./ncl_doc/lib/main.dart $(APP_EXAMPLE)
 
 clean:
 	cd ncl_doc && flutter clean
