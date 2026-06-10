@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -92,16 +93,31 @@ class _MainAVWidgetState extends State<MainAVWidget> {
       if (uriStr.startsWith('http://') || uriStr.startsWith('https://')) {
         _videoController = VideoPlayerController.networkUrl(Uri.parse(uriStr));
       } else {
-        _videoController = VideoPlayerController.file(File(uriStr));
+        if (kIsWeb) {
+          _videoController = VideoPlayerController.networkUrl(Uri.parse(uriStr));
+        } else {
+          _videoController = VideoPlayerController.file(File(uriStr));
+        }
       }
 
       await _videoController!.initialize();
-      if (widget.controller.isPlaying) {
-        await _videoController!.play();
-      }
 
       if (mounted) {
         setState(() {});
+      }
+
+      if (widget.controller.isPlaying) {
+        try {
+          await _videoController!.play();
+        } catch (playErr) {
+          debugPrint("MainAVWidget play error (e.g. autoplay blocked): $playErr");
+          if (kIsWeb) {
+            await _videoController!.setVolume(0.0);
+            try {
+              await _videoController!.play();
+            } catch (_) {}
+          }
+        }
       }
     } catch (e) {
       debugPrint("MainAVWidget Error initializing video: $e");

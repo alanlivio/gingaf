@@ -1,7 +1,7 @@
 <ncl>
   <body>
     <port id="init" component="sample_video"/>
-    <media id="sample_video" src="https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4" type="video/mp4">
+    <media id="sample_video" src="https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4" type="video/mp4">
       <area id="a1" begin="2s" end="4s"/>
     </media>
     <media id="green_bg" type="image/png">

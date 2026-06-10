@@ -1,8 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:ncl_doc/ncl_document.dart' hide State;
 import 'package:video_player/video_player.dart';
+
 import 'ncl_media_widget.dart';
 
 class AVWidget extends MediaWidget {
@@ -34,7 +35,11 @@ class AVWidgetState extends MediaState<AVWidget> {
       if (uriStr.startsWith('http://') || uriStr.startsWith('https://')) {
         _controller = VideoPlayerController.networkUrl(Uri.parse(uriStr));
       } else {
-        _controller = VideoPlayerController.file(File(uriStr));
+        if (kIsWeb) {
+          _controller = VideoPlayerController.networkUrl(Uri.parse(uriStr));
+        } else {
+          _controller = VideoPlayerController.file(File(uriStr));
+        }
       }
 
       _controller.addListener(() {
@@ -47,12 +52,23 @@ class AVWidgetState extends MediaState<AVWidget> {
       });
 
       await _controller.initialize();
-      await _controller.play();
 
       if (mounted) {
         setState(() {
           _initialized = true;
         });
+      }
+
+      try {
+        await _controller.play();
+      } catch (playErr) {
+        debugPrint("AVWidget play error (e.g. autoplay blocked): $playErr");
+        if (kIsWeb) {
+          await _controller.setVolume(0.0);
+          try {
+            await _controller.play();
+          } catch (_) {}
+        }
       }
     } catch (e) {
       debugPrint("AVWidget Error initializing video: $e");
@@ -70,10 +86,14 @@ class AVWidgetState extends MediaState<AVWidget> {
     if (!_initialized) {
       return const Center(child: CircularProgressIndicator());
     }
-    return Center(
-      child: AspectRatio(
-        aspectRatio: _controller.value.aspectRatio,
-        child: VideoPlayer(_controller),
+    return SizedBox.expand(
+      child: FittedBox(
+        fit: BoxFit.fill,
+        child: SizedBox(
+          width: _controller.value.size.width,
+          height: _controller.value.size.height,
+          child: VideoPlayer(_controller),
+        ),
       ),
     );
   }
