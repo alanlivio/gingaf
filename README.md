@@ -6,7 +6,7 @@
 
 For a web-based evaluation of `gingaf`, see [a  github-hosted Ginga Playground](https://alanlivio.github.io/gingaf/playground/).
 
-The project structure is:
+The `gingaf` project structure is:
 
 - `ginga/` - flutter-based GUI presentation player for Ginga applications. See [ginga/README.md](ginga/README.md).
 - `ncl_doc/` - Dart-based headless execution engine and core NCL logic. See [ncl_doc/README.md](ncl_doc/README.md).

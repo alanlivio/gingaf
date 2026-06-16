@@ -36,11 +36,13 @@ dart ncl_doc/lib/main.dart examples/video.ncl
 For easy, you can use `make run-example-headless`. See below.
 
 ```bash
+cd gingaf/
 make run-example-headless app=video.ncl
 ```
 
 ### Download PUC-Rio Examples
 
 ```bash
+cd gingaf/
 make download-puc-examples
 ```
