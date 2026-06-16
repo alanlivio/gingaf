@@ -1,12 +1,14 @@
 # gingaf
 
-`gingaf` is a multi-platform implementation of the interactive TV standard Ginga done by ITU-T and SBTVD.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+`gingaf` is an MIT-licensed, multi-platform implementation of the interactive TV middleware Ginga standardised by ITU-T and SBTVD.
 
 For a web-based evaluation of gingaf, try [Ginga Playground](https://alanlivio.github.io/gingaf/ginga-playground/).
 
 ## local run
 
-First see environment setup and technical architecture details at [SETUP.md](SETUP.md).
+First see environment setup at [SETUP.md](SETUP.md).
 
 To locally run Ginga-NCL or Ginga-HTML applications with GUI, do at `ginga/`:
 
