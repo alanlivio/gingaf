@@ -14,8 +14,7 @@ import 'lua.dart';
 import 'ssml.dart';
 import 'text.dart';
 
-import 'dart:html' as html;
-
+import '../../web_utils_stub.dart' if (dart.library.html) '../../web_utils_web.dart';
 abstract class MediaWidget extends StatefulWidget {
   final String uri;
   final Media? media;
@@ -130,7 +129,7 @@ abstract class MediaState<T extends MediaWidget> extends State<T> {
   Future<String> loadContent(String path) async {
     if (kIsWeb) {
       try {
-        final mockJson = html.window.sessionStorage['GINGA_PLAYGROUND_FILES'];
+        final mockJson = getSessionStorageItem('GINGA_PLAYGROUND_FILES');
         if (mockJson != null) {
           final mockFiles = jsonDecode(mockJson);
           final fileName = Uri.parse(path).pathSegments.last;

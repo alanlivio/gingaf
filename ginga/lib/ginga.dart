@@ -1,5 +1,6 @@
-import 'dart:html' as html;
 import 'dart:io';
+
+import 'web_utils_stub.dart' if (dart.library.html) 'web_utils_web.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -45,11 +46,7 @@ class GingaConfig {
       if (path == null && kIsWeb) {
         path = Uri.base.queryParameters['APP'];
         if (path == null) {
-          try {
-            path = html.window.sessionStorage['GINGA_PLAYGROUND_MAIN'];
-          } catch (e) {
-            // Ignore error
-          }
+          path = getSessionStorageItem('GINGA_PLAYGROUND_MAIN');
         }
       }
 
