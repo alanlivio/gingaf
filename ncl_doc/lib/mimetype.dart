@@ -18,10 +18,10 @@ final Map<String, List<String>> _extensionMap = {
 };
 
 String getMimeTypeFromExtension(String fileName) {
-  if (fileName.isEmpty) return 'application/octet-stream';
+  if (fileName.isEmpty) return 'application/x-ginga-time';
   final ext = fileName.split('.').last.toLowerCase();
   for (var entry in _extensionMap.entries) {
     if (entry.key == ext) return entry.value.first;
   }
-  return 'application/octet-stream';
+  return 'application/x-ginga-time';
 }

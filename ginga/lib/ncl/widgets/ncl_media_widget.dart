@@ -1,20 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:ncl_doc/ncl_document.dart' hide State;
 
+import '../../web_utils_stub.dart'
+    if (dart.library.html) '../../web_utils_web.dart';
 import 'av.dart';
 import 'image.dart';
 import 'lua.dart';
 import 'ssml.dart';
 import 'text.dart';
 
-import '../../web_utils_stub.dart' if (dart.library.html) '../../web_utils_web.dart';
 abstract class MediaWidget extends StatefulWidget {
   final String uri;
   final Media? media;
@@ -234,6 +235,8 @@ class WidgetFactory {
       case 'image/webp':
       case 'image/bmp':
       case 'image/heic':
+      case 'application/x-ginga-time':
+      case 'application/x-ncl-time':
         return ImageWidget(key: key, uri: uri, media: media);
       default:
         return null;
