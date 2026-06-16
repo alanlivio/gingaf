@@ -11,6 +11,8 @@ import luaCanvasLua from '../../examples/lua_canvas.lua?raw';
 import imageNcl from '../../examples/image.ncl?raw';
 // @ts-ignore
 import imageHtml from '../../examples/image.html?raw';
+// @ts-ignore
+import currentServiceHtml from '../../examples/current_service.html?raw';
 
 self.MonacoEnvironment = {
   getWorker(_workerId: string, _label: string) {
@@ -28,6 +30,7 @@ const examples: Record<string, Example> = {
   lua_canvas: { mainFile: 'lua_canvas.ncl', files: { 'lua_canvas.ncl': luaCanvasNcl, 'lua_canvas.lua': luaCanvasLua } },
   image: { mainFile: 'image.ncl', files: { 'image.ncl': imageNcl } },
   image_html: { mainFile: 'image.html', files: { 'image.html': imageHtml } },
+  current_service: { mainFile: 'current_service.html', files: { 'current_service.html': currentServiceHtml } },
 };
 
 const editorContainer = document.getElementById('editor-container');
