@@ -1,4 +1,4 @@
-.PHONY: all build build-windows build-web test clean run-example run-example-headless run-mainav check-app download-puc-examples
+.PHONY: all build build-windows build-web test clean run-example run-example-headless run-playground run-mainav check-app download-puc-examples
 
 all: build
 
@@ -40,6 +40,22 @@ run-example-headless: check-app
 	@echo Running Headless NCL Example: $(APP_EXAMPLE)
 	@echo ======================================================================
 	@dart ./ncl_doc/lib/main.dart $(APP_EXAMPLE)
+
+run-playground: build-web
+	@echo ======================================================================
+	@echo Starting Ginga Playground
+	@echo ======================================================================
+	cmd /c "mkdir ginga-playground\public\player 2>nul || exit 0"
+	cmd /c "xcopy /e /i /y ginga\build\web ginga-playground\public\player"
+	cd ginga-playground && npm run dev
+
+build-playground: build-web
+	@echo ======================================================================
+	@echo Building Ginga Playground
+	@echo ======================================================================
+	cmd /c "mkdir ginga-playground\public\player 2>nul || exit 0"
+	cmd /c "xcopy /e /i /y ginga\build\web ginga-playground\public\player"
+	cd ginga-playground && npm run build
 
 clean:
 	cd ncl_doc && flutter clean

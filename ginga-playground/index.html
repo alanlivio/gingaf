@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ginga Playground</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <div class="logo">Ginga Playground</div>
+        <div class="controls">
+          <select id="example-select">
+            <option value="video">video.ncl</option>
+            <option value="lua_canvas">lua_canvas.ncl</option>
+            <option value="image">image.ncl</option>
+          </select>
+          <button id="run-btn">Run</button>
+        </div>
+      </header>
+      <main class="split-pane">
+        <div id="editor-wrapper">
+          <div id="editor-tabs"></div>
+          <div id="editor-container"></div>
+        </div>
+        <div id="preview-container">
+          <iframe id="preview-frame" src="about:blank" frameborder="0"></iframe>
+        </div>
+      </main>
+      <footer>
+        Powered by <a href="https://github.com/alanlivio/gingaf" target="_blank" rel="noopener noreferrer">Alan Guedes gingaf</a>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -23,6 +23,11 @@ void main() {
 
   final config = GingaConfig();
   if (config.isEmpty) {
+    if (kIsWeb) {
+      _logger.info('Running in web without APP. Defaulting to empty playground player.');
+      runApp(Ginga(config: GingaConfig(null, false, null)));
+      return;
+    }
     stdout.writeln(USAGE);
     exit(0);
   }

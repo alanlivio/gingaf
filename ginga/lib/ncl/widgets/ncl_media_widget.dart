@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -10,6 +13,8 @@ import 'image.dart';
 import 'lua.dart';
 import 'ssml.dart';
 import 'text.dart';
+
+import 'dart:html' as html;
 
 abstract class MediaWidget extends StatefulWidget {
   final String uri;
@@ -123,6 +128,28 @@ abstract class MediaState<T extends MediaWidget> extends State<T> {
   }
 
   Future<String> loadContent(String path) async {
+    if (kIsWeb) {
+      try {
+        final mockJson = html.window.sessionStorage['GINGA_PLAYGROUND_FILES'];
+        if (mockJson != null) {
+          final mockFiles = jsonDecode(mockJson);
+          final fileName = Uri.parse(path).pathSegments.last;
+          if (mockFiles.containsKey(fileName)) {
+            return mockFiles[fileName];
+          }
+        }
+      } catch (e) {
+        // Ignore JSON errors
+      }
+    }
+
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      final response = await http.get(Uri.parse(path));
+      if (response.statusCode == 200) {
+        return response.body;
+      }
+      throw Exception('Failed to load $path: ${response.statusCode}');
+    }
     if (!kIsWeb) {
       final file = File(path);
       if (file.existsSync()) {

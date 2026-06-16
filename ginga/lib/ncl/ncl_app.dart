@@ -50,18 +50,12 @@ class NCLAppState extends MediaState<NCLApp> {
     }
 
     for (var media in activeMedia) {
-      final mediaId = media.id ?? '';
-
-      if (!_cachedWidgets.containsKey(mediaId)) {
-        changed = true;
+      final id = media.id ?? '';
+      if (!_cachedWidgets.containsKey(id)) {
         final key = GlobalKey<MediaState>();
-        _mediaStateKeys[mediaId] = key;
-
-        final widget = WidgetFactory.createMediaWidget(key: key, media: media);
-
-        if (widget != null) {
-          _cachedWidgets[mediaId] = widget;
-        }
+        _mediaStateKeys[id] = key;
+        _cachedWidgets[id] = WidgetFactory.createMediaWidget(key: key, media: media)!;
+        changed = true;
       }
     }
     return changed;
@@ -82,7 +76,8 @@ class NCLAppState extends MediaState<NCLApp> {
         setState(() {});
       }
 
-      final String nclData = await loadContent(widget.uri);
+      String nclData = await loadContent(widget.uri);
+
       final uri = widget.uri.startsWith('http')
           ? Uri.parse(widget.uri)
           : (kIsWeb ? Uri.parse(widget.uri) : Uri.file(widget.uri));

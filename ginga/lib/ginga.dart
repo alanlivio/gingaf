@@ -1,13 +1,15 @@
+import 'dart:html' as html;
 import 'dart:io';
 
-import 'ccws/ccws.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
-import 'ncl/ncl_app.dart' as ncl;
+
+import 'ccws/ccws.dart';
 import 'html/html_app.dart' as html;
 import 'main_av.dart';
+import 'ncl/ncl_app.dart' as ncl;
 
 final _logger = Logger('ginga');
 
@@ -39,6 +41,18 @@ class GingaConfig {
       path = const String.fromEnvironment('APP').isNotEmpty
           ? const String.fromEnvironment('APP')
           : null;
+
+      if (path == null && kIsWeb) {
+        path = Uri.base.queryParameters['APP'];
+        if (path == null) {
+          try {
+            path = html.window.sessionStorage['GINGA_PLAYGROUND_MAIN'];
+          } catch (e) {
+            // Ignore error
+          }
+        }
+      }
+
       if (path == null && !kIsWeb) {
         path = Platform.environment['APP'];
       }
