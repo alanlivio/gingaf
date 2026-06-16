@@ -1,18 +1,22 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
+import 'package:gingaf/ccws/ccws.dart';
 import 'package:gingaf/ncl/widgets/ncl_media_widget.dart';
+import 'package:logging/logging.dart';
 import 'package:webview_all/webview_all.dart';
 
 final _logger = Logger('ginga-html');
 
 class HTMLApp extends MediaWidget {
   final Map<String, void Function(JavaScriptMessage)>? javaScriptChannels;
+  final CCWS? ccws;
 
   const HTMLApp(
-      {super.key, required super.uri, super.media, this.javaScriptChannels});
+      {super.key,
+      required super.uri,
+      super.media,
+      this.javaScriptChannels,
+      this.ccws});
 
   @override
   State<HTMLApp> createState() => HTMLAppState();
@@ -30,9 +34,11 @@ class HTMLAppState extends MediaState<HTMLApp> {
     _controller = WebViewController()
       ..setBackgroundColor(const Color(0x00000000));
 
-    widget.javaScriptChannels?.forEach((name, callback) {
-      _controller.addJavaScriptChannel(name, onMessageReceived: callback);
-    });
+    if (!kIsWeb) {
+      widget.javaScriptChannels?.forEach((name, callback) {
+        _controller.addJavaScriptChannel(name, onMessageReceived: callback);
+      });
+    }
   }
 
   @override
@@ -44,10 +50,14 @@ class HTMLAppState extends MediaState<HTMLApp> {
     }
   }
 
-
   Future<void> _loadHTML() async {
     try {
-      final String content = await loadContent(widget.uri);
+      String content = await loadContent(widget.uri);
+
+      if (widget.ccws != null) {
+        content = widget.ccws!.injectCcwsFetch(content);
+      }
+
       await _controller.loadHtmlString(content);
       if (mounted) {
         setState(() => _initialized = true);

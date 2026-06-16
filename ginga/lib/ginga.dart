@@ -115,6 +115,7 @@ class _GingaState extends State<Ginga> {
       if (path.toLowerCase().endsWith('.html')) {
         htmlApp = html.HTMLApp(
           uri: path,
+          ccws: _ccws,
         );
       } else {
         nclApp = ncl.NCLApp(
