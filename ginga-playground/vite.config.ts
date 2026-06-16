@@ -16,6 +16,7 @@ export default defineConfig({
               else if (ext === '.png') res.setHeader('Content-Type', 'image/png');
               else if (ext === '.jpg') res.setHeader('Content-Type', 'image/jpeg');
               else if (ext === '.ncl') res.setHeader('Content-Type', 'application/xml');
+              else if (ext === '.html') res.setHeader('Content-Type', 'text/html');
               
               res.setHeader('Access-Control-Allow-Origin', '*');
               fs.createReadStream(filePath).pipe(res);

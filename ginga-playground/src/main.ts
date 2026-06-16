@@ -9,6 +9,8 @@ import luaCanvasNcl from '../../examples/lua_canvas.ncl?raw';
 import luaCanvasLua from '../../examples/lua_canvas.lua?raw';
 // @ts-ignore
 import imageNcl from '../../examples/image.ncl?raw';
+// @ts-ignore
+import imageHtml from '../../examples/image.html?raw';
 
 self.MonacoEnvironment = {
   getWorker(_workerId: string, _label: string) {
@@ -25,6 +27,7 @@ const examples: Record<string, Example> = {
   video: { mainFile: 'video.ncl', files: { 'video.ncl': videoNcl } },
   lua_canvas: { mainFile: 'lua_canvas.ncl', files: { 'lua_canvas.ncl': luaCanvasNcl, 'lua_canvas.lua': luaCanvasLua } },
   image: { mainFile: 'image.ncl', files: { 'image.ncl': imageNcl } },
+  image_html: { mainFile: 'image.html', files: { 'image.html': imageHtml } },
 };
 
 const editorContainer = document.getElementById('editor-container');
@@ -58,7 +61,7 @@ if (editorContainer && editorTabs && runBtn && selectEl && iframe) {
           currentExample.files[currentFileName] = editor.getValue();
           currentFileName = fileName;
           editor.setValue(currentExample.files[currentFileName]);
-          monaco.editor.setModelLanguage(editor.getModel()!, fileName.endsWith('.lua') ? 'lua' : 'xml');
+          monaco.editor.setModelLanguage(editor.getModel()!, fileName.endsWith('.lua') ? 'lua' : (fileName.endsWith('.html') ? 'html' : 'xml'));
           renderTabs();
         }
       });
@@ -77,7 +80,7 @@ if (editorContainer && editorTabs && runBtn && selectEl && iframe) {
       currentExample = examples[selected];
       currentFileName = currentExample.mainFile;
       editor.setValue(currentExample.files[currentFileName]);
-      monaco.editor.setModelLanguage(editor.getModel()!, currentFileName.endsWith('.lua') ? 'lua' : 'xml');
+      monaco.editor.setModelLanguage(editor.getModel()!, currentFileName.endsWith('.lua') ? 'lua' : (currentFileName.endsWith('.html') ? 'html' : 'xml'));
       renderTabs();
     }
   });
@@ -102,6 +105,12 @@ if (editorContainer && editorTabs && runBtn && selectEl && iframe) {
       runBtn.textContent = 'Stop';
       iframe.src = 'player/index.html';
       isRunning = true;
+    }
+  });
+
+  window.addEventListener('message', (event) => {
+    if (event.data === 'ginga_app_exited' && isRunning) {
+      runBtn.click();
     }
   });
 }
