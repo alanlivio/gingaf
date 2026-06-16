@@ -8,7 +8,7 @@
     <pre id="result">No data fetched yet.</pre>
     <script>
         async function fetchService() {
-            const startPort = 44642;
+            const startPort = 44642; // default port of Ginga CC WebServices from NBR15606-11
             const maxRetry = 20;
             const resultDiv = document.getElementById('result');
             const statusDiv = document.getElementById('status');
@@ -42,7 +42,7 @@
             }
 
             resultDiv.textContent = "Error: Service not found in the probed range.";
-            statusDiv.textContent = "Failed to resolve DTV service.";
+            statusDiv.textContent = "Failed to resolve Ginga CC WebServices.";
             statusDiv.style.color = "red";
         }
         fetchService();

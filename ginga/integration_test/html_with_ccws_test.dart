@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:gingaf/ccws/ccws.dart';
-import 'package:gingaf/ccws/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gingaf/ccws/ccws.dart';
+import 'package:gingaf/ccws/router.dart';
 import 'package:gingaf/html/html_app.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -24,7 +24,7 @@ class MockCCWSAssetBundle extends CachingAssetBundle {
     <div id="status">Connecting...</div>
     <script>
         async function fetchService() {
-            const startPort = 44642;
+            const startPort = 44642; // default port of Ginga CC WebServices from NBR15606-11
             const maxRetry = 20;
             for (let port = startPort; port < startPort + maxRetry; port++) {
                 try {
