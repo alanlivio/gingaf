@@ -45,17 +45,17 @@ run-playground: build-web
 	@echo ======================================================================
 	@echo Starting Ginga Playground
 	@echo ======================================================================
-	cmd /c "mkdir ginga-playground\public\player 2>nul || exit 0"
-	cmd /c "xcopy /e /i /y ginga\build\web ginga-playground\public\player"
-	cd ginga-playground && npm run dev
+	cmd /c "mkdir playground\public\player 2>nul || exit 0"
+	cmd /c "xcopy /e /i /y ginga\build\web playground\public\player"
+	cd playground && npm run dev
 
 build-playground: build-web
 	@echo ======================================================================
 	@echo Building Ginga Playground
 	@echo ======================================================================
-	cmd /c "mkdir ginga-playground\public\player 2>nul || exit 0"
-	cmd /c "xcopy /e /i /y ginga\build\web ginga-playground\public\player"
-	cd ginga-playground && npm run build
+	cmd /c "mkdir playground\public\player 2>nul || exit 0"
+	cmd /c "xcopy /e /i /y ginga\build\web playground\public\player"
+	cd playground && npm run build
 
 clean:
 	cd ncl_doc && flutter clean
