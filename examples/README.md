@@ -9,7 +9,7 @@ You may run app with UI as below.
 > **Note:** It is required to create a `ginga/examples` link to `examples` to allow Flutter to find it. You can do this by running `make ginga/examples`.
 
 ```bash
-cd ginga
+cd gingaf/ginga
 flutter run -d windows --dart-define="APP=examples/video.ncl"
 flutter run -d windows --dart-define="APP=examples/video.html"
 flutter run -d chrome --dart-define="APP=examples/video.ncl"
@@ -19,6 +19,7 @@ flutter run -d chrome --dart-define="APP=examples/video.html"
 For easy, you can use `make run-example app=NAME` for current platform, where NAME is a file at `examples`. See below.
 
 ```bash
+cd gingaf/
 make run-example app=video.ncl
 make run-example app=video.html
 ```
@@ -28,6 +29,7 @@ make run-example app=video.html
 To run headless NCL simulation:
 
 ```bash
+cd gingaf/
 dart ncl_doc/lib/main.dart examples/video.ncl
 ```
 
