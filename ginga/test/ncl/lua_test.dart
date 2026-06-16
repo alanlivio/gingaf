@@ -28,7 +28,7 @@ void main() {
 <ncl>
   <body>
     <port id="init" component="lua_media"/>
-    <media id="lua_media" src="test.lua" type="application/x-ginga-NCLua"/>
+    <media id="lua_media" src="test.lua"/>
   </body>
 </ncl>
 ''',

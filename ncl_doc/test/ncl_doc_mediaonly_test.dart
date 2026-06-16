@@ -130,7 +130,7 @@ void main() {
 <ncl>
   <body>
     <port id="p1" component="m1"/>
-    <media id="m1" src="script.lua" type="application/x-ginga-NCLua"/>
+    <media id="m1" src="script.lua"/>
   </body>
 </ncl>
 ''';

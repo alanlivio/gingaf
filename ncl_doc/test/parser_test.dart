@@ -1,5 +1,5 @@
-import 'package:ncl_doc/parser.dart';
 import 'package:ncl_doc/elements.dart';
+import 'package:ncl_doc/parser.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -146,7 +146,7 @@ void main() {
   <body>
     <port id="init1" component="lua_media"/>
     <port id="init2" component="html_media"/>
-    <media id="lua_media" src="main.lua" type="application/x-ginga-NCLua"/>
+    <media id="lua_media" src="main.lua"/>
     <media id="html_media" src="index.html" type="text/html"/>
   </body>
 </ncl>
