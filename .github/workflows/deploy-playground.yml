@@ -40,7 +40,7 @@ jobs:
 
       - name: Build Flutter Web
         working-directory: ./ginga
-        run: flutter build web
+        run: flutter build web --base-href /gingaf/playground/player/
 
       - name: Install playground dependencies
         working-directory: ./playground

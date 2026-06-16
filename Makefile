@@ -41,15 +41,17 @@ run-example-headless: check-app
 	@echo ======================================================================
 	@dart ./ncl_doc/lib/main.dart $(APP_EXAMPLE)
 
-run-playground: build-web
+run-playground:
+	cd ginga && flutter build web --base-href /gingaf/playground/player/
+	cmd /c "mkdir playground\public\player 2>nul || exit 0"
+	cmd /c "xcopy /e /i /y ginga\build\web playground\public\player"
 	@echo ======================================================================
 	@echo Starting Ginga Playground
 	@echo ======================================================================
-	cmd /c "mkdir playground\public\player 2>nul || exit 0"
-	cmd /c "xcopy /e /i /y ginga\build\web playground\public\player"
 	cd playground && npm run dev
 
-build-playground: build-web
+build-playground:
+	cd ginga && flutter build web --base-href /gingaf/playground/player/
 	@echo ======================================================================
 	@echo Building Ginga Playground
 	@echo ======================================================================
