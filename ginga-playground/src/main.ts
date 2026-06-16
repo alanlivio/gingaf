@@ -86,6 +86,7 @@ if (editorContainer && editorTabs && runBtn && selectEl && iframe) {
   runBtn.addEventListener('click', async () => {
     if (isRunning) {
       editor.updateOptions({ readOnly: false });
+      document.getElementById('editor-overlay')?.classList.add('hidden');
       runBtn.textContent = 'Run';
       iframe.src = 'about:blank';
       isRunning = false;
@@ -96,6 +97,7 @@ if (editorContainer && editorTabs && runBtn && selectEl && iframe) {
       sessionStorage.setItem('GINGA_PLAYGROUND_MAIN', currentExample.mainFile);
       
       editor.updateOptions({ readOnly: true });
+      document.getElementById('editor-overlay')?.classList.remove('hidden');
       runBtn.textContent = 'Stop';
       iframe.src = 'player/index.html';
       isRunning = true;

@@ -77,6 +77,36 @@ header {
   flex-direction: column;
   width: 50%;
   height: 100%;
+  position: relative;
+}
+
+#editor-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(30, 30, 30, 0.2);
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 20px;
+  backdrop-filter: grayscale(50%);
+}
+
+#editor-overlay span {
+  background-color: #252526;
+  color: #ccc;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: 1px solid #444;
+}
+
+#editor-overlay.hidden {
+  display: none;
 }
 
 #editor-tabs {
