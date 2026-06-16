@@ -97,7 +97,7 @@ if (editorContainer && editorTabs && runBtn && selectEl && iframe) {
       
       editor.updateOptions({ readOnly: true });
       runBtn.textContent = 'Stop';
-      iframe.src = '/player/index.html';
+      iframe.src = 'player/index.html';
       isRunning = true;
     }
   });
