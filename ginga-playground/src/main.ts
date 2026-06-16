@@ -44,6 +44,7 @@ if (editorContainer && editorTabs && runBtn && selectEl && iframe) {
     theme: 'vs-dark',
     minimap: { enabled: false },
     automaticLayout: true,
+    wordWrap: 'on',
   });
 
   const renderTabs = () => {
