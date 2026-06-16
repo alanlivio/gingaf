@@ -7,3 +7,11 @@ String? getSessionStorageItem(String key) {
     return null;
   }
 }
+
+void notifyParentAppExited() {
+  try {
+    html.window.parent?.postMessage('ginga_app_exited', '*');
+  } catch (e) {
+    // ignore
+  }
+}

@@ -154,6 +154,8 @@ class _GingaState extends State<Ginga> {
     _stopServices();
     if (!kIsWeb) {
       Future.delayed(const Duration(milliseconds: 200), () => exit(0));
+    } else {
+      notifyParentAppExited();
     }
   }
 

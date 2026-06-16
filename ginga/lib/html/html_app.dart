@@ -44,25 +44,10 @@ class HTMLAppState extends MediaState<HTMLApp> {
     }
   }
 
-  Future<String> _loadContent(String path) async {
-    if (!kIsWeb) {
-      final file = File(path);
-      if (file.existsSync()) {
-        return await file.readAsString();
-      }
-      final fileName =
-          path.contains('/') ? path.substring(path.lastIndexOf('/') + 1) : path;
-      final localFile = File(fileName);
-      if (localFile.existsSync()) {
-        return await localFile.readAsString();
-      }
-    }
-    return await DefaultAssetBundle.of(context).loadString(path);
-  }
 
   Future<void> _loadHTML() async {
     try {
-      final String content = await _loadContent(widget.uri);
+      final String content = await loadContent(widget.uri);
       await _controller.loadHtmlString(content);
       if (mounted) {
         setState(() => _initialized = true);
