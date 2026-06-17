@@ -4,9 +4,9 @@ A web-based interactive playground for the [gingaf](https://github.com/alanlivio
 
 ## Development
 
-Run the playground locally using the root Makefile:
+Run the playground locally using the playground Makefile:
 
 ```bash
-cd gingaf
-make run-playground
+cd gingaf/playground
+make run
 ```

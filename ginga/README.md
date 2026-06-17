@@ -82,9 +82,26 @@ Execute the test suite for core logic and integration:
 flutter test
 ```
 
-## Folder Structure
+## Run Ginga-NCL or Ginga-HTML applications with UI
 
-- `ginga/` - The Flutter GUI presentation player for Ginga applications.
-- `ncl_doc/` - The headless Dart execution engine and core NCL logic.
-- `playground/` - Web-based interactive playground for evaluating gingaf.
-- `examples/` - Collection of sample NCL and HTML documents for testing.
+All example NCL and HTML documents are stored in the `examples/` folder at the root of the workspace.
+
+You may run app with UI as below.
+
+> **Note:** It is required to create a `ginga/examples` link to `examples` to allow Flutter to find it. You can do this by running `make examples`.
+
+```bash
+cd gingaf/ginga
+flutter run -d windows --dart-define="APP=examples/video.ncl"
+flutter run -d windows --dart-define="APP=examples/video.html"
+flutter run -d chrome --dart-define="APP=examples/video.ncl"
+flutter run -d chrome --dart-define="APP=examples/video.html"
+```
+
+For easy, you can use `make run app=NAME` for current platform, where NAME is a file at `examples`. See below.
+
+```bash
+cd gingaf/ginga
+make run-example app=video.ncl
+make run-example app=video.html
+```
