@@ -6,24 +6,6 @@
 
 For a web-based evaluation of `gingaf`, see [a github-hosted Ginga Playground](https://alanlivio.github.io/gingaf/playground/).
 
-## Demonstration Videos
-
-### Android
-
-<video src="https://github.com/alanlivio/gingaf/releases/download/assets/android.mp4" controls width="100%"></video>
-
-### Chrome
-
-<video src="https://github.com/alanlivio/gingaf/releases/download/assets/chrome.mp4" controls width="100%"></video>
-
-### Windows
-
-<video src="https://github.com/alanlivio/gingaf/releases/download/assets/windows.mp4" controls width="100%"></video>
-
-### NCL headless
-
-<video src="https://github.com/alanlivio/gingaf/releases/download/assets/cli.mp4" controls width="100%"></video>
-
 The `gingaf` project structure is:
 
 - `ginga/` - flutter-based GUI presentation player for Ginga applications. See [ginga/README.md](ginga/README.md).
@@ -33,13 +15,48 @@ The `gingaf` project structure is:
 
 ## local run
 
-First see environment setup at [ginga/README.md](ginga/README.md).
+First see environment setup at [gingaf/README.md](gingaf/README.md).
 
-To locally run Ginga-NCL or Ginga-HTML applications with GUI, do at `ginga/`:
+To run gingaf, do
 
 ```bash
 cd gingaf/ginga
-flutter run -d <chrome,windows> --dart-define="APP=<path_to_file>"
-# for easy you can use make
 make run-example app=video.ncl
 ```
+
+To run playground, do
+
+```bash
+cd gingaf/ginga
+make run
+```
+
+## Demonstration Videos
+
+### Windows
+
+https://github.com/user-attachments/assets/07c9fb0f-a9f1-406b-b650-fa4eee331af0
+
+### Android
+
+https://github.com/user-attachments/assets/5bbecb80-04c7-4574-88d5-e979d1c11e22
+
+### Chrome
+
+https://github.com/user-attachments/assets/b04eabac-4636-453c-beec-7ec845d841a4
+
+### NCL headless
+
+https://github.com/user-attachments/assets/576cba53-04b7-4b55-b4a5-97d1b78f4a79
+
+### Playground Ginga-NCL (video.ncl)
+
+https://github.com/user-attachments/assets/3f4aa3f4-5950-4b6e-8a32-50021e8b014f
+
+### Playground  Ginga-HTML5 (current_service.html)
+
+https://github.com/user-attachments/assets/b06bf145-4cc2-4431-9f00-98b218cfedde
+
+### Playground  Ginga-NCL with Lua (lua.ncl)
+
+https://github.com/user-attachments/assets/c6fd4ce3-66a5-4888-8b49-50dde510c2d8
