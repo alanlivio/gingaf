@@ -51,12 +51,12 @@ https://github.com/user-attachments/assets/576cba53-04b7-4b55-b4a5-97d1b78f4a79
 
 ### Playground Ginga-NCL (video.ncl)
 
-https://github.com/user-attachments/assets/3f4aa3f4-5950-4b6e-8a32-50021e8b014f
+https://github.com/user-attachments/assets/c6fd4ce3-66a5-4888-8b49-50dde510c2d8
 
 ### Playground  Ginga-HTML5 (current_service.html)
 
-https://github.com/user-attachments/assets/b06bf145-4cc2-4431-9f00-98b218cfedde
+https://github.com/user-attachments/assets/3f4aa3f4-5950-4b6e-8a32-50021e8b014f
 
 ### Playground  Ginga-NCL with Lua (lua.ncl)
 
-https://github.com/user-attachments/assets/c6fd4ce3-66a5-4888-8b49-50dde510c2d8
+https://github.com/user-attachments/assets/b06bf145-4cc2-4431-9f00-98b218cfedde
