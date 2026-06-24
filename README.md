@@ -6,6 +6,24 @@
 
 For a web-based evaluation of `gingaf`, see [a  github-hosted Ginga Playground](https://alanlivio.github.io/gingaf/playground/).
 
+## Demonstration Videos
+
+### Android
+
+<video src="https://github.com/alanlivio/paper-gingaf-acmmmos/raw/main/web/assets/android.mp4" controls width="100%"></video>
+
+### Chrome
+
+<video src="https://github.com/alanlivio/paper-gingaf-acmmmos/raw/main/web/assets/chrome.mp4" controls width="100%"></video>
+
+### Windows
+
+<video src="https://github.com/alanlivio/paper-gingaf-acmmmos/raw/main/web/assets/windows.mp4" controls width="100%"></video>
+
+### NCL headless
+
+<video src="https://github.com/alanlivio/paper-gingaf-acmmmos/raw/main/web/assets/cli.mp4" controls width="100%"></video>
+
 The `gingaf` project structure is:
 
 - `ginga/` - flutter-based GUI presentation player for Ginga applications. See [ginga/README.md](ginga/README.md).
