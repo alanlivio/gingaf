@@ -4,7 +4,25 @@
 
 `gingaf` is an MIT-licensed, multi-platform implementation of the interactive TV middleware Ginga standardised by ITU-T and SBTVD.
 
-For a web-based evaluation of `gingaf`, see [a  github-hosted Ginga Playground](https://alanlivio.github.io/gingaf/playground/).
+For a web-based evaluation of `gingaf`, see [a github-hosted Ginga Playground](https://alanlivio.github.io/gingaf/playground/).
+
+## Demonstration Videos
+
+### Android
+
+<video src="https://github.com/alanlivio/gingaf/releases/download/assets/android.mp4" controls width="100%"></video>
+
+### Chrome
+
+<video src="https://github.com/alanlivio/gingaf/releases/download/assets/chrome.mp4" controls width="100%"></video>
+
+### Windows
+
+<video src="https://github.com/alanlivio/gingaf/releases/download/assets/windows.mp4" controls width="100%"></video>
+
+### NCL headless
+
+<video src="https://github.com/alanlivio/gingaf/releases/download/assets/cli.mp4" controls width="100%"></video>
 
 The `gingaf` project structure is:
 
